@@ -8,21 +8,29 @@ class ArrayList
         $this->classe = $classe;
     }
 
-    public function append($obj) {
-        if($obj instanceof $this->classe) {
-            $this->list[] = $obj;
-        }
+	/**
+	 * @param array $objs
+	 */
+	public function append(...$objs) {
+		foreach ($objs as $obj) {
+			if($obj instanceof $this->classe) {
+				$this->list[] = $obj;
+			}
+    	}
     }
 
-    /**
-     * @param $key
-     * @throws Exception
-     */
-    public function delete($key) {
-        if(isset($this->list[$key])) {
-            unset($this->list[$key]);
-        }
-        else throw new Exception('key '.$key.' out of range');
+	/**
+	 * @param array $keys
+	 * @throws Exception
+	 */
+    public function delete(...$keys) {
+		foreach ($keys as $key) {
+			if(isset($this->list[$key])) {
+				unset($this->list[$key]);
+			}
+			else throw new Exception('key '.$key.' out of range');
+    	}
+
     }
 
     public function update($key, $new_obj) {

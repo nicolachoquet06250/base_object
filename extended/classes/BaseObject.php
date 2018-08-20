@@ -6,7 +6,7 @@
  * @method test get_service_test()
  * @method test set_service_test()
  */
-class BaseObject {
+class BaseObject extends stdClass {
 	protected $gettable_and_settable_classes, $services;
 
 	public function __construct() {
@@ -32,7 +32,7 @@ class BaseObject {
 		return $o->$name($arguments);
 	}
 
-	protected function get_service(string $name, $arguments) {
+	protected function get_service(string $name, ...$arguments) {
 		if(isset($this->services[$name])) {
 			require_once $this->services[$name]->path;
 			$class = $this->services[$name]->class;
@@ -40,7 +40,7 @@ class BaseObject {
 		}
 		return null;
 	}
-	protected function set_service(string $name, $arguments) {
+	protected function set_service(string $name, ...$arguments) {
 		return $this->get_service($name, $arguments);
 	}
 	protected function gettable_and_settable_classes(array $gettable_and_settable_classes = null) {

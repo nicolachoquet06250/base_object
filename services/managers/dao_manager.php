@@ -29,17 +29,20 @@ class dao_manager extends dao implements service
         return new dao_manager();
     }
 
-    /**
-     * @param $dao
-     * @return dao|null
-     * @throws Exception
-     */
-    public function create_dao($dao) {
-        if($dao = $this->get_array('daos', $dao.'_dao')) {
-            require_once 'dao/'.$dao.'.php';
-            return new $dao();
-        }
-        return null;
+	/**
+	 * @param array $daos
+	 * @return dao[]|null
+	 * @throws Exception
+	 */
+    public function create_dao(...$daos) {
+    	$dao_array = [];
+		foreach ($daos as $dao) {
+			if($dao = $this->get_array('daos', $dao.'_dao')) {
+				require_once 'dao/'.$dao.'.php';
+				$dao_array[] = new $dao();
+			}
+    	}
+    	return empty($dao_array) ? null : (count($dao_array) === 1 ? $dao_array[0] : $dao_array);
     }
 
     /**
