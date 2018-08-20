@@ -1,0 +1,6 @@
+{
+  "test": {
+     "path": "services/test.php",
+     "class": "test"
+   }
+}

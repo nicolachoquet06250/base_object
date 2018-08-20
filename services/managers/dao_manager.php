@@ -1,0 +1,109 @@
+<?php
+
+class dao_manager extends dao implements service
+{
+    use manager;
+
+    private $daos = [];
+
+    /**
+     * dao_manager constructor.
+     * @throws Exception
+     */
+    public function __construct() {
+    	parent::__construct();
+        $daos = opendir('./dao');
+        while (($dao = readdir($daos)) !== false) {
+            if($dao !== '.' && $dao !== '..') {
+                $dao_class = str_replace('.php', '', $dao);
+                $this->set_array('daos', $dao_class, $dao_class);
+            }
+        }
+    }
+
+    /**
+     * @return dao_manager|mixed
+     * @throws Exception
+     */
+    public static function create() {
+        return new dao_manager();
+    }
+
+    /**
+     * @param $dao
+     * @return dao|null
+     * @throws Exception
+     */
+    public function create_dao($dao) {
+        if($dao = $this->get_array('daos', $dao.'_dao')) {
+            require_once 'dao/'.$dao.'.php';
+            return new $dao();
+        }
+        return null;
+    }
+
+    /**
+     * @param $dao
+     * @param $champ
+     * @param $value
+     * @return dao
+     * @throws Exception
+     */
+    public function get_dao_from($dao, $champ, $value) {
+        $dao_table = $dao;
+        if($dao = $this->get_array('daos', $dao.'_dao')) {
+            $data_test_method = 'get_test_datas_for_'.$dao_table;
+            $data_test = data_test::$data_test_method();
+            require_once 'dao/'.$dao.'.php';
+            $array = new ArrayList($dao);
+            foreach ($data_test as $data) {
+                /**
+                 * @var dao $dao_obj
+                 */
+                $dao_obj = new $dao();
+                foreach ($dao_obj->get_fields() as $field) {
+                    $dao_obj->set($field, $data[$field]);
+                }
+                $array->append($dao_obj);
+            }
+
+            /**
+             * @var user_dao $user
+             */
+            foreach ($array->get() as $user) {
+                if($user->get($champ) === $value) {
+                    return $user;
+                }
+            }
+            throw new Exception('User not contains field '.$champ.' equal to '.$value);
+        }
+        return null;
+    }
+
+	/**
+	 * @param $dao
+	 * @return ArrayList(dao)|null
+	 * @throws Exception
+	 */
+	public function get_dao_list($dao) {
+		$dao_table = $dao;
+		if($dao = $this->get_array('daos', $dao.'_dao')) {
+			$data_test_method = 'get_test_datas_for_'.$dao_table;
+			$data_test = data_test::$data_test_method();
+			require_once 'dao/'.$dao.'.php';
+			$array = new ArrayList($dao);
+			foreach ($data_test as $data) {
+				/**
+				 * @var dao $dao_obj
+				 */
+				$dao_obj = new $dao();
+				foreach ($dao_obj->get_fields() as $field) {
+					$dao_obj->set($field, $data[$field]);
+				}
+				$array->append($dao_obj);
+			}
+			return $array;
+		}
+		return null;
+	}
+}
