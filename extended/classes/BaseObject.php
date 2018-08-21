@@ -1,12 +1,17 @@
 <?php
 
+namespace project\extended\classes;
+use project\services\test;
+use project\utils\ArrayList;
+use project\utils\json;
+
 /**
  * Class BaseObject
  *
  * @method test get_service_test()
  * @method test set_service_test()
  */
-class BaseObject extends stdClass {
+class BaseObject extends \stdClass {
 	/**
 	 * @var ArrayList $array
 	 */
@@ -61,7 +66,7 @@ class BaseObject extends stdClass {
 	protected function get_service(string $name, ...$arguments) {
 		if(isset($this->services[$name])) {
 			require_once $this->services[$name]->path;
-			$class = $this->services[$name]->class;
+			$class = (strstr('_manager', $this->services[$name]->class) ? '\project\services\\' : '\project\services\managers\\').$this->services[$name]->class;
 			return new $class($arguments);
 		}
 		return null;
@@ -84,7 +89,7 @@ class BaseObject extends stdClass {
 	protected function get_util(string $name, ...$arguments) {
 		if(isset($this->utils[$name])) {
 			require_once $this->utils[$name]->path;
-			$class = $this->utils[$name]->class;
+			$class = '\project\utils\\'.$this->utils[$name]->class;
 			return new $class($arguments);
 		}
 		return null;

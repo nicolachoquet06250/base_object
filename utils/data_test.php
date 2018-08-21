@@ -1,5 +1,7 @@
 <?php
 
+namespace project\utils;
+
 class data_test {
     public function __construct() {}
 

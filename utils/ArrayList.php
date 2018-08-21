@@ -1,5 +1,7 @@
 <?php
 
+namespace project\utils;
+
 class ArrayList {
     protected $classe;
     protected $list = [];

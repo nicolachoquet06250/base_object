@@ -1,8 +1,12 @@
 <?php
 
+use project\dao\user_dao;
+use project\services\managers\dao_manager;
+use project\utils\Project;
+
 require_once 'autoload.php';
 
-Project::main(function () {
+Project::main(function ($args) {
 	$prenom = dao_manager::create()->get_dao_from('user', 'prenom', 'Yann')->get_field('prenom');
 	$src = dao_manager::create()->get_dao_from('slider', 'name', 'Slider 1')->get_field('src');
 

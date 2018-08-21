@@ -1,5 +1,7 @@
 <?php
 
+namespace project\utils;
+
 class json {
 	private $json;
 	private $is_string;

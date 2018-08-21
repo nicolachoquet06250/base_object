@@ -1,5 +1,8 @@
 <?php
 
+namespace project\classes;
+use project\extended\classes\BaseObject;
+
 class test_afficher_body extends BaseObject {
 	/**
 	 * @return string

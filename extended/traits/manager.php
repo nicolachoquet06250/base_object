@@ -1,5 +1,8 @@
 <?php
 
+namespace project\extended\traits;
+use Exception;
+
 trait manager {
     /**
      * @param $file
@@ -42,6 +45,7 @@ trait manager {
      */
     protected function get_array($champ, $key) {
         $array = $this->get($champ);
+        $key = str_replace('\project\dao\\', '', $key);
         if(isset($array[$key]) || empty($array[$key])) {
             return $array[$key];
         }

@@ -1,5 +1,8 @@
 <?php
 
+namespace project\dao;
+use project\extended\classes\dao;
+
 class slider_dao extends dao {
 	protected $id;
 	protected $name;

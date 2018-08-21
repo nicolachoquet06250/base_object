@@ -1,5 +1,13 @@
 <?php
 
+namespace project\services\managers;
+
+use Exception;
+use project\dao\user_dao;
+use project\extended\classes\dao;
+use project\extended\traits\manager;
+use project\utils\ArrayList;
+
 class dao_manager extends dao {
     use manager;
 
@@ -36,8 +44,9 @@ class dao_manager extends dao {
     public function create_dao(...$daos) {
     	$dao_array = [];
 		foreach ($daos as $dao) {
-			if($dao = $this->get_array('daos', $dao.'_dao')) {
-				require_once 'dao/'.$dao.'.php';
+			$dao_table = $dao;
+			if($dao = '\project\dao\\'.$this->get_array('daos', $dao.'_dao')) {
+				require_once 'dao/'.$dao_table.'_dao.php';
 				$dao_array[] = new $dao();
 			}
     	}
@@ -52,11 +61,11 @@ class dao_manager extends dao {
      * @throws Exception
      */
     public function get_dao_from($dao, $champ, $value) {
-        $dao_table = $dao;
-        if($dao = $this->get_array('daos', $dao.'_dao')) {
+		$dao_table = $dao;
+        if($dao = '\project\dao\\'.$this->get_array('daos', $dao.'_dao')) {
             $data_test_method = 'get_test_datas_for_'.$dao_table;
             $data_test = $this->get_util('data_test')->$data_test_method();
-            require_once 'dao/'.$dao.'.php';
+            require_once 'dao/'.$dao_table.'_dao.php';
 			/**
 			 * @var ArrayList $array
 			 */
@@ -92,10 +101,10 @@ class dao_manager extends dao {
 	 */
 	public function get_dao_list($dao) {
 		$dao_table = $dao;
-		if($dao = $this->get_array('daos', $dao.'_dao')) {
+		if($dao = '\project\dao\\'.$this->get_array('daos', $dao.'_dao')) {
 			$data_test_method = 'get_test_datas_for_'.$dao_table;
 			$data_test = $this->get_util('data_test')->$data_test_method();
-			require_once 'dao/'.$dao.'.php';
+			require_once 'dao/'.$dao_table.'_dao.php';
 			/**
 			 * @var ArrayList $array
 			 */

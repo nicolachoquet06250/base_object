@@ -1,5 +1,9 @@
 <?php
 
+namespace project\extended\classes;
+use Exception;
+use project\extended\traits\manager;
+
 class dao extends BaseObject {
     use manager;
 
@@ -8,7 +12,7 @@ class dao extends BaseObject {
 	 */
     public function get_fields() {
     	$fields = array_keys(get_class_vars(get_class($this)));
-    	$base_object_fields = array_keys(get_class_vars('BaseObject'));
+    	$base_object_fields = array_keys(get_class_vars('\project\extended\classes\BaseObject'));
 		foreach ($fields as $key => $field) {
 			if(in_array($field, $base_object_fields)) {
 				unset($fields[$key]);
@@ -24,7 +28,7 @@ class dao extends BaseObject {
 	 * @throws Exception
 	 */
 	public function set_field(string $champ, $valeur) {
-		if(!in_array($champ, array_keys(get_class_vars('BaseObject')))) {
+		if(!in_array($champ, array_keys(get_class_vars('\project\extended\classes\BaseObject')))) {
 			return $this->set($champ, $valeur);
 		}
 		throw new Exception('Field '.$champ.' not found');
@@ -45,7 +49,6 @@ class dao extends BaseObject {
 	 * @throws Exception
 	 */
 	public function create_new(...$fields) {
-    	$class = __CLASS__;
 		foreach ($this->get_fields() as $i => $field) {
 			$this->set_field($field, $fields[$i]);
     	}

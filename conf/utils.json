@@ -6,5 +6,9 @@
   "data_test": {
     "path": "utils/data_test.php",
     "class": "data_test"
+  },
+  "data_link": {
+    "path": "utils/data_link.php",
+    "class": "data_link"
   }
 }

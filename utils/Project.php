@@ -1,6 +1,11 @@
 <?php
 
+namespace project\utils;
+
+use Exception;
+
 class Project {
+
 	/**
 	 * @param callable $callback
 	 * @param callable|null $catch
