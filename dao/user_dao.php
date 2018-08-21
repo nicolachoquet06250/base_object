@@ -1,7 +1,6 @@
 <?php
 
-class user_dao extends dao
-{
+class user_dao extends dao {
     protected $id;
     protected $nom;
     protected $prenom;

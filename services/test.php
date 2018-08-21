@@ -1,6 +1,6 @@
 <?php
 
-class test extends BaseObject implements service {
+class test extends BaseObject {
 	public function hello_world() {
 		var_dump('Hello World');
 	}

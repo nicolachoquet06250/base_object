@@ -1,7 +1,6 @@
 <?php
 
-class dao_manager extends dao implements service
-{
+class dao_manager extends dao {
     use manager;
 
     private $daos = [];
@@ -22,7 +21,7 @@ class dao_manager extends dao implements service
     }
 
     /**
-     * @return dao_manager|mixed
+     * @return dao_manager
      * @throws Exception
      */
     public static function create() {

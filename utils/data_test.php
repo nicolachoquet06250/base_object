@@ -1,7 +1,6 @@
 <?php
 
-class data_test
-{
+class data_test {
     public function __construct() {}
 
     public function get_test_datas_for_user() {

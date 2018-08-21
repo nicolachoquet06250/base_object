@@ -1,7 +1,6 @@
 <?php
 
-class slider_dao extends dao
-{
+class slider_dao extends dao {
 	protected $id;
 	protected $name;
 	protected $src;

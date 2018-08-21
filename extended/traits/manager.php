@@ -1,8 +1,6 @@
 <?php
 
-trait manager
-{
-
+trait manager {
     /**
      * @param $file
      * @param $ligne

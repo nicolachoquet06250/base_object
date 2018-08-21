@@ -7,6 +7,11 @@
  * @method test set_service_test()
  */
 class BaseObject extends stdClass {
+	/**
+	 * @var ArrayList $array
+	 */
+	private $array = null;
+	private $key = null;
 	protected $gettable_and_settable_classes, $services, $utils;
 
 	/**
@@ -103,5 +108,42 @@ class BaseObject extends stdClass {
 			return $this;
 		}
 		return $this->gettable_and_settable_classes;
+	}
+
+	/**
+	 * @param ArrayList $arrayList
+	 * @return $this
+	 */
+	public function set_arraylist(ArrayList $arrayList) {
+		$this->array = $arrayList;
+		return $this;
+	}
+	/**
+	 * @return ArrayList
+	 */
+	public function get_arraylist() {
+		return $this->array;
+	}
+
+	/**
+	 * @param int $key
+	 * @return dao
+	 */
+	public function set_key(int $key) {
+		$this->key = $key;
+		return $this;
+	}
+	/**
+	 * @return int
+	 */
+	public function get_key() {
+		return $this->key;
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	public function delete() {
+		$this->get_arraylist()->delete($this->get_key());
 	}
 }

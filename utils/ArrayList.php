@@ -1,7 +1,6 @@
 <?php
 
-class ArrayList
-{
+class ArrayList {
     protected $classe;
     protected $list = [];
 
@@ -15,7 +14,7 @@ class ArrayList
     }
 
 	/**
-	 * @param array[object] ...$objs
+	 * @param array[BaseObject] ...$objs
 	 */
 	public function append(...$objs) {
 		foreach ($objs as $obj) {
@@ -26,7 +25,7 @@ class ArrayList
     }
 
 	/**
-	 * @param array[object] ...$keys
+	 * @param BaseObject[] ...$keys
 	 * @throws Exception
 	 */
     public function delete(...$keys) {
@@ -41,7 +40,7 @@ class ArrayList
 
 	/**
 	 * @param int $key
-	 * @param object $new_obj
+	 * @param BaseObject $new_obj
 	 */
     public function update($key, $new_obj) {
         if($new_obj instanceof $this->classe) {

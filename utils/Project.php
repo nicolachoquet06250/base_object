@@ -1,7 +1,6 @@
 <?php
 
-class Project
-{
+class Project {
 	/**
 	 * @param callable $callback
 	 * @param callable|null $catch
