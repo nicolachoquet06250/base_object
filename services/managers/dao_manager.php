@@ -30,7 +30,7 @@ class dao_manager extends dao {
 
 	/**
 	 * @param array $daos
-	 * @return dao[]|null
+	 * @return dao[]|dao|null
 	 * @throws Exception
 	 */
     public function create_dao(...$daos) {

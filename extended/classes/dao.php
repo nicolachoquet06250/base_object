@@ -41,18 +41,14 @@ class dao extends BaseObject {
 
 	/**
 	 * @param array ...$fields
-	 * @return dao
+	 * @return $this
 	 * @throws Exception
 	 */
 	public function create_new(...$fields) {
     	$class = __CLASS__;
-		/**
-		 * @var dao $dao
-		 */
-    	$dao = new $class();
-		foreach ($dao->get_fields() as $i => $field) {
-			$dao->set_field($field, $fields[$i]);
+		foreach ($this->get_fields() as $i => $field) {
+			$this->set_field($field, $fields[$i]);
     	}
-    	return $dao;
+    	return $this;
 	}
 }

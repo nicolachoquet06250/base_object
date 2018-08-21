@@ -15,10 +15,13 @@ class ArrayList {
 
 	/**
 	 * @param array[BaseObject] ...$objs
+	 * @throws Exception
 	 */
 	public function append(...$objs) {
 		foreach ($objs as $obj) {
 			if ($obj instanceof $this->classe) {
+				$obj->set_key(count($this->get()));
+				$obj->set_arraylist($this);
 				$this->list[] = $obj;
 			}
 		}

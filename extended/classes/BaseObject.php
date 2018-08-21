@@ -127,7 +127,7 @@ class BaseObject extends stdClass {
 
 	/**
 	 * @param int $key
-	 * @return dao
+	 * @return $this
 	 */
 	public function set_key(int $key) {
 		$this->key = $key;
@@ -140,10 +140,5 @@ class BaseObject extends stdClass {
 		return $this->key;
 	}
 
-	/**
-	 * @throws Exception
-	 */
-	public function delete() {
-		$this->get_arraylist()->delete($this->get_key());
-	}
+	public function __destruct() {}
 }
