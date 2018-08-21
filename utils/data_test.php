@@ -2,9 +2,9 @@
 
 class data_test
 {
-    private function __construct() {}
+    public function __construct() {}
 
-    public static function get_test_datas_for_user() {
+    public function get_test_datas_for_user() {
         return [
             [
                 'id' => 0,
@@ -42,7 +42,7 @@ class data_test
         ];
     }
 
-    public static function get_test_datas_for_slider() {
+    public function get_test_datas_for_slider() {
     	return [
     		[
     			'id' => 0,

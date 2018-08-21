@@ -4,23 +4,29 @@ class ArrayList
 {
     protected $classe;
     protected $list = [];
+
+	/**
+	 * ArrayList constructor.
+	 *
+	 * @param string $classe
+	 */
     public function __construct($classe) {
-        $this->classe = $classe;
+        $this->classe = $classe[0];
     }
 
 	/**
-	 * @param array $objs
+	 * @param array[object] ...$objs
 	 */
 	public function append(...$objs) {
 		foreach ($objs as $obj) {
-			if($obj instanceof $this->classe) {
+			if ($obj instanceof $this->classe) {
 				$this->list[] = $obj;
 			}
-    	}
+		}
     }
 
 	/**
-	 * @param array $keys
+	 * @param array[object] ...$keys
 	 * @throws Exception
 	 */
     public function delete(...$keys) {
@@ -33,6 +39,10 @@ class ArrayList
 
     }
 
+	/**
+	 * @param int $key
+	 * @param object $new_obj
+	 */
     public function update($key, $new_obj) {
         if($new_obj instanceof $this->classe) {
             $this->list[$key] = $new_obj;
@@ -40,8 +50,8 @@ class ArrayList
     }
 
     /**
-     * @param null $key
-     * @return mixed
+     * @param null|int $key
+     * @return array
      * @throws Exception
      */
     public function get($key = null) {
@@ -54,6 +64,9 @@ class ArrayList
         return $this->list;
     }
 
+	/**
+	 * @return array
+	 */
     public function __debugInfo() {
         return $this->list;
     }

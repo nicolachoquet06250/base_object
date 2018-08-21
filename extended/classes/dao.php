@@ -4,6 +4,9 @@ class dao extends BaseObject implements service
 {
     use manager;
 
+	/**
+	 * @return array
+	 */
     public function get_fields() {
     	$fields = array_keys(get_class_vars(get_class($this)));
     	$base_object_fields = array_keys(get_class_vars('BaseObject'));

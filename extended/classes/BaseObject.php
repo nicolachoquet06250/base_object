@@ -7,13 +7,23 @@
  * @method test set_service_test()
  */
 class BaseObject extends stdClass {
-	protected $gettable_and_settable_classes, $services;
+	protected $gettable_and_settable_classes, $services, $utils;
 
+	/**
+	 * BaseObject constructor.
+	 */
 	public function __construct() {
+		$this->utils = (array) json::get_from_file('conf/utils', true)->json();
 		$g_a_s_classes = (array) json::get_from_file('conf/gettable_and_settable_classes', true)->json();
 		$this->services = (array) json::get_from_file('conf/services', true)->json();
 		$this->gettable_and_settable_classes((array) $g_a_s_classes);
 	}
+
+	/**
+	 * @param $name
+	 * @param $arguments
+	 * @return null
+	 */
 	public function __call($name, $arguments) {
 		$method_parts = explode('_', $name);
 		if(
@@ -27,11 +37,22 @@ class BaseObject extends stdClass {
 		}
 		return null;
 	}
+
+	/**
+	 * @param $name
+	 * @param $arguments
+	 * @return mixed
+	 */
 	public static function __callStatic($name, $arguments) {
 		$o = new BaseObject();
 		return $o->$name($arguments);
 	}
 
+	/**
+	 * @param string $name
+	 * @param mixed ...$arguments
+	 * @return null
+	 */
 	protected function get_service(string $name, ...$arguments) {
 		if(isset($this->services[$name])) {
 			require_once $this->services[$name]->path;
@@ -40,9 +61,42 @@ class BaseObject extends stdClass {
 		}
 		return null;
 	}
+
+	/**
+	 * @param string $name
+	 * @param mixed ...$arguments
+	 * @return null
+	 */
 	protected function set_service(string $name, ...$arguments) {
 		return $this->get_service($name, $arguments);
 	}
+
+	/**
+	 * @param string $name
+	 * @param mixed ...$arguments
+	 * @return null
+	 */
+	protected function get_util(string $name, ...$arguments) {
+		if(isset($this->utils[$name])) {
+			require_once $this->utils[$name]->path;
+			$class = $this->utils[$name]->class;
+			return new $class($arguments);
+		}
+		return null;
+	}
+
+	/**
+	 * @param string $name
+	 * @param mixed ...$arguments
+	 */
+	protected function set_util(string $name, ...$arguments) {
+		$this->get_util($name, $arguments);
+	}
+
+	/**
+	 * @param array|null $gettable_and_settable_classes
+	 * @return $this
+	 */
 	protected function gettable_and_settable_classes(array $gettable_and_settable_classes = null) {
 		if($gettable_and_settable_classes !== null) {
 			$this->gettable_and_settable_classes = $gettable_and_settable_classes;

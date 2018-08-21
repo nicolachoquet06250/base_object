@@ -56,9 +56,12 @@ class dao_manager extends dao implements service
         $dao_table = $dao;
         if($dao = $this->get_array('daos', $dao.'_dao')) {
             $data_test_method = 'get_test_datas_for_'.$dao_table;
-            $data_test = data_test::$data_test_method();
+            $data_test = $this->get_util('data_test')->$data_test_method();
             require_once 'dao/'.$dao.'.php';
-            $array = new ArrayList($dao);
+			/**
+			 * @var ArrayList $array
+			 */
+            $array = $this->get_util('ArrayList', $dao);
             foreach ($data_test as $data) {
                 /**
                  * @var dao $dao_obj
@@ -85,16 +88,19 @@ class dao_manager extends dao implements service
 
 	/**
 	 * @param $dao
-	 * @return ArrayList(dao)|null
+	 * @return ArrayList|null
 	 * @throws Exception
 	 */
 	public function get_dao_list($dao) {
 		$dao_table = $dao;
 		if($dao = $this->get_array('daos', $dao.'_dao')) {
 			$data_test_method = 'get_test_datas_for_'.$dao_table;
-			$data_test = data_test::$data_test_method();
+			$data_test = $this->get_util('data_test')->$data_test_method();
 			require_once 'dao/'.$dao.'.php';
-			$array = new ArrayList($dao);
+			/**
+			 * @var ArrayList $array
+			 */
+			$array = $this->get_util('ArrayList', $dao);
 			foreach ($data_test as $data) {
 				/**
 				 * @var dao $dao_obj

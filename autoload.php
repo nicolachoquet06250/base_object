@@ -1,9 +1,7 @@
 <?php
 
 	require_once 'utils/Project.php';
-    require_once 'utils/data_test.php';
 	require_once 'utils/json.php';
-	require_once 'utils/ArrayList.php';
 
 	require_once 'extended/interfaces/service.php';
 	require_once 'extended/traits/manager.php';
