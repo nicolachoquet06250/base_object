@@ -23,10 +23,11 @@ class BaseObject extends \stdClass {
 	 * BaseObject constructor.
 	 */
 	public function __construct() {
-		$this->utils = (array) json::get_from_file('conf/utils', true)->json();
-		$g_a_s_classes = (array) json::get_from_file('conf/gettable_and_settable_classes', true)->json();
-		$this->services = (array) json::get_from_file('conf/services', true)->json();
-		$this->gettable_and_settable_classes((array) $g_a_s_classes);
+		$json = new json();
+		$this->utils = (array)$json->get_from_file('conf/utils', true)->json();
+		$g_a_s_classes = (array)$json->get_from_file('conf/gettable_and_settable_classes', true)->json();
+		$this->services = (array)$json->get_from_file('conf/services', true)->json();
+		$this->gettable_and_settable_classes($g_a_s_classes);
 	}
 
 	/**

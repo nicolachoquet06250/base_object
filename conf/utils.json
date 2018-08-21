@@ -10,5 +10,9 @@
   "data_link": {
     "path": "utils/data_link.php",
     "class": "data_link"
+  },
+  "json": {
+    "path": "utils/json.php",
+    "class": "json"
   }
 }

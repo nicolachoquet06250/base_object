@@ -2,7 +2,11 @@
 
 namespace project\utils;
 
-class ArrayList {
+use Exception;
+use project\extended\classes\BaseObject;
+use project\extended\classes\util;
+
+class ArrayList extends util {
     protected $classe;
     protected $list = [];
 
@@ -12,6 +16,7 @@ class ArrayList {
 	 * @param string $classe
 	 */
     public function __construct($classe) {
+    	parent::__construct();
         $this->classe = $classe[0];
     }
 

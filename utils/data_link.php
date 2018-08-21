@@ -3,8 +3,9 @@
 namespace project\utils;
 
 use project\extended\classes\BaseObject;
+use project\extended\classes\util;
 
-class data_link extends BaseObject {
+class data_link extends util {
 	private $table;
 	public function __construct($table) {
 		parent::__construct();

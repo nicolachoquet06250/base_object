@@ -3,8 +3,9 @@
 namespace project\utils;
 
 use Exception;
+use project\extended\classes\util;
 
-class Project {
+class Project extends util {
 
 	/**
 	 * @param callable $callback

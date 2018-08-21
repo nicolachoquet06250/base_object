@@ -2,8 +2,12 @@
 
 namespace project\utils;
 
-class data_test {
-    public function __construct() {}
+use project\extended\classes\util;
+
+class data_test extends util {
+    public function __construct() {
+    	parent::__construct();
+	}
 
     public function get_test_datas_for_user() {
         return [

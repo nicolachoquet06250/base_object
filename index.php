@@ -23,7 +23,7 @@ Project::main(function ($args) {
 							'1102 ch de l\'espagnol', 'Les primevères',
 							'06250', 'Mougins', '1995-07-21',
 							date('Y-m-d'));
-	var_dump($prenom, $src, $nom, $new_user);
+	var_dump($prenom, $src, $nom, $new_user->get_field('date_naissence'));
 
 	unset($new_user);
 });
