@@ -1,5 +1,7 @@
 <?php
 
+namespace project;
+
 use project\classes\test_afficher_body;
 use project\dao\user_dao;
 use project\services\managers\dao_manager;
