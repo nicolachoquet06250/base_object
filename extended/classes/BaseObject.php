@@ -17,7 +17,7 @@ class BaseObject extends \stdClass {
 	 */
 	private $array = null;
 	private $key = null;
-	protected $gettable_and_settable_classes, $services, $utils;
+	protected $gettable_and_settable_classes, $services, $utils, $sql;
 
 	/**
 	 * BaseObject constructor.
@@ -27,6 +27,7 @@ class BaseObject extends \stdClass {
 		$this->utils = (array)$json->get_from_file('conf/utils', true)->json();
 		$g_a_s_classes = (array)$json->get_from_file('conf/gettable_and_settable_classes', true)->json();
 		$this->services = (array)$json->get_from_file('conf/services', true)->json();
+		$this->sql = (array)$json->get_from_file('conf/sql', true)->json();
 		$this->gettable_and_settable_classes($g_a_s_classes);
 	}
 
@@ -85,7 +86,7 @@ class BaseObject extends \stdClass {
 	/**
 	 * @param string $name
 	 * @param mixed ...$arguments
-	 * @return null
+	 * @return null|util
 	 */
 	protected function get_util(string $name, ...$arguments) {
 		if(isset($this->utils[$name])) {

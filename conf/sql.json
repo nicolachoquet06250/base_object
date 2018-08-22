@@ -1,0 +1,9 @@
+{
+  "json": {
+    "account": {
+      "path": "conf/sql",
+      "database": "account"
+    },
+    "mysql": {}
+  }
+}

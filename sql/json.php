@@ -2,17 +2,26 @@
 
 namespace project\sql;
 
-use project\extended\classes\BaseObject;
+use project\extended\classes\sql_connector;
 
-class json extends BaseObject {
-	private $table;
-	public function __construct($table) {
+class json extends sql_connector {
+	private $database, $path, $file_path;
+	public function __construct($connection) {
 		parent::__construct();
-		$this->table = $table;
+		$this->database = $connection->database;
+		$this->path = $connection->path;
+		$this->file_path = $this->path.'/'.$this->database;
 	}
 
-	public function create_table() {
-		$json_utils = $this->get_util('json', [])->create_file($this->table);
-		var_dump($this->table);
+	protected function create_database() {
+		if(!is_dir($this->file_path)) {
+			mkdir($this->file_path, 0777, true);
+		}
+		return $this;
+	}
+
+	function create_table($table, array $fields, array $types, array $default, array $keys) {
+		$this->create_database();
+		var_dump($fields, $types, $default, $keys);
 	}
 }

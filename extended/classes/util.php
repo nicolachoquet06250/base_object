@@ -81,22 +81,41 @@ class util extends BaseObject {
 		throw new \Exception('class '.$origin_class.' not found');
 	}
 
+	/**
+	 * @param $mode
+	 * @param $alias
+	 * @return bool|array
+	 */
+	private function sql($mode, $alias) {
+		return isset($this->sql[$mode]->$alias) ? $this->sql[$mode]->$alias : false;
+	}
+
+	/**
+	 * @param $mode
+	 * @param $alias
+	 * @return bool|sql_connector
+	 */
+	public function sql_connector($mode, $alias) {
+		if($infos = $this->sql($mode, $alias)) {
+			$mode = '\project\\sql\\'.$mode;
+			require_once str_replace(['\project\\', '\\'], ['', '/'], $mode).'.php';
+			return new $mode($infos);
+		}
+		return false;
+	}
+
 	public function is_array($var) {
 		return is_array($var);
 	}
-
 	public function is_int($var) {
 		return is_int($var);
 	}
-
 	public function is_integer($var) {
 		return is_integer($var);
 	}
-
 	public function is_string($var) {
 		return is_string($var);
 	}
-
 	public function is_object($var, $tested_class = null) {
 		$origin_class = get_class($var);
 		if($tested_class) {
