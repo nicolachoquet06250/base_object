@@ -14,11 +14,11 @@ class Project extends util {
 	 */
 	public static function main(callable $callback, callable $catch = null, $args = []) {
 		try {
-			$callback($args);
+			$callback(new Project(), $args);
 		}
 		catch (Exception $e) {
 			if($catch) {
-				$catch($e);
+				$catch($e, new Project());
 			}
 			else {
 				echo $e->getMessage()."\n";

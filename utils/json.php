@@ -2,7 +2,6 @@
 
 namespace project\utils;
 
-use project\extended\classes\BaseObject;
 use project\extended\classes\util;
 
 class json extends util {
@@ -17,14 +16,14 @@ class json extends util {
 	public function __construct($json = null) {
 		$json = gettype($json) === 'array' ? $json[0] : $json;
 		$this->json($json);
-		$this->is_string(is_string($json));
+		$this->json_is_string(is_string($json));
 	}
 
 	/**
 	 * @param bool|null $is_string
 	 * @return $this
 	 */
-	public function is_string(bool $is_string = null) {
+	public function json_is_string(bool $is_string = null) {
 		if($is_string !== null) {
 			$this->is_string = $is_string;
 			return $this;
@@ -45,7 +44,7 @@ class json extends util {
 	}
 
 	public function create_file($file_name) {
-		if(!$this->is_string()) {
+		if(!$this->json_is_string()) {
 			$this->json(json_encode($this->json()));
 		}
 		file_get_contents($file_name, $this->json());
