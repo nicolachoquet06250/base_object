@@ -1,7 +1,0 @@
-[
-  {
-    "mon_controller": {
-      "path": "controllers/mon_model.php"
-    }
-  }
-]

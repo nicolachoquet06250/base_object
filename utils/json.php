@@ -14,6 +14,7 @@ class json extends util {
 	 * @param $json
 	 */
 	public function __construct($json = null) {
+		$json = $json ? $json : '';
 		$json = gettype($json) === 'array' ? $json[0] : $json;
 		$this->json($json);
 		$this->json_is_string(is_string($json));
@@ -43,11 +44,14 @@ class json extends util {
 		return $this->json;
 	}
 
+	/**
+	 * @param $file_name
+	 */
 	public function create_file($file_name) {
 		if(!$this->json_is_string()) {
 			$this->json(json_encode($this->json()));
 		}
-		file_get_contents($file_name, $this->json());
+		file_put_contents($file_name.'.json', $this->json());
 	}
 
 	/**
@@ -57,15 +61,6 @@ class json extends util {
 	 */
 	public static function get_from_file(string $file, bool $assoc = false): json {
 		return new json(json_decode(file_get_contents($file.'.json', $assoc)));
-	}
-
-	/**
-	 * @param $json
-	 * @param string $file
-	 * @return bool
-	 */
-	public function put_to_file($json, string $file): bool {
-		return file_put_contents($file, json_encode($json));
 	}
 
 }

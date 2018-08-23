@@ -4,7 +4,9 @@ namespace project;
 
 use project\classes\test_afficher_body;
 use project\dao\user_dao;
+use project\extended\classes\sql_connector;
 use project\services\managers\dao_manager;
+use project\sql\json;
 use project\utils\Project;
 
 require_once 'autoload.php';
@@ -47,6 +49,50 @@ Project::main(function ($_this) {
 //			 .test_afficher_body::toto('test', 'avec', 'des', 'tapettes'));
 //	var_dump($_this->is_object($test_afficher_body));
 
-	$_this->sql_connector('json', 'account')->create_table('toto', [], [], [], []);
+	$sql_connector = $_this->sql_connector('json', 'account');
+
+//	$sql_connector->create_table('user',
+//						 [
+//						 	'id', 'nom', 'prenom',
+//							'email', 'motdepasse', 'date_inscription'
+//						 ],
+//						 [
+//						 	sql_connector::INT, sql_connector::STRING, sql_connector::STRING,
+//							sql_connector::STRING, sql_connector::STRING, sql_connector::DATE
+//						 ],
+//						 [
+//						 	'date_inscription' => sql_connector::NOW
+//						 ],
+//						 [
+//						 	'id' => [
+//						 		'primary',
+//								'auto_increment'
+//							]
+//						 ]
+//		  );
+
+	$sql_connector->create_table('message',
+						 [
+							 'id', 'user', 'message', 'date_message'
+						 ],
+						 [
+							 sql_connector::INT, sql_connector::OBJECT, sql_connector::STRING, sql_connector::DATE
+						 ],
+						 [
+							 'date_message' => sql_connector::NOW,
+						 ],
+						 [
+							 'id' => [
+								 'primary',
+								 'auto_increment'
+							 ]
+						 ]
+		  );
+
+	var_dump($sql_connector	->get('user', 'id', 'nom', 'prenom', ['date_inscription' => 'di'])
+				 			->where(['id', 10, json::INF_OR_EQUALS])
+						   	->go());
+
+
 
 });
