@@ -87,6 +87,38 @@ class json extends sql_connector {
 	/**
 	 * @inheritdoc
 	 */
+	public function order(...$by): sql_connector {
+		$this->request['order'] = $by;
+		return $this;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function group(...$by): sql_connector {
+		$this->request['group'] = $by;
+		return $this;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function desc(): sql_connector {
+		$this->request['sens'] = 'desc';
+		return $this;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function asc(): sql_connector {
+		$this->request['sens'] = 'asc';
+		return $this;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
 	public function go($format = 'json') {
 		switch ($this->request['key']) {
 			case self::$SELECT:
@@ -95,6 +127,7 @@ class json extends sql_connector {
 				 */
 				$json_util = $this->get_util('json');
 				$json = $json_util::get_from_file($this->connector.'/'.$this->request['table'])->json();
+
 				if(empty((array) $json->body)) return [];
 
 				$result = [];
@@ -119,59 +152,41 @@ class json extends sql_connector {
 						$result[] = (array) $new_line;
 					}
 				}
+
+				$result_tmp = [];
 				if($this->request['where']) {
 					foreach ($result as $value) {
-						$OK = false;
+						$OK = [];
 						foreach ($this->request['where'] as $i => $where) {
-							if($where !== self::AND || $where !== self::OR) {
+							if($where !== self::AND && $where !== self::OR) {
 								$part1 = $where[0];
 								$part2 = $where[1];
 								$op = $where[2];
 
-								switch ($op) {
-									case self::EQUALS:
-										if($value[$part1] === $part2) {
-											$OK = true;
-										}
-										break;
-									case self::DIF:
-										if($value[$part1] !== $part2) {
-											$OK = true;
-										}
-										break;
-									case self::SUP:
-										if($value[$part1] > $part2) {
-											$OK = true;
-										}
-										break;
-									case self::SUP_OR_EQUALS:
-										if($value[$part1] >= $part2) {
-											$OK = true;
-										}
-										break;
-									case self::INF:
-										if($value[$part1] < $part2) {
-											$OK = true;
-										}
-										break;
-									case self::INF_OR_EQUALS:
-										if($value[$part1] <= $part2) {
-											$OK = true;
-										}
-										break;
-									default:
-										break;
-								}
-
-								if(!$OK) {
-									unset($result[$i]);
-								}
+								$OK[] = ($op === self::EQUALS && $value[$part1] === $part2)
+										|| ($op === self::DIF && $value[$part1] !== $part2)
+										|| ($op === self::SUP && $value[$part1] > $part2)
+										|| ($op === self::SUP_OR_EQUALS && $value[$part1] >= $part2)
+										|| ($op === self::INF && $value[$part1] < $part2)
+										|| ($op === self::INF_OR_EQUALS && $value[$part1] <= $part2);
 							}
 						}
-					}
-				}
-				$this->result = $result;
+						$valid_OK = true;
+						foreach ($OK as $item) {
+							if(!$item) {
+								$valid_OK = false;
+								break;
+							}
+						}
 
+						if($valid_OK) {
+							$result_tmp[] = $value;
+						}
+					}
+					$result = $result_tmp;
+				}
+
+				$this->result = $result;
 				break;
 			case self::$INSERT:
 			case self::$UPDATE:

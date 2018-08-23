@@ -19,7 +19,7 @@ abstract class sql_connector extends util {
 	/**
 	 * @return void
 	 */
-	abstract protected function after__construct();
+	abstract protected 	function after__construct();
 
 	/**
 	 * @return sql_connector
@@ -49,5 +49,31 @@ abstract class sql_connector extends util {
 	 */
 	abstract public 	function where(...$where) : sql_connector;
 
+	/**
+	 * @param array ...$by
+	 * @return sql_connector
+	 */
+	abstract public 	function order(...$by) : sql_connector;
+
+	/**
+	 * @param array ...$by
+	 * @return sql_connector
+	 */
+	abstract public 	function group(...$by) : sql_connector;
+
+	/**
+	 * @return sql_connector
+	 */
+	abstract public 	function desc() : sql_connector;
+
+	/**
+	 * @return sql_connector
+	 */
+	abstract public 	function asc() : sql_connector;
+
+	/**
+	 * @param string $format
+	 * @return mixed
+	 */
 	abstract public 	function go($format = 'json');
 }

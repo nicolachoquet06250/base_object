@@ -42,16 +42,41 @@ class mysql extends sql_connector {
 	 * @inheritdoc
 	 */
 	public function where(...$where): sql_connector {
-		if(!empty($where)) {
+		return $this;
+	}
 
-		}
+	/**
+	 * @param array ...$by
+	 * @return sql_connector
+	 */
+	public function order(...$by): sql_connector {
+		return $this;
+	}
+
+	/**
+	 * @param array ...$by
+	 * @return sql_connector
+	 */
+	public function group(...$by): sql_connector {
+		return $this;
+	}
+
+	/**
+	 * @return sql_connector
+	 */
+	public function desc(): sql_connector {
+		return $this;
+	}
+
+	/**
+	 * @return sql_connector
+	 */
+	public function asc(): sql_connector {
 		return $this;
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	public function go($format = 'json') {
-		// TODO: Implement go() method.
-	}
+	public function go($format = 'json') {}
 }

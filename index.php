@@ -90,8 +90,10 @@ Project::main(function ($_this) {
 		  );
 
 	var_dump($sql_connector	->get('user', 'id', 'nom', 'prenom', ['date_inscription' => 'di'])
-				 			->where(['id', 10, json::INF_OR_EQUALS])
-						   	->go());
+				 			->where(
+				 				['id', 	10, 		json::INF_OR_EQUALS	],
+								['nom', 'Choquet', 	json::EQUALS		]
+							)->order('id', 'nom')->go());
 
 
 
