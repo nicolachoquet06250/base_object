@@ -34,7 +34,7 @@ class json extends util {
 
 	/**
 	 * @param null $json
-	 * @return $this
+	 * @return $this|object|array
 	 */
 	public function json($json = null) {
 		if($json !== null) {

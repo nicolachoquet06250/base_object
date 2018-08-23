@@ -51,25 +51,25 @@ Project::main(function ($_this) {
 
 	$sql_connector = $_this->sql_connector('json', 'account');
 
-//	$sql_connector->create_table('user',
-//						 [
-//						 	'id', 'nom', 'prenom',
-//							'email', 'motdepasse', 'date_inscription'
-//						 ],
-//						 [
-//						 	sql_connector::INT, sql_connector::STRING, sql_connector::STRING,
-//							sql_connector::STRING, sql_connector::STRING, sql_connector::DATE
-//						 ],
-//						 [
-//						 	'date_inscription' => sql_connector::NOW
-//						 ],
-//						 [
-//						 	'id' => [
-//						 		'primary',
-//								'auto_increment'
-//							]
-//						 ]
-//		  );
+	$sql_connector->create_table('user',
+						 [
+						 	'id', 'nom', 'prenom',
+							'email', 'motdepasse', 'date_inscription'
+						 ],
+						 [
+						 	sql_connector::INT, sql_connector::STRING, sql_connector::STRING,
+							sql_connector::STRING, sql_connector::STRING, sql_connector::DATE
+						 ],
+						 [
+						 	'date_inscription' => sql_connector::NOW
+						 ],
+						 [
+						 	'id' => [
+						 		'primary',
+								'auto_increment'
+							]
+						 ]
+		  );
 
 	$sql_connector->create_table('message',
 						 [
@@ -93,7 +93,12 @@ Project::main(function ($_this) {
 				 			->where(
 				 				['id', 	10, 		json::INF_OR_EQUALS	],
 								['nom', 'Choquet', 	json::EQUALS		]
-							)->order('id', 'nom')->go());
+							)->go());
+
+	$sql_connector->add('user',
+		['id' => 2], ['nom' => 'Choquet'], ['prenom' => 'André'],
+		['email' => 'andre.choquet@gmail.com'], ['motdepasse' => '0000']
+	);
 
 
 

@@ -5,8 +5,10 @@ namespace project\extended\classes;
 abstract class sql_connector extends util {
 	const STRING = 'string', INTEGER = 'integer', INT = 'integer', OBJECT = 'object', DATE = 'string';
 	const NOW = 'NOW()';
+	public static function NOW() { return date('Y-m-d'); }
 	const AND = 'AND', OR = 'OR';
 	const EQUALS = '=', DIF = '!=', SUP = '>', SUP_OR_EQUALS = '>=', INF = '<', INF_OR_EQUALS = '<=';
+	const ASC = 'asc', DESC = 'desc';
 
 	protected $connector = null, $connection = [];
 
@@ -42,6 +44,13 @@ abstract class sql_connector extends util {
 	 * @return sql_connector
 	 */
 	abstract public 	function get($table, ...$fields) : sql_connector;
+
+	/**
+	 * @param $in
+	 * @param mixed ...$fields
+	 * @return sql_connector
+	 */
+	abstract public 	function add($in, ...$fields) : sql_connector;
 
 	/**
 	 * @param mixed ...$where

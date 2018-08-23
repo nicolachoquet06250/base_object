@@ -5,7 +5,7 @@ namespace project\sql;
 use project\extended\classes\sql_connector;
 
 class json extends sql_connector {
-	private static $SELECT = 'select', $UPDATE = 'update', $DELETE = 'delete', $INSERT = 'insert';
+	private const SELECT = 'select', UPDATE = 'update', DELETE = 'delete', INSERT = 'insert';
 	private $database, $path, $request, $result = null;
 
 	/**
@@ -59,8 +59,9 @@ class json extends sql_connector {
 		 * @var \project\utils\json $json_util
 		 */
 		$json_util = $this->get_util('json', $table_content);
-		$json_file = $json_util::get_from_file($this->connector.'/'.$table, true);
-		$json_util->create_file($this->connector.'/'.$table);
+		if(!$if_not_exists && !is_file($this->connector.'/'.$table.'.json')) {
+			$json_util->create_file($this->connector.'/'.$table);
+		}
 		return $this;
 	}
 
@@ -68,8 +69,18 @@ class json extends sql_connector {
 	 * @inheritdoc
 	 */
 	public function get($table, ...$fields): sql_connector {
-		$this->request['key'] = self::$SELECT;
+		$this->request['key'] = self::SELECT;
 		$this->request['table'] = $table;
+		$this->request['fields'] = $fields;
+		return $this;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public 	function add($in, ...$fields) : sql_connector {
+		$this->request['table'] = $in;
+		$this->request['key'] = self::INSERT;
 		$this->request['fields'] = $fields;
 		return $this;
 	}
@@ -104,7 +115,7 @@ class json extends sql_connector {
 	 * @inheritdoc
 	 */
 	public function desc(): sql_connector {
-		$this->request['sens'] = 'desc';
+		$this->request['sens'] = self::DESC;
 		return $this;
 	}
 
@@ -112,20 +123,22 @@ class json extends sql_connector {
 	 * @inheritdoc
 	 */
 	public function asc(): sql_connector {
-		$this->request['sens'] = 'asc';
+		$this->request['sens'] = self::ASC;
 		return $this;
 	}
 
 	/**
 	 * @inheritdoc
+	 * @throws \Exception
 	 */
 	public function go($format = 'json') {
+		/**
+		 * @var \project\utils\json $json_util
+		 */
+		$json_util = $this->get_util('json');
+
 		switch ($this->request['key']) {
-			case self::$SELECT:
-				/**
-				 * @var \project\utils\json $json_util
-				 */
-				$json_util = $this->get_util('json');
+			case self::SELECT:
 				$json = $json_util::get_from_file($this->connector.'/'.$this->request['table'])->json();
 
 				if(empty((array) $json->body)) return [];
@@ -153,8 +166,8 @@ class json extends sql_connector {
 					}
 				}
 
-				$result_tmp = [];
-				if($this->request['where']) {
+				if(isset($this->request['where'])) {
+					$result_tmp = [];
 					foreach ($result as $value) {
 						$OK = [];
 						foreach ($this->request['where'] as $i => $where) {
@@ -186,11 +199,90 @@ class json extends sql_connector {
 					$result = $result_tmp;
 				}
 
+				if(isset($this->request['order'])) {
+					// TODO code pour ordonner les résultats
+				}
+
+				if(isset($this->request['group'])) {
+					// TODO code pour grouper les résultats
+				}
+
+				if(isset($this->request['sens'])) {
+					switch ($this->request['sens']) {
+						case self::ASC:
+							// TODO code pour ordonner les résultats dans le sens croissant
+						case self::DESC:
+							// TODO code pour ordonner les résultats dans le sens décroissant
+						default:
+							break;
+					}
+				}
+
 				$this->result = $result;
 				break;
-			case self::$INSERT:
-			case self::$UPDATE:
-			case self::$DELETE:
+			case self::INSERT:
+				$json_obj = $json_util::get_from_file($this->connector.'/'.$this->request['table']);
+				$json = $json_obj->json();
+				$line = [];
+				$line_valid = true;
+				$failed_field = [];
+
+				foreach ($json->header as $field) {
+					$field_exists = false;
+					foreach ($this->request['fields'] as $local_field) {
+						if($field->field === array_keys($local_field)[0]) {
+							$field->value = $local_field[array_keys($local_field)[0]];
+							$field_exists = $field;
+							break;
+						}
+					}
+					if(!$field_exists) {
+						$field_name = $field->field;
+						$default = null;
+						if(isset($field->default)) {
+							$default = $field->default;
+						}
+						$field_value = $default;
+						if($default === self::NOW) {
+							$field_value = self::NOW();
+						}
+					}
+					else {
+						$field_name = $field_exists->field;
+						$field_value = $field_exists->value;
+					}
+					$require_type = $field->type;
+					if($this->{'is_'.$require_type}($field_value)) {
+						if($field_value === self::NOW) {
+							$field_value = self::NOW();
+						}
+						$line[$field_name] = $field_value;
+					}
+					else {
+						$failed_field = [
+							'name' => $field_name,
+							'type' => [
+								'expected' => $require_type,
+								'actual' => gettype($field_value),
+							],
+						];
+						$line_valid = false;
+						break;
+					}
+				}
+
+				if($line_valid) {
+					$json->body[] = $line;
+					/**
+					 * @var \project\utils\json $json_util_w
+					 */
+					$json_util_w = $this->get_util('json', $json);
+					$json_util_w->create_file($this->connector.'/'.$this->request['table']);
+				}
+				else throw new \Exception('Le champ \''.$failed_field['name'].'\' n\'est pas au bon format : il est au format \''.$failed_field['type']['expected'].'\' alors qu\'il devrait être au format \''.$failed_field['type']['actual'].'\'');
+				break;
+			case self::UPDATE:
+			case self::DELETE:
 			default:
 				break;
 		}

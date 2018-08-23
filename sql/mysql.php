@@ -78,5 +78,12 @@ class mysql extends sql_connector {
 	/**
 	 * @inheritdoc
 	 */
+	public function add($in, ...$fields): sql_connector {
+		return $this;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
 	public function go($format = 'json') {}
 }
