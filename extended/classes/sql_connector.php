@@ -60,6 +60,12 @@ abstract class sql_connector extends util {
 	abstract public 	function update($in, ...$fields) : sql_connector;
 
 	/**
+	 * @param $in
+	 * @return sql_connector
+	 */
+	abstract public 	function delete($in) : sql_connector;
+
+	/**
 	 * @param mixed ...$where
 	 * @return sql_connector
 	 */

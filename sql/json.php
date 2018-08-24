@@ -10,12 +10,11 @@ class json extends sql_connector {
 	private const SELECT = 'select', UPDATE = 'update', DELETE = 'delete', INSERT = 'insert';
 	private $database, $path, $request, $result = null, $last_id = null;
 
-	private function save_request_infos($type, $table, $fields) {
+	private function save_request_infos($type, $table, $fields = []) {
 		$this->request['table'] = $table;
 		$this->request['key'] = $type;
-		$this->request['fields'] = $fields;
-		if(count($fields) === 1 && count($fields[0]) > 1 && isset($fields[0][0])) {
-			$this->request['fields'] = $fields[0];
+		if(!empty($fields)) {
+			$this->request['fields'] = $fields;
 		}
 	}
 
@@ -117,6 +116,14 @@ class json extends sql_connector {
 	 */
 	public function update($in, ...$fields): sql_connector {
 		$this->save_request_infos(self::UPDATE, $in, $fields);
+		return $this;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function delete($in): sql_connector {
+		$this->save_request_infos(self::DELETE, $in);
 		return $this;
 	}
 
@@ -271,7 +278,7 @@ class json extends sql_connector {
 				}
 
 				$this->result = $result;
-				break;
+				return $this->result;
 			case self::INSERT:
 				$json_obj = $json_util::get_from_file($this->connector.'/'.$this->request['table']);
 				$json = $json_obj->json();
@@ -351,7 +358,6 @@ class json extends sql_connector {
 					return false;
 				}
 				else throw new \Exception('Le champ \''.$failed_field['name'].'\' n\'est pas au bon format : il est au format \''.$failed_field['type']['expected'].'\' alors qu\'il devrait être au format \''.$failed_field['type']['actual'].'\'');
-				break;
 			case self::UPDATE:
 				$request = $this->request;
 				if(isset($request['where'])) {
@@ -379,11 +385,49 @@ class json extends sql_connector {
 					$json_util_w = $this->get_util('json', $complete_table);
 					$json_util_w->create_file($this->connector.'/'.$this->request['table']);
 				}
-				break;
+				return true;
 			case self::DELETE:
+				$request = $this->request;
+				if(isset($request['where'])) {
+					$json_obj = $json_util::get_from_file($this->connector.'/'.$request['table']);
+					$complete_table = $json_obj->json();
+					$complete_table_body = $complete_table->body;
+					foreach ($complete_table_body as $i => $line) {
+						$OK = [];
+						foreach ($request['where'] as $where) {
+							$where_part1 = $where[0];
+							$where_part2 = $where[1];
+							$op = $where[2];
+							$OK[] = (($op === self::EQUALS && $line->$where_part1 === $where_part2)
+							|| ($op === self::DIF && $line->$where_part1 !== $where_part2)
+							|| ($op === self::SUP && $line->$where_part1 > $where_part2)
+							|| ($op === self::SUP_OR_EQUALS && $line->$where_part1 >= $where_part2)
+							|| ($op === self::INF && $line->$where_part1 < $where_part2)
+							|| ($op === self::INF_OR_EQUALS && $line->$where_part1 <= $where_part2));
+						}
+						$del_OK = true;
+						foreach ($OK as $item) {
+							if(!$item) {
+								$del_OK = false;
+								break;
+							}
+						}
+						if($del_OK) {
+							unset($complete_table_body[$i]);
+						}
+					}
+					$complete_table->body = $complete_table_body;
+					/**
+					 * @var \project\utils\json $json_util_w
+					 */
+					$json_util_w = $this->get_util('json', $complete_table);
+					$json_util_w->create_file($this->connector.'/'.$this->request['table']);
+				}
+				return true;
 			default:
 				break;
 		}
+		$this->request = [];
 		return $this->result;
 	}
 }

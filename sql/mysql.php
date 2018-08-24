@@ -41,6 +41,29 @@ class mysql extends sql_connector {
 	/**
 	 * @inheritdoc
 	 */
+	public function add($in, ...$fields): sql_connector {
+		return $this;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function update($in, ...$fields): sql_connector {
+
+		return $this;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function delete($in): sql_connector {
+
+		return $this;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
 	public function where(...$where): sql_connector {
 		return $this;
 	}
@@ -72,13 +95,6 @@ class mysql extends sql_connector {
 	 * @return sql_connector
 	 */
 	public function asc(): sql_connector {
-		return $this;
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function add($in, ...$fields): sql_connector {
 		return $this;
 	}
 
