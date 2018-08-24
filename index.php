@@ -97,7 +97,7 @@ Project::main(function ($_this) {
 							 ->asc()->go());
 
 	$sql_connector->add('user',
-		['id' => 2], ['nom' => 'Choquet'], ['prenom' => 'André'],
+		['nom' => 'Choquet'], ['prenom' => 'André'],
 		['email' => 'andre.choquet@gmail.com'], ['motdepasse' => '0000']
 	);
 
