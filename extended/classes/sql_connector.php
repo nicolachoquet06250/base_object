@@ -53,13 +53,6 @@ abstract class sql_connector extends util {
 	abstract public 	function add($in, ...$fields) : sql_connector;
 
 	/**
-	 * @param $in
-	 * @param array ...$fields
-	 * @return sql_connector
-	 */
-	abstract public 	function update($in, ...$fields) : sql_connector;
-
-	/**
 	 * @param mixed ...$where
 	 * @return sql_connector
 	 */

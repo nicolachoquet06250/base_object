@@ -8,16 +8,7 @@ use project\services\managers\dao_manager;
 
 class json extends sql_connector {
 	private const SELECT = 'select', UPDATE = 'update', DELETE = 'delete', INSERT = 'insert';
-	private $database, $path, $request, $result = null, $last_id = null;
-
-	private function save_request_infos($type, $table, $fields) {
-		$this->request['table'] = $table;
-		$this->request['key'] = $type;
-		$this->request['fields'] = $fields;
-		if(count($fields) === 1 && count($fields[0]) > 1 && isset($fields[0][0])) {
-			$this->request['fields'] = $fields[0];
-		}
-	}
+	private $database, $path, $request, $result = null;
 
 	/**
 	 * @inheritdoc
@@ -80,7 +71,9 @@ class json extends sql_connector {
 	 * @inheritdoc
 	 */
 	public function get($table, ...$fields): sql_connector {
-		$this->save_request_infos(self::SELECT, $table, $fields);
+		$this->request['key'] = self::SELECT;
+		$this->request['table'] = $table;
+		$this->request['fields'] = $fields;
 		return $this;
 	}
 
@@ -88,15 +81,9 @@ class json extends sql_connector {
 	 * @inheritdoc
 	 */
 	public 	function add($in, ...$fields) : sql_connector {
-		$this->save_request_infos(self::INSERT, $in, $fields);
-		return $this;
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	public function update($in, ...$fields): sql_connector {
-		$this->save_request_infos(self::UPDATE, $in, $fields);
+		$this->request['table'] = $in;
+		$this->request['key'] = self::INSERT;
+		$this->request['fields'] = $fields;
 		return $this;
 	}
 
@@ -106,9 +93,6 @@ class json extends sql_connector {
 	public function where(...$where): sql_connector {
 		if(!empty($where)) {
 			$this->request['where'] = $where;
-			if(count($where) === 1 && count($where[0]) > 1 && isset($fields[0][0])) {
-				$this->request['where'] = $where[0][0];
-			}
 		}
 		return $this;
 	}
@@ -118,9 +102,6 @@ class json extends sql_connector {
 	 */
 	public function order(...$by): sql_connector {
 		$this->request['order'] = $by;
-		if(count($by) === 1 && count($by[0]) > 1) {
-			$this->request['order'] = $by[0];
-		}
 		return $this;
 	}
 
@@ -129,9 +110,6 @@ class json extends sql_connector {
 	 */
 	public function group(...$by): sql_connector {
 		$this->request['group'] = $by;
-		if(count($by) === 1 && count($by[0]) > 1) {
-			$this->request['group'] = $by[0];
-		}
 		return $this;
 	}
 
@@ -149,26 +127,6 @@ class json extends sql_connector {
 	public function asc(): sql_connector {
 		$this->request['sens'] = self::ASC;
 		return $this;
-	}
-
-	/**
-	 * @throws \Exception
-	 */
-	private function get_primary_key() {
-		/**
-		 * @var \project\utils\json $json_util
-		 */
-		$json_util = $this->get_util('json');
-		$json_obj = $json_util::get_from_file($this->connector.'/'.$this->request['table']);
-
-		$header = $json_obj->json()->header;
-
-		foreach ($header as $value) {
-			if(isset($value->key) && $value->key === 'primary') {
-				return $value->field;
-			}
-		}
-		return null;
 	}
 
 	/**
@@ -214,10 +172,8 @@ class json extends sql_connector {
 					$result_tmp = [];
 					foreach ($result as $value) {
 						$OK = [];
-						var_dump($this->request['where']);
 						foreach ($this->request['where'] as $i => $where) {
 							if($where !== self::AND && $where !== self::OR) {
-								var_dump($where);
 								$part1 = $where[0];
 								$part2 = $where[1];
 								$op = $where[2];
@@ -292,29 +248,20 @@ class json extends sql_connector {
 					$field_exists = false;
 					foreach ($this->request['fields'] as $local_field) {
 						if($field->field === array_keys($local_field)[0]) {
-							$field->value = $local_field[$field->field];
+							$field->value = $local_field[array_keys($local_field)[0]];
 							$field_exists = $field;
 							break;
 						}
 					}
-					if($field_exists === false) {
+					if(!$field_exists) {
 						$field_name = $field->field;
 						$default = null;
 						if(isset($field->default)) {
-							$field_value = $field->default;
-							if($field_value === self::NOW) {
-								$field_value = self::NOW();
-							}
+							$default = $field->default;
 						}
-						else {
-							$field_value = $field->value;
-						}
-						$last_field = null;
-						if(isset($field->increment) && $field->increment === 'auto_increment') {
-							$complete_table = $this->get($this->request['table'])->go();
-							$last_field = count($complete_table) > 1 ? $complete_table[count($complete_table)-1][$field->field] : 0;
-							$last_field++;
-							$field_value = $last_field;
+						$field_value = $default;
+						if($default === self::NOW) {
+							$field_value = self::NOW();
 						}
 					}
 					else {
@@ -347,33 +294,11 @@ class json extends sql_connector {
 					 * @var \project\utils\json $json_util_w
 					 */
 					$json_util_w = $this->get_util('json', $json);
-					$complete_table = $this->get($this->request['table'])->go();
-					$primary_key = $this->get_primary_key();
-					$this->last_id = $complete_table[count($complete_table)-1][$primary_key];
 					$json_util_w->create_file($this->connector.'/'.$this->request['table']);
-					$complete_table = $this->get($this->request['table'])->go();
-					$last_id = $complete_table[count($complete_table)-1][$primary_key];
-					if($this->last_id === $last_id-1) {
-						$this->last_id = $last_id;
-						return true;
-					}
-					return false;
 				}
 				else throw new \Exception('Le champ \''.$failed_field['name'].'\' n\'est pas au bon format : il est au format \''.$failed_field['type']['expected'].'\' alors qu\'il devrait être au format \''.$failed_field['type']['actual'].'\'');
 				break;
 			case self::UPDATE:
-				if(isset($this->request['where'])) {
-					$fields = [];
-					foreach ($this->request['fields'] as $field) {
-						$fields[] = array_keys($field)[0];
-					}
-					$sql_class_name = __CLASS__;
-					$table_selected_with_condition = (new $sql_class_name($this->connection))->get($this->request['table'], $fields)
-														  ->where($this->request['where'])->go();
-					var_dump($table_selected_with_condition);
-				}
-				else throw new \Exception('\'where\' condition is expected');
-				break;
 			case self::DELETE:
 			default:
 				break;
