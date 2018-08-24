@@ -89,19 +89,19 @@ Project::main(function ($_this) {
 						 ]
 		  );
 
-//	var_dump($sql_connector	->get('user', 'id', 'nom', 'prenom', ['date_inscription' => 'di'])
-//				 			->where(
-//				 				['id', 	10, 		json::INF_OR_EQUALS	],
-//								['nom', 'Choquet', 	json::EQUALS		]
-//							)->order('prenom')
-//							 ->asc()->go());
+	var_dump($sql_connector	->get('user', 'id', 'nom', 'prenom', ['date_inscription' => 'di'])
+				 			->where(
+				 				['id', 	10, 		json::INF_OR_EQUALS	],
+								['nom', 'Choquet', 	json::EQUALS		]
+							)->order('prenom')
+							 ->asc()->go());
 
 //	$sql_connector->add('user',
 //		['nom' => 'Choquet'], ['prenom' => 'André'],
 //		['email' => 'andre.choquet@gmail.com'], ['motdepasse' => '0000']
 //	)->go();
 
-	$sql_connector->update('user', ['nom' => 'Loubet'])->where(['prenom' => 'André'])->go();
+//	$sql_connector->update('user', ['nom' => 'Loubet'])->where(['prenom' => 'André'])->go();
 
 
 
