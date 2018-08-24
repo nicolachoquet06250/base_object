@@ -89,7 +89,12 @@ class json extends sql_connector {
 		 * @var \project\utils\json $json_util
 		 */
 		$json_util = $this->get_util('json', $table_content);
-		if(!$if_not_exists && !is_file($this->connector.'/'.$table.'.json')) {
+		if($if_not_exists) {
+			if(!file_exists($this->connector.'/'.$table.'.json')) {
+				$json_util->create_file($this->connector.'/'.$table);
+			}
+		}
+		else {
 			$json_util->create_file($this->connector.'/'.$table);
 		}
 		return $this;
@@ -310,7 +315,7 @@ class json extends sql_connector {
 						$last_field = null;
 						if(isset($field->increment) && $field->increment === 'auto_increment') {
 							$complete_table = $this->get($this->request['table'])->go();
-							$last_field = count($complete_table) > 1 ? $complete_table[count($complete_table)-1][$field->field] : 0;
+							$last_field = count($complete_table) > 1 && isset($complete_table[count($complete_table)-1][$field->field]) ? $complete_table[count($complete_table)-1][$field->field] : 0;
 							$last_field++;
 							$field_value = $last_field;
 						}
@@ -340,6 +345,7 @@ class json extends sql_connector {
 				}
 
 				if($line_valid) {
+					$json->body = (array)$json->body;
 					$json->body[] = $line;
 					/**
 					 * @var \project\utils\json $json_util_w

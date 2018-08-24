@@ -9,6 +9,8 @@ use project\services\managers\dao_manager;
 use project\sql\json;
 use project\utils\Project;
 
+//ini_set('display_errors', 'on');
+
 require_once 'autoload.php';
 
 Project::main(function ($_this) {
@@ -89,17 +91,44 @@ Project::main(function ($_this) {
 						 ]
 		  );
 
-//	var_dump($sql_connector	->get('user', 'id', 'nom', 'prenom', ['date_inscription' => 'di'])
-//				 			->where(
-//				 				['id', 	10, 		json::INF_OR_EQUALS	],
-//								['nom', 'Choquet', 	json::EQUALS		]
-//							)->order('prenom')
-//							 ->asc()->go());
+	$users = [
+		[
+			'nom' => 'Choquet',
+			'prenom' => 'Nicolas',
+			'email' => 'nicolachoquet06250@gmail.com',
+			'motdepasse' => '0000'
+		],
+		[
+			'nom' => 'Choquet',
+			'prenom' => 'Yann',
+			'email' => 'choquet.yann@gmail.com',
+			'motdepasse' => '0000'
+		],
+		[
+			'nom' => 'Choquet',
+			'prenom' => 'André',
+			'email' => 'andchoq36@gmail.com',
+			'motdepasse' => '0000'
+		],
+		[
+			'nom' => 'Loubet',
+			'prenom' => 'André',
+			'email' => 'loubet.andre@laposte.net',
+			'motdepasse' => '0000'
+		]
+	];
+	foreach ($users as $user) {
+		$sql_connector->add('user',
+							['nom' => $user['nom']], ['prenom' => $user['prenom']],
+							['email' => $user['email']], ['motdepasse' => $user['motdepasse']])->go();
+	}
 
-//	$sql_connector->add('user',
-//		['nom' => 'Choquet'], ['prenom' => 'André'],
-//		['email' => 'andre.choquet@gmail.com'], ['motdepasse' => '0000']
-//	)->go();
+	$_this->var_dump($sql_connector	->get('user', 'id', 'nom', 'prenom', ['date_inscription' => 'di'])
+				 			->where(
+				 				['id', 	10, 		json::INF_OR_EQUALS	],
+								['nom', 'Choquet', 	json::EQUALS		]
+							)->order('prenom')
+							 ->asc()->go());
 
 //	$sql_connector->update('user', ['nom' => 'Loubet'])->where(['prenom' => 'André'])->go();
 

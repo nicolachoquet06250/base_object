@@ -4,6 +4,13 @@ namespace project\extended\classes;
 
 
 class util extends BaseObject {
+
+	public function var_dump(...$var) {
+		echo '<pre>';
+		var_dump($var);
+		echo '</pre>';
+	}
+
 	private function parcour_dir($class_to_find, $directory = './classes') {
 		$dir = opendir($directory);
 		$class = false;
