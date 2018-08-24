@@ -8,7 +8,36 @@ use project\services\managers\dao_manager;
 
 class json extends sql_connector {
 	private const SELECT = 'select', UPDATE = 'update', DELETE = 'delete', INSERT = 'insert';
-	private $database, $path, $request, $result = null;
+	private $database, $path, $request, $result = null, $last_id = null;
+
+	private function save_request_infos($type, $table, $fields) {
+		$this->request['table'] = $table;
+		$this->request['key'] = $type;
+		$this->request['fields'] = $fields;
+		if(count($fields) === 1 && count($fields[0]) > 1 && isset($fields[0][0])) {
+			$this->request['fields'] = $fields[0];
+		}
+	}
+
+	/**
+	 * @throws \Exception
+	 */
+	private function get_primary_key() {
+		/**
+		 * @var \project\utils\json $json_util
+		 */
+		$json_util = $this->get_util('json');
+		$json_obj = $json_util::get_from_file($this->connector.'/'.$this->request['table']);
+
+		$header = $json_obj->json()->header;
+
+		foreach ($header as $value) {
+			if(isset($value->key) && $value->key === 'primary') {
+				return $value->field;
+			}
+		}
+		return null;
+	}
 
 	/**
 	 * @inheritdoc
@@ -71,9 +100,7 @@ class json extends sql_connector {
 	 * @inheritdoc
 	 */
 	public function get($table, ...$fields): sql_connector {
-		$this->request['key'] = self::SELECT;
-		$this->request['table'] = $table;
-		$this->request['fields'] = $fields;
+		$this->save_request_infos(self::SELECT, $table, $fields);
 		return $this;
 	}
 
@@ -81,9 +108,15 @@ class json extends sql_connector {
 	 * @inheritdoc
 	 */
 	public 	function add($in, ...$fields) : sql_connector {
-		$this->request['table'] = $in;
-		$this->request['key'] = self::INSERT;
-		$this->request['fields'] = $fields;
+		$this->save_request_infos(self::INSERT, $in, $fields);
+		return $this;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function update($in, ...$fields): sql_connector {
+		$this->save_request_infos(self::UPDATE, $in, $fields);
 		return $this;
 	}
 
@@ -92,7 +125,9 @@ class json extends sql_connector {
 	 */
 	public function where(...$where): sql_connector {
 		if(!empty($where)) {
-			$this->request['where'] = $where;
+			if(isset($where[0]) && !empty($where[0])) {
+				$this->request['where'] = $where;
+			}
 		}
 		return $this;
 	}
@@ -248,20 +283,29 @@ class json extends sql_connector {
 					$field_exists = false;
 					foreach ($this->request['fields'] as $local_field) {
 						if($field->field === array_keys($local_field)[0]) {
-							$field->value = $local_field[array_keys($local_field)[0]];
+							$field->value = $local_field[$field->field];
 							$field_exists = $field;
 							break;
 						}
 					}
-					if(!$field_exists) {
+					if($field_exists === false) {
 						$field_name = $field->field;
 						$default = null;
 						if(isset($field->default)) {
-							$default = $field->default;
+							$field_value = $field->default;
+							if($field_value === self::NOW) {
+								$field_value = self::NOW();
+							}
 						}
-						$field_value = $default;
-						if($default === self::NOW) {
-							$field_value = self::NOW();
+						else {
+							$field_value = $field->value;
+						}
+						$last_field = null;
+						if(isset($field->increment) && $field->increment === 'auto_increment') {
+							$complete_table = $this->get($this->request['table'])->go();
+							$last_field = count($complete_table) > 1 ? $complete_table[count($complete_table)-1][$field->field] : 0;
+							$last_field++;
+							$field_value = $last_field;
 						}
 					}
 					else {
@@ -294,11 +338,48 @@ class json extends sql_connector {
 					 * @var \project\utils\json $json_util_w
 					 */
 					$json_util_w = $this->get_util('json', $json);
+					$complete_table = $this->get($this->request['table'])->go();
+					$primary_key = $this->get_primary_key();
+					$this->last_id = $complete_table[count($complete_table)-1][$primary_key];
 					$json_util_w->create_file($this->connector.'/'.$this->request['table']);
+					$complete_table = $this->get($this->request['table'])->go();
+					$last_id = $complete_table[count($complete_table)-1][$primary_key];
+					if($this->last_id === $last_id-1) {
+						$this->last_id = $last_id;
+						return true;
+					}
+					return false;
 				}
 				else throw new \Exception('Le champ \''.$failed_field['name'].'\' n\'est pas au bon format : il est au format \''.$failed_field['type']['expected'].'\' alors qu\'il devrait être au format \''.$failed_field['type']['actual'].'\'');
 				break;
 			case self::UPDATE:
+				$request = $this->request;
+				if(isset($request['where'])) {
+					$json_obj = $json_util::get_from_file($this->connector.'/'.$request['table']);
+					$complete_table = $json_obj->json();
+					$complete_table_body = $complete_table->body;
+					foreach ($complete_table_body as $i => $line) {
+						foreach ($request['where'] as $where) {
+							if(in_array(array_keys($where)[0], array_keys((array) $line))) {
+								$field = array_keys($where)[0];
+								if($line->$field === $where[$field]) {
+									foreach ($request['fields'] as $local_field) {
+										$local_field_name = array_keys($local_field)[0];
+										$local_field_value = $local_field[$local_field_name];
+										$complete_table_body[$i]->$local_field_name = $local_field_value;
+									}
+								}
+							}
+						}
+					}
+					$complete_table->body = $complete_table_body;
+					/**
+					 * @var \project\utils\json $json_util_w
+					 */
+					$json_util_w = $this->get_util('json', $complete_table);
+					$json_util_w->create_file($this->connector.'/'.$this->request['table']);
+				}
+				break;
 			case self::DELETE:
 			default:
 				break;
