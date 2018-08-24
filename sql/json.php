@@ -2,7 +2,9 @@
 
 namespace project\sql;
 
+use project\dao\user_dao;
 use project\extended\classes\sql_connector;
+use project\services\managers\dao_manager;
 
 class json extends sql_connector {
 	private const SELECT = 'select', UPDATE = 'update', DELETE = 'delete', INSERT = 'insert';
@@ -200,21 +202,36 @@ class json extends sql_connector {
 				}
 
 				if(isset($this->request['order'])) {
-					// TODO code pour ordonner les résultats
+					foreach ($this->request['order'] as $order) {
+						if(isset($this->request['sens'])) {
+							usort($result, [
+								dao_manager::create()->create_dao($this->request['table']),
+								'order_by_'.$order.'__'.$this->request['sens']
+							]);
+						}
+						else {
+							usort($result, [
+								dao_manager::create()->create_dao($this->request['table']),
+								'order_by_'.$order
+							]);
+						}
+					}
 				}
 
 				if(isset($this->request['group'])) {
-					// TODO code pour grouper les résultats
-				}
-
-				if(isset($this->request['sens'])) {
-					switch ($this->request['sens']) {
-						case self::ASC:
-							// TODO code pour ordonner les résultats dans le sens croissant
-						case self::DESC:
-							// TODO code pour ordonner les résultats dans le sens décroissant
-						default:
-							break;
+					foreach ($this->request['order'] as $order) {
+						if(isset($this->request['sens'])) {
+							usort($result, [
+								dao_manager::create()->create_dao($this->request['table']),
+								'group_by_'.$order.'__'.$this->request['sens']
+							]);
+						}
+						else {
+							usort($result, [
+								dao_manager::create()->create_dao($this->request['table']),
+								'group_by_'.$order
+							]);
+						}
 					}
 				}
 

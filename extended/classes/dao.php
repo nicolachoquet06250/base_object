@@ -4,7 +4,7 @@ namespace project\extended\classes;
 use Exception;
 use project\extended\traits\manager;
 
-class dao extends BaseObject {
+class dao extends util {
     use manager;
 
 	/**
@@ -53,5 +53,75 @@ class dao extends BaseObject {
 			$this->set_field($field, $fields[$i]);
     	}
     	return $this;
+	}
+
+	/**
+	 * Algo d'ordonendement 'order_by'
+	 *
+	 * @param $field
+	 * @param $sens
+	 * @param $tab1
+	 * @param $tab2
+	 * @return bool
+	 */
+	protected function order_by($field, $sens, $tab1, $tab2) {
+		if($sens === sql_connector::ASC) {
+			if ($this->is_integer($tab1[$field])) {
+				return $tab1[$field] > $tab2[$field];
+			} else {
+				return ord(substr($tab1[$field], 0, 1)) > ord(substr($tab2[$field], 0, 1));
+			}
+		}
+		else {
+			if ($this->is_integer($tab1[$field])) {
+				return $tab1[$field] < $tab2[$field];
+			} else {
+				return ord(substr($tab1[$field], 0, 1)) < ord(substr($tab2[$field], 0, 1));
+			}
+		}
+	}
+
+	/**
+	 * Algo d'ordonendement 'group_by'
+	 *
+	 * @param $field
+	 * @param $sens
+	 * @param $tab1
+	 * @param $tab2
+	 * @return bool
+	 */
+	protected function group_by($field, $sens, $tab1, $tab2) {
+		if($sens === sql_connector::ASC) {
+			if ($this->is_integer($tab1[$field])) {
+				return $tab1[$field] > $tab2[$field];
+			} else {
+				return ord(substr($tab1[$field], 0, 1)) > ord(substr($tab2[$field], 0, 1));
+			}
+		}
+		else {
+			if ($this->is_integer($tab1[$field])) {
+				return $tab1[$field] < $tab2[$field];
+			} else {
+				return ord(substr($tab1[$field], 0, 1)) < ord(substr($tab2[$field], 0, 1));
+			}
+		}
+	}
+
+	public function __call($name, $a) {
+		if(strstr($name, 'order_by_')) {
+			$field = str_replace('order_by_', '', $name);
+			$field = explode('__', $field);
+			$sens = isset($field[1]) ? $field[1] : sql_connector::ASC;
+			$field = $field[0];
+			return $this->order_by($field, $sens, $a[0], $a[1]);
+		}
+		elseif(strstr($name, 'group_by_')) {
+			$field = str_replace('group_by_', '', $name);
+			$field = explode('__', $field);
+			$sens = isset($field[1]) ? $field[1] : sql_connector::ASC;
+			$field = $field[0];
+			return $this->group_by($field, $sens, $a[0], $a[1]);
+		}
+		return parent::__call($name, $a);
 	}
 }

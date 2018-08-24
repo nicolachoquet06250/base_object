@@ -38,8 +38,7 @@ class BaseObject extends \stdClass {
 	 */
 	public function __call($name, $arguments) {
 		$method_parts = explode('_', $name);
-		if(
-			($method_parts[0] === 'get' || $method_parts[0] === 'set')
+		if(($method_parts[0] === 'get' || $method_parts[0] === 'set')
 			&& isset($this->gettable_and_settable_classes[$method_parts[1]])
 		) {
 			$method = $method_parts[0].'_'.$method_parts[1];

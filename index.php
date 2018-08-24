@@ -93,7 +93,8 @@ Project::main(function ($_this) {
 				 			->where(
 				 				['id', 	10, 		json::INF_OR_EQUALS	],
 								['nom', 'Choquet', 	json::EQUALS		]
-							)->go());
+							)->order('prenom')
+							 ->asc()->go());
 
 	$sql_connector->add('user',
 		['id' => 2], ['nom' => 'Choquet'], ['prenom' => 'André'],
