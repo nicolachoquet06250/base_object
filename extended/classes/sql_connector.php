@@ -2,6 +2,8 @@
 
 namespace project\extended\classes;
 
+use project\utils\ArrayList;
+
 abstract class sql_connector extends util {
 	const STRING = 'string', INTEGER = 'integer', INT = 'integer', OBJECT = 'object', DATE = 'string';
 	const NOW = 'NOW()';
@@ -95,7 +97,7 @@ abstract class sql_connector extends util {
 
 	/**
 	 * @param string $format
-	 * @return mixed
+	 * @return ArrayList<dao>|array|bool
 	 */
 	abstract public 	function go($format = 'json');
 }

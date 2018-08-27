@@ -7,19 +7,18 @@ use project\dao\user_dao;
 use project\extended\classes\sql_connector;
 use project\services\managers\dao_manager;
 use project\sql\json;
-use project\utils\ArrayList;
 use project\utils\Project;
+use project\extended\classes\view;
 
 require_once 'autoload.php';
 
-Project::Accueil(function ($_this, $args) {
+echo Project::Accueil(function ($_this, $args) {
 	$page_name = $args['page_name'];
+	$template_name = $args['template_name'];
 	/**
 	 * @var Project $_this
 	 * @var user_dao $user
 	 */
-
-	$_this->var_dump($page_name);
 
 	$prenom = dao_manager::create()->get_dao_from('user', 'prenom', 'Yann')->get_field('prenom');
 	$src = dao_manager::create()->get_dao_from('slider', 'name', 'Slider 1')->get_field('src');
@@ -35,20 +34,6 @@ Project::Accueil(function ($_this, $args) {
 							'06250', 'Mougins', '1995-07-21',
 							date('Y-m-d'));
 	$test_afficher_body = $_this->get_object('test_afficher_body');
-
-	echo "--------------------------- dao ---------------------------\n";
-	$_this->var_dump($prenom, $src, $nom, $new_user->get_field('date_naissence'));
-
-	echo "--------------------------- util --------------------------\n";
-	$_this->var_dump('test avec la méthode => '
-			 .$_this->get_method(test_afficher_body::class, 'display'),
-					 'test sans la méthode => '
-			 .$test_afficher_body->display(),
-					 'test statique avec la méthode => '
-			 .$_this->get_static_method(test_afficher_body::class, 'toto', 'test', 'avec', 'des', 'tapettes'),
-					 'test statique sans la méthode => '
-					 .test_afficher_body::toto('test', 'avec', 'des', 'tapettes'),
-			 $_this->is_object($test_afficher_body));
 
 	$sql_connector = $_this->sql_connector('json', 'account');
 
@@ -122,17 +107,65 @@ Project::Accueil(function ($_this, $args) {
 //							['email' => $user['email']], ['motdepasse' => $user['motdepasse']])->go());
 	}
 
-	$_this->var_dump($sql_connector	->get(user_dao::class, 'id', 'nom', 'prenom', ['date_inscription' => 'di'])
+	$users = $sql_connector	->get(user_dao::class, 'id', 'nom', 'prenom', ['date_inscription' => 'di'])
 				 			->where(
 				 				['id', 	10, 		json::INF_OR_EQUALS	],
 								['nom', 'Choquet', 	json::EQUALS		]
 							)->order('prenom')
-							 ->asc()->go());
+							 ->asc()->go();
+
+	$tableau_user = '<table>';
+	if(!empty($users)) {
+		/**
+		 * @var user_dao $user0
+		 */
+		$user0 = $users[0];
+		$tableau_user .= '<thead><tr>';
+		foreach ($user0->get_fields() as $field) {
+			if($field !== 'id') {
+				$tableau_user .= '<th>'.$field.'</th>';
+			}
+		}
+		$tableau_user .= '</tr></thead>';
+	}
+	else {
+		$tableau_user .= '<body>
+	<tr>
+		<th>Aucun utilisateur inscrit</th>
+	</tr>
+</body>';
+	}
+	$tableau_user .= '<tbody>';
+	foreach ($users as $user) {
+		$tableau_user .= '<tr>';
+		foreach ($user->get_fields() as $field) {
+			if($field !== 'id') {
+				$tableau_user .= '<td>';
+				$tableau_user .= (($field_value = $user->get_field($field)) !== null) ? $field_value : '<center>//</center>';
+				$tableau_user .= '</td>';
+			}
+		}
+		$tableau_user .= '</tr>';
+	}
+	$tableau_user .= '</tbody>';
+	$tableau_user .= '</table>';
 
 //	$sql_connector->update('user', ['nom' => 'Loubet'])->where(['prenom' => 'André'])->go();
-
 //	$sql_connector->delete('user')->where(['id', 3, json::EQUALS])->go();
 
-
-
-});
+	return view::get(
+		['page_name' => $page_name],
+		['template_name' => $template_name],
+		['prenom' => $prenom],
+		['src' => $src],
+		['nom' => $nom],
+		['date_naissence' => $new_user->get_field('date_naissence')],
+		['test1' => 'test avec la méthode => '.$_this->get_method(test_afficher_body::class, 'display')],
+		['test2' => 'test sans la méthode => '.$test_afficher_body->display()],
+		['test3' => 'test statique avec la méthode => '
+					.$_this->get_static_method(test_afficher_body::class, 'toto', 'test', 'avec', 'des', 'tapettes')],
+		['test4' => 'test statique sans la méthode => '.test_afficher_body::toto('test', 'avec', 'des', 'tapettes')],
+		['test5' => $_this->is_object($test_afficher_body)],
+		['tableau_users' => $tableau_user]
+	);
+}, 'Accueil');

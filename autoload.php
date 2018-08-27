@@ -2,6 +2,7 @@
 
 	require_once 'extended/classes/BaseObject.php';
 	require_once 'extended/classes/util.php';
+	require_once 'extended/classes/view.php';
 	require_once 'extended/classes/sql_connector.php';
 	require_once 'extended/traits/manager.php';
 	require_once 'extended/classes/dao.php';

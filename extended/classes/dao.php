@@ -34,6 +34,14 @@ class dao extends util {
 		throw new Exception('Field '.$champ.' not found');
 	}
 
+	/**
+	 * @throws Exception
+	 */
+	public function get_not_null_fields() {
+		$fields = [];
+		foreach ($this->get_fields() as $field) if($this->get_field($field) !== null) $fields[] = $field;
+	}
+
     /**
      * @param string $champ
      * @return string|int|BaseObject
@@ -44,7 +52,7 @@ class dao extends util {
     }
 
 	/**
-	 * @param array ...$fields
+	 * @param string[] ...$fields
 	 * @return $this
 	 * @throws Exception
 	 */
