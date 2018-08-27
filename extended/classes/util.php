@@ -11,7 +11,9 @@ class util extends BaseObject {
 		if(!self::is_cli()) {
 			echo '<pre>';
 		}
-		var_dump($var);
+		foreach ($var as $value) {
+			var_dump($value);
+		}
 		if(!self::is_cli()) {
 			echo '</pre>';
 		}

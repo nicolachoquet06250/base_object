@@ -165,6 +165,13 @@ class json extends sql_connector {
 
 		$this->last_id = $this->get_last_id();
 
+		foreach ($json->body as $field) {
+			if($field->{$this->get_primary_key()} === $this->last_id) {
+				$bad_last_id = $line[$this->get_primary_key()];
+				throw new \Exception('La ligne avec l\'identifiant de la valeur \''.$bad_last_id.'\' existe déja');
+			}
+		}
+
 		/**
 		 * @var \project\utils\json $json_util_w
 		 */
