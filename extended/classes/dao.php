@@ -49,6 +49,9 @@ class dao extends util {
 	 * @throws Exception
 	 */
 	public function create_new(...$fields) {
+		if(count($fields) === 1 && count($fields[0]) > 1) {
+			$fields = $fields[0];
+		}
 		foreach ($this->get_fields() as $i => $field) {
 			$this->set_field($field, $fields[$i]);
     	}
@@ -63,20 +66,41 @@ class dao extends util {
 	 * @param $tab1
 	 * @param $tab2
 	 * @return bool
+	 * @throws Exception
 	 */
 	protected function order_by($field, $sens, $tab1, $tab2) {
-		if($sens === sql_connector::ASC) {
-			if ($this->is_integer($tab1[$field])) {
-				return $tab1[$field] > $tab2[$field];
+		if($this->is_object($tab1, dao::class)) {
+			/**
+			 * @var dao $tab1
+			 * @var dao $tab2
+			 */
+			if ($sens === sql_connector::ASC) {
+				if ($this->is_integer($tab1->get_field($field))) {
+					return $tab1->get_field($field) > $tab2->get_field($field);
+				} else {
+					return ord(substr($tab1->get_field($field), 0, 1)) > ord(substr($tab2->get_field($field), 0, 1));
+				}
 			} else {
-				return ord(substr($tab1[$field], 0, 1)) > ord(substr($tab2[$field], 0, 1));
+				if ($this->is_integer($tab1[$field])) {
+					return $tab1->get_field($field) < $tab2->get_field($field);
+				} else {
+					return ord(substr($tab1->get_field($field), 0, 1)) < ord(substr($tab2->get_field($field), 0, 1));
+				}
 			}
 		}
 		else {
-			if ($this->is_integer($tab1[$field])) {
-				return $tab1[$field] < $tab2[$field];
+			if ($sens === sql_connector::ASC) {
+				if ($this->is_integer($tab1[$field])) {
+					return $tab1[$field] > $tab2[$field];
+				} else {
+					return ord(substr($tab1[$field], 0, 1)) > ord(substr($tab2[$field], 0, 1));
+				}
 			} else {
-				return ord(substr($tab1[$field], 0, 1)) < ord(substr($tab2[$field], 0, 1));
+				if ($this->is_integer($tab1[$field])) {
+					return $tab1[$field] < $tab2[$field];
+				} else {
+					return ord(substr($tab1[$field], 0, 1)) < ord(substr($tab2[$field], 0, 1));
+				}
 			}
 		}
 	}
@@ -89,20 +113,41 @@ class dao extends util {
 	 * @param $tab1
 	 * @param $tab2
 	 * @return bool
+	 * @throws Exception
 	 */
 	protected function group_by($field, $sens, $tab1, $tab2) {
-		if($sens === sql_connector::ASC) {
-			if ($this->is_integer($tab1[$field])) {
-				return $tab1[$field] > $tab2[$field];
+		if($this->is_object($tab1, dao::class)) {
+			/**
+			 * @var dao $tab1
+			 * @var dao $tab2
+			 */
+			if ($sens === sql_connector::ASC) {
+				if ($this->is_integer($tab1->get_field($field))) {
+					return $tab1->get_field($field) > $tab2->get_field($field);
+				} else {
+					return ord(substr($tab1->get_field($field), 0, 1)) > ord(substr($tab2->get_field($field), 0, 1));
+				}
 			} else {
-				return ord(substr($tab1[$field], 0, 1)) > ord(substr($tab2[$field], 0, 1));
+				if ($this->is_integer($tab1[$field])) {
+					return $tab1->get_field($field) < $tab2->get_field($field);
+				} else {
+					return ord(substr($tab1->get_field($field), 0, 1)) < ord(substr($tab2->get_field($field), 0, 1));
+				}
 			}
 		}
 		else {
-			if ($this->is_integer($tab1[$field])) {
-				return $tab1[$field] < $tab2[$field];
+			if ($sens === sql_connector::ASC) {
+				if ($this->is_integer($tab1[$field])) {
+					return $tab1[$field] > $tab2[$field];
+				} else {
+					return ord(substr($tab1[$field], 0, 1)) > ord(substr($tab2[$field], 0, 1));
+				}
 			} else {
-				return ord(substr($tab1[$field], 0, 1)) < ord(substr($tab2[$field], 0, 1));
+				if ($this->is_integer($tab1[$field])) {
+					return $tab1[$field] < $tab2[$field];
+				} else {
+					return ord(substr($tab1[$field], 0, 1)) < ord(substr($tab2[$field], 0, 1));
+				}
 			}
 		}
 	}

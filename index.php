@@ -7,6 +7,7 @@ use project\dao\user_dao;
 use project\extended\classes\sql_connector;
 use project\services\managers\dao_manager;
 use project\sql\json;
+use project\utils\ArrayList;
 use project\utils\Project;
 
 require_once 'autoload.php';

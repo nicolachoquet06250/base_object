@@ -2,16 +2,28 @@
 
 namespace project\sql;
 
-use project\dao\user_dao;
+use project\extended\classes\dao;
 use project\extended\classes\sql_connector;
 use project\services\managers\dao_manager;
+use project\utils\ArrayList;
 
 class json extends sql_connector {
-	private const SELECT = 'select', UPDATE = 'update', DELETE = 'delete', INSERT = 'insert';
-	private $database, $path, $request, $result = null, $last_id = null;
+	private const 	SELECT = 'select',
+					UPDATE = 'update',
+					DELETE = 'delete',
+					INSERT = 'insert';
+	private $database, $path, $request,
+			$result = null, $last_id = null;
 
 	private function save_request_infos($type, $table, $fields = []) {
 		$this->request['table'] = $table;
+		$this->request['dao'] = false;
+		$this->request['dao_class'] = false;
+		if(strstr($table, 'dao')) {
+			$this->request['dao_class'] = $table;
+			$this->request['table'] = str_replace(['project\dao\\', '_dao'], '', $table);
+			$this->request['dao'] = $this->request['table'];
+		}
 		$this->request['key'] = $type;
 		if(!empty($fields)) {
 			$this->request['fields'] = $fields;
@@ -19,6 +31,7 @@ class json extends sql_connector {
 	}
 
 	/**
+	 * @return string|null
 	 * @throws \Exception
 	 */
 	private function get_primary_key() {
@@ -60,8 +73,8 @@ class json extends sql_connector {
 	}
 
 	/**
-	 * @throws \Exception
 	 * @return int
+	 * @throws \Exception
 	 */
 	private function get_last_id() {
 		$primary_key = $this->get_primary_key();
@@ -340,16 +353,26 @@ class json extends sql_connector {
 				$json = $json_util::get_from_file($this->connector.'/'.$this->request['table'])->json();
 
 				if(empty((array) $json->body)) return [];
+				$result = ($dao = $this->request['dao_class']) !== false ? new ArrayList($dao) : [];
 
-				$result = [];
 				if(empty($this->request['fields'])) {
 					foreach ($json->body as $line) {
-						$result[] = (array) $line;
+						if(($dao = $this->request['dao']) !== false) {
+							$new_line = dao_manager::create()->create_dao($dao);
+							foreach ($new_line->get_fields() as $field) {
+								$new_line->set_field($field, $line->$field);
+							}
+							$result->append($new_line);
+						}
+						else {
+							$result[] = (array)$line;
+						}
 					}
 				}
 				else {
 					foreach ($json->body as $line) {
-						$new_line = [];
+						$new_line = ($dao = $this->request['dao']) !== false ? dao_manager::create()->create_dao($dao) : [];
+
 						foreach ($this->request['fields'] as $h_field) {
 							$alias = null;
 							if($this->is_array($h_field)) {
@@ -357,41 +380,86 @@ class json extends sql_connector {
 								$h_field = array_keys($h_field)[0];
 								$alias = $h_field_arr[$h_field];
 							}
-
-							$new_line[($alias ? $alias : $h_field)] = $line->$h_field;
+							if(($dao = $this->request['dao']) !== false) {
+								$new_line->set_field($h_field, $line->$h_field);
+							}
+							else {
+								$new_line[($alias ? $alias : $h_field)] = $line->$h_field;
+							}
 						}
-						$result[] = (array) $new_line;
+						if(($dao = $this->request['dao']) !== false) {
+							$result->append($new_line);
+						}
+						else {
+							$result[] = (array)$new_line;
+						}
 					}
 				}
 
 				if(isset($this->request['where'])) {
-					$result_tmp = [];
-					foreach ($result as $value) {
-						$OK = [];
-						foreach ($this->request['where'] as $i => $where) {
-							if($where !== self::AND && $where !== self::OR) {
-								$part1 = $where[0];
-								$part2 = $where[1];
-								$op = $where[2];
+					if(($dao = $this->request['dao_class']) !== false) {
+						$result_tmp = new ArrayList($dao);
+						/**
+						 * @var dao $value
+						 */
+						foreach ($result->get() as $value) {
+							$OK = [];
+							foreach ($this->request['where'] as $i => $where) {
+								if ($where !== self:: AND && $where !== self:: OR) {
+									$part1 = $where[0];
+									$part2 = $where[1];
+									$op    = $where[2];
 
-								$OK[] = ($op === self::EQUALS && $value[$part1] === $part2)
-										|| ($op === self::DIF && $value[$part1] !== $part2)
-										|| ($op === self::SUP && $value[$part1] > $part2)
-										|| ($op === self::SUP_OR_EQUALS && $value[$part1] >= $part2)
-										|| ($op === self::INF && $value[$part1] < $part2)
-										|| ($op === self::INF_OR_EQUALS && $value[$part1] <= $part2);
+									$OK[] = ($op === self::EQUALS && $value->get_field($part1) === $part2)
+											|| ($op === self::DIF && $value->get_field($part1) !== $part2)
+											|| ($op === self::SUP && $value->get_field($part1) > $part2)
+											|| ($op === self::SUP_OR_EQUALS && $value->get_field($part1) >= $part2)
+											|| ($op === self::INF && $value->get_field($part1) < $part2)
+											|| ($op === self::INF_OR_EQUALS && $value->get_field($part1) <= $part2);
+								}
+							}
+							$valid_OK = true;
+							foreach ($OK as $item) {
+								if (!$item) {
+									$valid_OK = false;
+									break;
+								}
+							}
+
+							if ($valid_OK) {
+								$result_tmp->append($value);
 							}
 						}
-						$valid_OK = true;
-						foreach ($OK as $item) {
-							if(!$item) {
-								$valid_OK = false;
-								break;
-							}
-						}
+					}
+					else {
+						$result_tmp = [];
+						foreach ($result as $value) {
+							$OK = [];
+							foreach ($this->request['where'] as $i => $where) {
+								if ($where !== self:: AND && $where !== self:: OR) {
+									$part1 = $where[0];
+									$part2 = $where[1];
+									$op    = $where[2];
 
-						if($valid_OK) {
-							$result_tmp[] = $value;
+									$OK[] = ($op === self::EQUALS && $value[$part1] === $part2)
+											|| ($op === self::DIF && $value[$part1] !== $part2)
+											|| ($op === self::SUP && $value[$part1] > $part2)
+											|| ($op === self::SUP_OR_EQUALS && $value[$part1] >= $part2)
+											|| ($op === self::INF && $value[$part1] < $part2)
+											|| ($op === self::INF_OR_EQUALS && $value[$part1] <= $part2);
+								}
+							}
+							$valid_OK = true;
+							foreach ($OK as $item) {
+								if (!$item) {
+									$valid_OK = false;
+									break;
+								}
+							}
+
+							if ($valid_OK) {
+								$result_tmp[] = $value;
+							}
 						}
 					}
 					$result = $result_tmp;
@@ -399,34 +467,64 @@ class json extends sql_connector {
 
 				if(isset($this->request['order'])) {
 					foreach ($this->request['order'] as $order) {
-						if(isset($this->request['sens'])) {
-							usort($result, [
-								dao_manager::create()->create_dao($this->request['table']),
-								'order_by_'.$order.'__'.$this->request['sens']
-							]);
+						if(($dao = $this->request['dao']) !== false) {
+							$result = $result->get();
+							if (isset($this->request['sens'])) {
+								usort($result, [
+									dao_manager::create()->create_dao($this->request['table']),
+									'order_by_'.$order.'__'.$this->request['sens']
+								]);
+							} else {
+								usort($result, [
+									dao_manager::create()->create_dao($this->request['table']),
+									'order_by_'.$order
+								]);
+							}
 						}
 						else {
-							usort($result, [
-								dao_manager::create()->create_dao($this->request['table']),
-								'order_by_'.$order
-							]);
+							if (isset($this->request['sens'])) {
+								usort($result, [
+									dao_manager::create()->create_dao($this->request['table']),
+									'order_by_'.$order.'__'.$this->request['sens']
+								]);
+							} else {
+								usort($result, [
+									dao_manager::create()->create_dao($this->request['table']),
+									'order_by_'.$order
+								]);
+							}
 						}
 					}
 				}
 
 				if(isset($this->request['group'])) {
 					foreach ($this->request['order'] as $order) {
-						if(isset($this->request['sens'])) {
-							usort($result, [
-								dao_manager::create()->create_dao($this->request['table']),
-								'group_by_'.$order.'__'.$this->request['sens']
-							]);
+						if(($dao = $this->request['dao']) !== false) {
+							$result = $result->get();
+							if (isset($this->request['sens'])) {
+								usort($result, [
+									dao_manager::create()->create_dao($this->request['table']),
+									'group_by_'.$order.'__'.$this->request['sens']
+								]);
+							} else {
+								usort($result, [
+									dao_manager::create()->create_dao($this->request['table']),
+									'group_by_'.$order
+								]);
+							}
 						}
 						else {
-							usort($result, [
-								dao_manager::create()->create_dao($this->request['table']),
-								'group_by_'.$order
-							]);
+							if (isset($this->request['sens'])) {
+								usort($result, [
+									dao_manager::create()->create_dao($this->request['table']),
+									'group_by_'.$order.'__'.$this->request['sens']
+								]);
+							} else {
+								usort($result, [
+									dao_manager::create()->create_dao($this->request['table']),
+									'group_by_'.$order
+								]);
+							}
 						}
 					}
 				}

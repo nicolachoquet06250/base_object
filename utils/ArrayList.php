@@ -17,11 +17,11 @@ class ArrayList extends util {
 	 */
     public function __construct($classe) {
     	parent::__construct();
-        $this->classe = $classe[0];
+    	$this->classe = $this->is_array($classe) ? $classe[0] : $classe;
     }
 
 	/**
-	 * @param array[BaseObject] ...$objs
+	 * @param BaseObject[] ...$objs
 	 * @throws Exception
 	 */
 	public function append(...$objs) {
@@ -60,7 +60,7 @@ class ArrayList extends util {
 
     /**
      * @param null|int $key
-     * @return array
+     * @return BaseObject[]
      * @throws Exception
      */
     public function get($key = null) {
@@ -74,7 +74,7 @@ class ArrayList extends util {
     }
 
 	/**
-	 * @return array
+	 * @return BaseObject[]
 	 */
     public function __debugInfo() {
         return $this->list;
