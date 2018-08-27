@@ -4,11 +4,24 @@ namespace project\extended\classes;
 
 
 class util extends BaseObject {
-
+	/**
+	 * @param array ...$var
+	 */
 	public function var_dump(...$var) {
-		echo '<pre>';
+		if(!self::is_cli()) {
+			echo '<pre>';
+		}
 		var_dump($var);
-		echo '</pre>';
+		if(!self::is_cli()) {
+			echo '</pre>';
+		}
+	}
+
+	public static function is_cli() {
+		if(strstr('cli', php_sapi_name())) {
+			return true;
+		}
+		return false;
 	}
 
 	private function parcour_dir($class_to_find, $directory = './classes') {

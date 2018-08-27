@@ -5,6 +5,7 @@ namespace project;
 use project\classes\test_afficher_body;
 use project\dao\user_dao;
 use project\extended\classes\sql_connector;
+use project\extended\classes\util;
 use project\services\managers\dao_manager;
 use project\sql\json;
 use project\utils\Project;
@@ -118,9 +119,9 @@ Project::main(function ($_this) {
 		]
 	];
 	foreach ($users as $user) {
-		$sql_connector->add('user',
-							['nom' => $user['nom']], ['prenom' => $user['prenom']],
-							['email' => $user['email']], ['motdepasse' => $user['motdepasse']])->go();
+//		$_this->var_dump($sql_connector->add('user',
+//							['nom' => $user['nom']], ['prenom' => $user['prenom']],
+//							['email' => $user['email']], ['motdepasse' => $user['motdepasse']])->go());
 	}
 
 	$_this->var_dump($sql_connector	->get('user', 'id', 'nom', 'prenom', ['date_inscription' => 'di'])

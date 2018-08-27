@@ -39,6 +39,148 @@ class json extends sql_connector {
 	}
 
 	/**
+	 * @param $field
+	 * @return int
+	 */
+	private function get_last_field($field) {
+		/**
+		 * @var \project\utils\json $json_util
+		 */
+		$json_util = $this->get_util('json');
+		$json_obj = $json_util::get_from_file($this->connector.'/'.$this->request['table']);
+		$json = $json_obj->json();
+		$complete_table = $json->body;
+		$nb_lignes = count($complete_table);
+		if($nb_lignes > 0) {
+			return $complete_table[$nb_lignes === 0 ? $nb_lignes : ($nb_lignes - 1)]->$field;
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
+	 * @throws \Exception
+	 * @return int
+	 */
+	private function get_last_id() {
+		$primary_key = $this->get_primary_key();
+		$last_field = $this->get_last_field($primary_key);
+		return $last_field !== null ? $last_field : 0;
+	}
+
+	/**
+	 * @param $field
+	 * @return bool
+	 */
+	private function field_exists($field) {
+		$field_exists = false;
+		foreach ($this->request['fields'] as $local_field) {
+			if($field->field === array_keys($local_field)[0]) {
+				$field->value = $local_field[$field->field];
+				$field_exists = $field;
+				break;
+			}
+		}
+		return $field_exists;
+	}
+
+	/**
+	 * @param $field_exists
+	 * @param $field
+	 * @return array
+	 */
+	private function get_finally_field($field_exists, $field) {
+		$field_value = null;
+
+		if($field_exists === false) {
+			$field_name = $field->field;
+			$default = null;
+			if(isset($field->default)) {
+				$field_value = $field->default;
+				if($field_value === self::NOW) {
+					$field_value = self::NOW();
+				}
+			}
+			else {
+				$field_value = $field->value;
+			}
+			$last_field = null;
+			if(isset($field->increment) && $field->increment === 'auto_increment') {
+				$last_field = $this->get_last_field($field_name);
+				if($last_field !== null) {
+					$last_field++;
+				}
+				else {
+					$last_field = 0;
+				}
+				$field_value = $last_field;
+			}
+		}
+		else {
+			$field_name = $field_exists->field;
+			$field_value = $field_exists->value;
+		}
+
+		return [$field_name, $field_value];
+	}
+
+	/**
+	 * @param $require_type
+	 * @param $line
+	 * @param $field_name
+	 * @param $field_value
+	 * @param $failed_field
+	 * @return bool
+	 */
+	private function replace_default_value_if_need($require_type, &$line, $field_name, $field_value, &$failed_field) {
+		if($this->{'is_'.$require_type}($field_value)) {
+			if($field_value === self::NOW) {
+				$field_value = self::NOW();
+			}
+			$line[$field_name] = $field_value;
+		}
+		else {
+			$failed_field = [
+				'name' => $field_name,
+				'type' => [
+					'expected' => $require_type,
+					'actual' => gettype($field_value),
+				],
+			];
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * @param $json
+	 * @param $line
+	 * @return bool
+	 * @throws \Exception
+	 */
+	private function save_new_line($json, $line) {
+		$json->body = (array)$json->body;
+		$json->body[] = $line;
+
+		$this->last_id = $this->get_last_id();
+
+		/**
+		 * @var \project\utils\json $json_util_w
+		 */
+		$json_util_w = $this->get_util('json', $json);
+		$json_util_w->create_file($this->connector.'/'.$this->request['table']);
+
+		$last_id = $this->get_last_id();
+
+		if($this->last_id === $last_id-1) {
+			$this->last_id = $last_id;
+			return true;
+		}
+		return false;
+	}
+
+	/**
 	 * @inheritdoc
 	 */
 	protected function after__construct() {
@@ -292,78 +434,20 @@ class json extends sql_connector {
 				$failed_field = [];
 
 				foreach ($json->header as $field) {
-					$field_exists = false;
-					foreach ($this->request['fields'] as $local_field) {
-						if($field->field === array_keys($local_field)[0]) {
-							$field->value = $local_field[$field->field];
-							$field_exists = $field;
-							break;
-						}
-					}
-					if($field_exists === false) {
-						$field_name = $field->field;
-						$default = null;
-						if(isset($field->default)) {
-							$field_value = $field->default;
-							if($field_value === self::NOW) {
-								$field_value = self::NOW();
-							}
-						}
-						else {
-							$field_value = $field->value;
-						}
-						$last_field = null;
-						if(isset($field->increment) && $field->increment === 'auto_increment') {
-							$complete_table = $this->get($this->request['table'])->go();
-							$last_field = count($complete_table) > 1 && isset($complete_table[count($complete_table)-1][$field->field]) ? $complete_table[count($complete_table)-1][$field->field] : 0;
-							$last_field++;
-							$field_value = $last_field;
-						}
-					}
-					else {
-						$field_name = $field_exists->field;
-						$field_value = $field_exists->value;
-					}
+					$field_exists = $this->field_exists($field);
+					list($field_name, $field_value) = $this->get_finally_field($field_exists, $field);
+
 					$require_type = $field->type;
-					if($this->{'is_'.$require_type}($field_value)) {
-						if($field_value === self::NOW) {
-							$field_value = self::NOW();
-						}
-						$line[$field_name] = $field_value;
-					}
-					else {
-						$failed_field = [
-							'name' => $field_name,
-							'type' => [
-								'expected' => $require_type,
-								'actual' => gettype($field_value),
-							],
-						];
+					if(!$this->replace_default_value_if_need($require_type, $line, $field_name, $field_value, $failed_field)) {
 						$line_valid = false;
 						break;
 					}
 				}
 
 				if($line_valid) {
-					$json->body = (array)$json->body;
-					$json->body[] = $line;
-					/**
-					 * @var \project\utils\json $json_util_w
-					 */
-					$json_util_w = $this->get_util('json', $json);
-					$complete_table = $this->get($this->request['table'])->go();
-					$primary_key = $this->get_primary_key();
-					$this->last_id = $complete_table[count($complete_table)-1][$primary_key];
-					$json_util_w->create_file($this->connector.'/'.$this->request['table']);
-					$complete_table = $this->get($this->request['table'])->go();
-					$last_id = $complete_table[count($complete_table)-1][$primary_key];
-					if($this->last_id === $last_id-1) {
-						$this->last_id = $last_id;
-						return true;
-					}
-					return false;
+					return $this->save_new_line($json, $line);
 				}
-				else throw new \Exception('Le champ \''.$failed_field['name'].'\' n\'est pas au bon format : il est au format \''.$failed_field['type']['expected'].'\' alors qu\'il devrait être au format \''.$failed_field['type']['actual'].'\'');
+				else throw new \Exception('Le champ \''.$failed_field['name'].'\' n\'est pas au bon format : il est au format \''.$failed_field['type']['actual'].'\' alors qu\'il devrait être au format \''.$failed_field['type']['expected'].'\'');
 			case self::UPDATE:
 				$request = $this->request;
 				if(isset($request['where'])) {
