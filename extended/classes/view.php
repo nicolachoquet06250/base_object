@@ -8,7 +8,7 @@ class view extends util {
 	private $view_path = './views';
 	private $template_name = '';
 	private $template_file_name = 'index.view.html';
-	private $template_404 = false;
+	private $template_404 = './views/errors/404/index.view.html';
 	private $vars = [];
 
 	public function __construct($vars) {
@@ -21,12 +21,28 @@ class view extends util {
 	}
 
 	protected function get_template_content() {
-		$template_content = file_get_contents($this->get_complete_path().'/'.$this->get_template_file_name());
-		list($var_keys, $var_values) = $this->get_vars_array();
-		$template_content = str_replace($var_keys, $var_values, $template_content);
-		return $template_content;
+		if(is_file($this->get_complete_path().'/'.str_replace('.html', '.php', $this->get_template_file_name()))) {
+			list($var_keys, $var_values) = $this->get_vars_array();
+			foreach ($var_keys as $i => $var_key) {
+				$key = str_replace(['[', ']'], '', $var_key);
+				$$key = $var_values[$i];
+			}
+			return include $this->get_complete_path().'/'.str_replace('.html', '.php', $this->get_template_file_name());
+		}
+		elseif (is_file($this->get_complete_path().'/'.$this->get_template_file_name())) {
+			$template_content = file_get_contents($this->get_complete_path().'/'.$this->get_template_file_name());
+			list($var_keys, $var_values) = $this->get_vars_array();
+			$template_content = str_replace($var_keys, $var_values, $template_content);
+			return $template_content;
+		}
+		else {
+			return $this->_404();
+		}
 	}
 
+	protected function get_vars() {
+		return $this->vars;
+	}
 	protected function set_vars_array($vars) {
 		$this->vars = $vars;
 	}
@@ -74,20 +90,25 @@ class view extends util {
 	}
 
 	protected function _404() {
+		header("HTTP/1.0 404 Page not found");
 		if($this->template_404 && is_file($this->template_404)) {
-			return file_get_contents($this->template_404);
+			$this->vars[]['page'] = $this->vars[0]['page_name'];
+			$this->vars[]['template'] = $this->vars[1]['template_name'];
+			$this->vars[0]['page_name'] = '404';
+			$this->vars[1]['template_name'] = '404';
+			list($var_keys, $var_values) = $this->get_vars_array();
+			$template_content = file_get_contents($this->template_404);
+			foreach ($var_keys as $i => $var_key) {
+				$template_content = str_replace($var_key, $var_values[$i], $template_content);
+			}
+			return $template_content;
 		}
-		return '404';
+		return '404 - Page not found';
 	}
 
 	protected function display_for_sub_view() {
 		$this->before_display();
-		if(is_file($this->get_complete_path().'/'.$this->get_template_file_name())) {
-			return $this->get_template_content();
-		}
-		else {
-			return $this->_404();
-		}
+		return $this->get_template_content();
 	}
 
 	/**
@@ -97,7 +118,7 @@ class view extends util {
 	public function display($sub = false) {
 		$this->before_display();
 		if($sub) {
-			return $this->display_for_sub_view();
+			return $this->get_template_content();
 		}
 		else {
 			if (is_file($this->get_complete_path().'/'.$this->get_template_file_name())) {
@@ -110,11 +131,13 @@ class view extends util {
 					$view = new $class($this->vars);
 					$view->set_template_name($this->get_template_name());
 					return $view->display();
-				} else {
+				}
+				else {
 					return $this->get_template_content();
 				}
-			} else {
-				return $this->_404();
+			}
+			else {
+				return $this->get_template_content();
 			}
 		}
 	}

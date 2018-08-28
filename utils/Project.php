@@ -71,5 +71,10 @@ class Project extends util {
 				return '';
 			}
 		}
+		header("HTTP/1.0 500 Internal Error");
+		$view = view::get(['page_name' => 500], ['template_name' => 500]);
+		$view->set_template_name('errors/500');
+		$view->set_template_404('errors/404');
+		return $view->display(true);
 	}
 }
