@@ -1,5 +1,7 @@
 <?php
 
+use project\dao\user_dao;
+
 $retour = '<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,14 +18,72 @@ $retour = '<!DOCTYPE html>
     '.$test2.'<br />
     '.$test3.'<br />
     '.$test4.'<br />
-    '.$test5.'<br />
-    '.$tableau_users;
-$retour .= '<br />';
-//foreach ($path_array as $directory => $file_array) {
-//	foreach ($file_array as $file) {
-//		$retour .= $directory.$file.'<br>';
-//	}
-//}
+    '.($test5 ? 'true' : 'false').'<br />';
+
+$tableau_users = '<table>';
+if(!empty($users)) {
+	/**
+	 * @var user_dao $user0
+	 */
+	$user0 = $users[0];
+	$tableau_users .= '<thead><tr>';
+	foreach ($user0->get_fields() as $field) {
+		if($field !== 'id') {
+			$tableau_users .= '<th>'.$field.'</th>';
+		}
+	}
+	$tableau_users .= '</tr></thead>';
+}
+else {
+	$tableau_users .= '<tbody>
+	<tr>
+		<th>Aucun utilisateur inscrit</th>
+	</tr>
+</tbody>';
+}
+$tableau_users .= '<tbody>';
+foreach ($users as $user) {
+	/**
+	 * @var user_dao $user
+	 */
+	$tableau_users .= '<tr>';
+	foreach ($user->get_fields() as $field) {
+		if($field !== 'id') {
+			$tableau_users .= '<td>';
+			$tableau_users .= (($field_value = $user->get_field($field)) !== null) ? $field_value : '<center>//</center>';
+			$tableau_users .= '</td>';
+		}
+	}
+	$tableau_users .= '</tr>';
+}
+$tableau_users .= '</tbody>';
+$tableau_users .= '</table>';
+
+$retour .= $tableau_users.'<br />';
+
+$tableau_paths = '<ul>';
+foreach ($path_array as $directory => $file_and_directory_array) {
+	$tableau_paths .= '<li><b>'.$directory.'</b>';
+	$tableau_paths .= '<ul>';
+	foreach ($file_and_directory_array as $file_or_directory => $path_or_array) {
+		$tableau_paths .= '<li>';
+		if(is_array($path_or_array)) {
+			$tableau_paths .= '<ul><b>'.$file_or_directory.'</b>';
+			foreach ($path_or_array as $path) {
+				$tableau_paths .= '<li><i>'.$path.'</i></li>';
+			}
+			$tableau_paths .= '</ul>';
+		}
+		else {
+			$tableau_paths .= '<i>'.$path_or_array.'</i>';
+		}
+		$tableau_paths .= '</li>';
+	}
+	$tableau_paths .= '</ul></li>';
+}
+$tableau_paths .= '</ul>';
+
+$retour .= $tableau_paths;
 $retour .= '</body>
 </html>';
 

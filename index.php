@@ -114,44 +114,56 @@ echo Project::Accueil(function ($_this, $args) {
 							)->order('prenom')
 							 ->asc()->go();
 
-	$tableau_user = '<table>';
-	if(!empty($users)) {
-		/**
-		 * @var user_dao $user0
-		 */
-		$user0 = $users[0];
-		$tableau_user .= '<thead><tr>';
-		foreach ($user0->get_fields() as $field) {
-			if($field !== 'id') {
-				$tableau_user .= '<th>'.$field.'</th>';
-			}
-		}
-		$tableau_user .= '</tr></thead>';
-	}
-	else {
-		$tableau_user .= '<body>
-	<tr>
-		<th>Aucun utilisateur inscrit</th>
-	</tr>
-</body>';
-	}
-	$tableau_user .= '<tbody>';
-	foreach ($users as $user) {
-		$tableau_user .= '<tr>';
-		foreach ($user->get_fields() as $field) {
-			if($field !== 'id') {
-				$tableau_user .= '<td>';
-				$tableau_user .= (($field_value = $user->get_field($field)) !== null) ? $field_value : '<center>//</center>';
-				$tableau_user .= '</td>';
-			}
-		}
-		$tableau_user .= '</tr>';
-	}
-	$tableau_user .= '</tbody>';
-	$tableau_user .= '</table>';
+	$sql_connector->update(user_dao::class, ['nom' => 'Loubet'])->where(['prenom' => 'André'])->go();
+	$sql_connector->delete(user_dao::class)->where(['id', 3, json::EQUALS])->go();
 
-//	$sql_connector->update('user', ['nom' => 'Loubet'])->where(['prenom' => 'André'])->go();
-//	$sql_connector->delete('user')->where(['id', 3, json::EQUALS])->go();
+	$base_dir	= __DIR__.'/scss/';
+	$suffix		= 'scss';
+	$reg_exp           = '/^([0-9]+)_(.+)\.'.$suffix.'$/';
+	$array = [];
+	$last_update = 0;
+
+	/*
+	 * Parcour les répertoires à la racine du répertoire 'test'
+	 */
+	foreach (glob($base_dir.'**/*.'.$suffix) as $filepath) {
+		$basename = basename($filepath);
+		if (preg_match($reg_exp, $basename, $matches)) {
+			$directory_name  							= basename(dirname($filepath));
+			$directory_order 							= (int)strtok($directory_name, '_');
+			$directory_ident 							= strtok('');
+
+			$order       								= (int)$matches[1];
+			$last_update 								= max($last_update, filemtime($filepath));
+			$array[$directory_ident][$basename]       	= $filepath;
+			$files_order[$directory_ident][$basename] 	= $order;
+			$directories_order[$directory_ident]        = $directory_order;
+		}
+	}
+
+	/*
+	 * Parcour les sous-répertoires
+	 */
+	foreach (glob($base_dir.'**/**/*.'.$suffix) as $filepath) {
+		$basename = basename($filepath);
+		$directory = str_replace($basename, '', $filepath);
+		if (preg_match($reg_exp, $basename, $matches)) {
+			$directory_name  												 = basename(dirname($filepath));
+			$sub_directory_name 											 = basename(dirname(str_replace($directory_name.'/'.$basename, '', $directory)));
+			$directory_order												 = (int)strtok($sub_directory_name, '_');
+			$directory_ident 												 = strtok('');
+
+			$order       													 = (int)$matches[1];
+			$last_update 													 = max($last_update, filemtime($filepath));
+			$array[$directory_ident][$directory_name][$basename] 			 = $filepath;
+			$files_order[$directory_ident][$directory_name][$basename] 		 = $order;
+			$directories_order[$directory_ident][$directory_name][$basename] = $directory_order;
+		}
+	}
+
+	foreach ($array as $key => $value) {
+		ksort($array[$key]);
+	}
 
 	return view::get(
 		['page_name' => $page_name],
@@ -166,6 +178,7 @@ echo Project::Accueil(function ($_this, $args) {
 					.$_this->get_static_method(test_afficher_body::class, 'toto', 'test', 'avec', 'des', 'tapettes')],
 		['test4' => 'test statique sans la méthode => '.test_afficher_body::toto('test', 'avec', 'des', 'tapettes')],
 		['test5' => $_this->is_object($test_afficher_body)],
-		['tableau_users' => $tableau_user]
+		['users' => $users],
+		['path_array' => $array]
 	);
-}, 'Accueil');
+});
