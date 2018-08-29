@@ -1,14 +1,17 @@
 /*
- @titre
- Voici un titre
- @description
- Voici une description
+@titre
+Voici un titre
+@description
+Voici une description
 
- @Markup:
- <div class="test">
-    <div class="test-test"></div>
- </div>
- */
+@Markup:
+<div class="test">
+   <div class="test-test"></div>
+</div>
+
+@Styleguide
+Components.test1.test
+*/
 .test {
   width: 50px;
   height: 50px;
