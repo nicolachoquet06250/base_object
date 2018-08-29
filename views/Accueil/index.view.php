@@ -84,6 +84,8 @@ foreach ($path_array as $directory => $file_and_directory_array) {
 $tableau_paths .= '</ul>';
 
 $retour .= $tableau_paths;
+$retour .= '<br /><br />';
+$retour .= '<a href="cssdoc.php">CssDoc</a> | <a href="page1.php">page 1</a>';
 $retour .= '</body>
 </html>';
 

@@ -14,5 +14,9 @@
   "json": {
     "path": "utils/json.php",
     "class": "json"
+  },
+  "ScssParser": {
+    "path": "utils/ScssParser.php",
+    "class": "ScssParser"
   }
 }

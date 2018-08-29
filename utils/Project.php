@@ -38,6 +38,14 @@ class Project extends util {
 		$catch = null;
 		$args = [];
 		$template_name = null;
+
+		/**
+		 * @var ScssParser $scss_parser
+		 */
+		$scss_parser = (new Project())->get_scss_parser(__DIR__);
+		$scss_parser->parse()->get_scss_array();
+		$scss_parser->genere_scss_file()->genere_scss_doc_array()->genere_doc_file();
+
 		if(isset($arguments[1]) && gettype($arguments[1]) === 'array') {
 			$args = $arguments[1];
 		}
@@ -76,5 +84,9 @@ class Project extends util {
 		$view->set_template_name('errors/500');
 		$view->set_template_404('errors/404');
 		return $view->display(true);
+	}
+
+	public function get_scss_parser($root_dir) {
+		return $this->get_util('ScssParser', $root_dir);
 	}
 }
