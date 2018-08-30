@@ -43,7 +43,8 @@ class ArrayList extends util {
 			if(isset($this->list[$key])) {
 				unset($this->list[$key]);
 			}
-			else throw new Exception('key '.$key.' out of range');
+			else $this->throw_exception('key '.$key.' out of range', __LINE__);
+			//throw new Exception('key '.$key.' out of range');
     	}
 
     }
@@ -68,7 +69,7 @@ class ArrayList extends util {
             if(isset($this->list[$key])) {
                 return $this->list[$key];
             }
-            else throw new Exception('key '.$key.' out of range');
+            else $this->throw_exception('key '.$key.' out of range', __LINE__);//throw new Exception('key '.$key.' out of range');
         }
         return $this->list;
     }

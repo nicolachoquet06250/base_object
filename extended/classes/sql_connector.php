@@ -2,9 +2,11 @@
 
 namespace project\extended\classes;
 
+use project\extended\traits\manager;
 use project\utils\ArrayList;
 
 abstract class sql_connector extends util {
+	use manager;
 	const STRING = 'string', INTEGER = 'integer', INT = 'integer', OBJECT = 'object', DATE = 'string';
 	const NOW = 'NOW()';
 	public static function NOW() { return date('Y-m-d'); }

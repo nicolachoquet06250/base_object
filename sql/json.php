@@ -181,7 +181,8 @@ class json extends sql_connector {
 		foreach ($json->body as $field) {
 			if($field->{$this->get_primary_key()} === $this->last_id) {
 				$bad_last_id = $line[$this->get_primary_key()];
-				throw new \Exception('La ligne avec l\'identifiant de la valeur \''.$bad_last_id.'\' existe déja');
+				$this->throw_exception('La ligne avec l\'identifiant de la valeur \''.$bad_last_id.'\' existe déja', __LINE__);
+//				throw new \Exception('La ligne avec l\'identifiant de la valeur \''.$bad_last_id.'\' existe déja');
 			}
 		}
 
@@ -552,7 +553,8 @@ class json extends sql_connector {
 				if($line_valid) {
 					return $this->save_new_line($json, $line);
 				}
-				else throw new \Exception('Le champ \''.$failed_field['name'].'\' n\'est pas au bon format : il est au format \''.$failed_field['type']['actual'].'\' alors qu\'il devrait être au format \''.$failed_field['type']['expected'].'\'');
+				$this->throw_exception('Le champ \''.$failed_field['name'].'\' n\'est pas au bon format : il est au format \''.$failed_field['type']['actual'].'\' alors qu\'il devrait être au format \''.$failed_field['type']['expected'].'\'', __LINE__);
+//				else throw new \Exception('Le champ \''.$failed_field['name'].'\' n\'est pas au bon format : il est au format \''.$failed_field['type']['actual'].'\' alors qu\'il devrait être au format \''.$failed_field['type']['expected'].'\'');
 			case self::UPDATE:
 				$request = $this->request;
 				if(isset($request['where'])) {

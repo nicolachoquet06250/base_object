@@ -236,7 +236,30 @@ class ScssParser extends util {
 			$html .= '			<hr />';
 		}
 
-		$nav = '<ul style="position: fixed;">';
+		$nav = '<div class="menu" style="position: fixed; top: 0; padding-left: 5px; text-align: center;">';
+
+		$dir = opendir($this->root_dir.'/views');
+		$max = 0;
+		while (($directory = readdir($dir)) !== false) {
+			if($directory !== '.' && $directory !== '..' && $directory !== 'errors') {
+				$max++;
+			}
+		}
+
+		$dir1 = opendir($this->root_dir.'/views');
+		$nb = 0;
+		while (($directory = readdir($dir1)) !== false) {
+			if($directory !== '.' && $directory !== '..' && $directory !== 'errors') {
+				$directory_link = $directory === 'Accueil' ? '/' : strtolower($directory).'.php';
+				$nav .= '<a href="'.$directory_link.'">'.$directory.'</a>';
+				if($nb < $max-1) {
+					$nav .= ' | ';
+				}
+				$nb++;
+			}
+		}
+		$nav .= '</div>';
+		$nav .= '<ul style="position: fixed; top: 30px;">';
 		foreach ($stylesgide as $categorie => $sub_cat) {
 			$nav .= '	<li>';
 			$nav .= '		<b>
