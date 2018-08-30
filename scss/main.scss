@@ -2,7 +2,7 @@
 // SOURCE scss/000_components/000_test1/000_test.scss
 /*
 @title
-Voici un titre
+Voici un titre 1
 @description
 Voici une description
 
@@ -12,9 +12,9 @@ Voici une description
 </div>
 
 @Styleguide
-Components.test1.test
+Components.test1.test1
 */
-.test {
+.test1 {
   width: 50px;
   height: 50px;
   &-test {
@@ -26,7 +26,7 @@ Components.test1.test
 // SOURCE scss/000_components/001_test.css
 /*
 @title
-Voici un titre
+Voici un titre 2
 @description
 Voici une description
 
@@ -34,6 +34,9 @@ Voici une description
 <div class="test" style="min-height: 50px; box-shadow: 5px 5px 5px 5px rgba(0, 0, 255, .2);">
    <div class="test-test"></div>
 </div>
+
+@Styleguide
+Components.test.test-test
 */
 .test {
     width: 50px;
@@ -47,7 +50,7 @@ Voici une description
 // SOURCE scss/004_base/011_test3/000_test.scss
 /*
 @title
-Voici un titre
+Voici un titre 3
 @description
 Voici une description
 

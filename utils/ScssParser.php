@@ -23,6 +23,22 @@ class ScssParser extends util {
 		$this->css_reg_exp = '/^([0-9]+)_(.+)\.'.$this->css_suffix.'$/';
 	}
 
+	public function get_last_update_file() {
+		return file_get_contents($this->base_dir.'/'.$this->last_update_file);
+	}
+
+	public function get_css_filename() {
+		return $this->css_file.'.'.$this->css_suffix;
+	}
+
+	public function get_scss_array() {
+		return $this->scss_array;
+	}
+
+	public function get_doc_array() {
+		return $this->docs;
+	}
+
 	public function parse() {
 		/*
 		 * Parcour les répertoires à la racine du répertoire 'test'
@@ -99,18 +115,6 @@ class ScssParser extends util {
 		return $this;
 	}
 
-	public function get_last_update_file() {
-		return file_get_contents($this->base_dir.'/'.$this->last_update_file);
-	}
-
-	public function get_css_filename() {
-		return $this->css_file.'.'.$this->css_suffix;
-	}
-
-	public function get_scss_array() {
-		return $this->scss_array;
-	}
-
 	public function genere_scss_file() {
 		$this->parse();
 		$css_file_content = '';
@@ -150,35 +154,28 @@ class ScssParser extends util {
 		return $this;
 	}
 
-	public function get_doc_array() {
-		return $this->docs;
-	}
-
 	public function genere_doc_file() {
 		$html = '<!Doctype html>
-<html>
+<html style="overflow-x: hidden;">
 	<head>
 		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<title>Documentation Css</title>
-		<style>
-			.source-file {
-				font-size: small;
-			}
-			.source-code {
-				margin-bottom: 25px;
-				margin-top: 15px;
-			}
-			.exemples-code {
-				margin-bottom: 50px;
-				margin-top: 15px;
-			}
-		</style>
+		
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+		<link rel="stylesheet" href="/scss/hightlight/styles/default.css">
 	</head>
 	<body>
-		<div style="text-align: center;">
+		<header style="text-align: center;">
 			<h1>Documentation Css</h1>
-		</div>';
-
+		</header>
+		<div class="row">
+			<nav class="col-3" style="min-height: 200px;">
+				[nav_menu]
+			</nav>
+			<div class="col-9">
+				<main class="container">';
+		$stylesgide = [];
 		foreach ($this->docs as $cmp => $doc) {
 			$doc = explode("\n", $doc);
 			foreach ($doc as $i => $value) {
@@ -193,7 +190,7 @@ class ScssParser extends util {
 			$last_key = '';
 			foreach ($doc as $i => $value) {
 				if(substr($value, 0, 1) === '@') {
-					$last_key = substr($value, 1, strlen($value)-1);
+					$last_key = str_replace('@', '', $value);
 					$new_doc_array[$last_key] = '';
 				}
 				else {
@@ -201,34 +198,82 @@ class ScssParser extends util {
 				}
 			}
 			$doc = $new_doc_array;
+			$id = str_replace([' ', '-', '\'', ',', '[', ']', "\n"], ['', '', '_', '_', '6', '3', ''], $doc['title']);
+			if(isset($doc['Styleguide'])) {
+				$doc['Styleguide'] = str_replace("\n", '', $doc['Styleguide']);
+				$path = explode('.', $doc['Styleguide']);
+				if(count($path) === 1) {
+					$stylesgide[$path[0]] = $id;
+				}
+				elseif (count($path) === 2) {
+					$stylesgide[$path[0]][$path[1]] = $id;
+				}
+				elseif (count($path) === 3) {
+					$stylesgide[$path[0]][$path[1]][$path[2]] = $id;
+				}
+			}
 
-
-			$html .= '<i class="source-file">Fichier source: '.$doc['source'].'</i>';
-			$html .= '<h2>'.$doc['title'].'</h2>';
-			$html .= '<p>'.$doc['description'].'</p>';
-			$html .= '<div>
-		<b>EXEMPLES</b>
-		<br />
-		<div class="exemples-code" style="margin-bottom: 50px; margin-top: 15px;;">
-			'.$doc['Markup:'].'
-		</div>
-	</div>
-	<div>
-		<b>CODE SOURCE</b>
-		<br />
-		<div class="source-code">
-			<code>
-<pre>'.htmlentities($doc['Markup:']).'</pre>
-			</code>
-		</div>
-	</div>';
-			$html .= '<hr />';
+			$html .= '		<div class="col-12" id="'.$id.'">';
+			$html .= '			<i class="source-file">Fichier source: '.$doc['source'].'</i>';
+			$html .= '			<h2>'.$doc['title'].'</h2>';
+			$html .= '			<p>'.$doc['description'].'</p>';
+			$html .= '			<div>
+					<b>EXEMPLES</b>
+					<br />
+					<div class="exemples-code" style="margin-bottom: 50px; margin-top: 15px;;">
+						'.$doc['Markup:'].'
+					</div>
+				</div>
+				<div>
+					<b>CODE SOURCE</b>
+					<br />
+					<div class="source-code">
+						<pre><code class="html">'.htmlentities($doc['Markup:']).'</code></pre>
+					</div>
+				</div>
+			</div>';
+			$html .= '			<hr />';
 		}
-		$html .= '	<footer style="text-align: center;">
+
+		$nav = '<ul style="position: fixed;">';
+		foreach ($stylesgide as $categorie => $sub_cat) {
+			$nav .= '	<li>';
+			$nav .= '		<b>
+								'.$categorie.'
+							</b>
+							<ul>';
+			foreach ($sub_cat as $class => $sub_class) {
+				$nav .= '		<li>
+									<b>'.$class.'</b>
+									<ul>';
+				foreach ($sub_class as $sub_sub_class => $id_div) {
+					$nav .= '			<li><a href="#'.$id_div.'">'.$sub_sub_class.'</a></li>';
+				}
+				$nav .= '			</ul>
+								</li>';
+			}
+			$nav .= '		</ul>
+						</li>';
+		}
+		$nav .= '</ul>';
+		$html .= '			</main>
+						</div>
+					</div>';
+		$html .= '
+	<footer style="text-align: center;">
 		Dernière modification: [last_update]
 	</footer>';
+		$html .= '
+		<!-- Optional JavaScript -->
+		<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+		<script src="/scss/hightlight/highlight.pack.js"></script>
+		<script>hljs.initHighlightingOnLoad();</script>';
 		$html .= '	</body>
 	</html>';
+		$html = str_replace('[nav_menu]', $nav, $html);
 
 		if(!is_dir($this->html_doc_dir)) {
 			mkdir($this->html_doc_dir, 0777, true);

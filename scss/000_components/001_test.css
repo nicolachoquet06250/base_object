@@ -1,6 +1,6 @@
 /*
 @title
-Voici un titre
+Voici un titre 2
 @description
 Voici une description
 
@@ -8,6 +8,9 @@ Voici une description
 <div class="test" style="min-height: 50px; box-shadow: 5px 5px 5px 5px rgba(0, 0, 255, .2);">
    <div class="test-test"></div>
 </div>
+
+@Styleguide
+Components.test.test-test
 */
 .test {
     width: 50px;
