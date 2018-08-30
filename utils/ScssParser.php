@@ -166,14 +166,15 @@ class ScssParser extends util {
 		<link rel="stylesheet" href="/scss/hightlight/styles/default.css">
 	</head>
 	<body>
-		<header style="text-align: center;">
-			<h1>Documentation Css</h1>
-		</header>
 		<div class="row">
 			<nav class="col-3" style="min-height: 200px;">
 				[nav_menu]
 			</nav>
-			<div class="col-9">
+			<div class="col-9" style="border-left: 1px solid lightgray;">
+				<header style="text-align: center;">
+					<h1>Documentation Css</h1>
+				</header>
+				<hr />
 				<main class="container">';
 		$stylesgide = [];
 		foreach ($this->docs as $cmp => $doc) {
@@ -256,13 +257,13 @@ class ScssParser extends util {
 						</li>';
 		}
 		$nav .= '</ul>';
-		$html .= '			</main>
-						</div>
-					</div>';
+		$html .= '			</main>';
 		$html .= '
-	<footer style="text-align: center;">
-		Dernière modification: [last_update]
-	</footer>';
+					<footer style="text-align: center;">
+						Dernière modification: [last_update]
+					</footer>';
+		$html .= '				</div>
+					</div>';
 		$html .= '
 		<!-- Optional JavaScript -->
 		<!-- jQuery first, then Popper.js, then Bootstrap JS -->
