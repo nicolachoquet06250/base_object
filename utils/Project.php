@@ -42,7 +42,7 @@ class Project extends util {
 		/**
 		 * @var ScssParser $scss_parser
 		 */
-		$scss_parser = (new Project())->get_scss_parser(__DIR__);
+		$scss_parser = (new Project())->get_scss_parser(__DIR__.'/..');
 		$scss_parser->parse()->get_scss_array();
 		$scss_parser->genere_scss_file()->genere_scss_doc_array()->genere_doc_file();
 

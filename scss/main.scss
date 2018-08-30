@@ -1,16 +1,19 @@
 
-
+// SOURCE scss/000_components/000_test1/000_test.scss
 /*
- @titre
- Voici un titre
- @description
- Voici une description
+@title
+Voici un titre
+@description
+Voici une description
 
- @Markup:
- <div class="test">
-    <div class="test-test"></div>
- </div>
- */
+@Markup:
+<div class="test" style="min-height: 50px; box-shadow: 5px 5px 5px 5px rgba(0, 0, 255, .2);">
+   <div class="test-test"></div>
+</div>
+
+@Styleguide
+Components.test1.test
+*/
 .test {
   width: 50px;
   height: 50px;
@@ -20,18 +23,42 @@
     color: #8bff36;
   }
 }
-
+// SOURCE scss/000_components/001_test.css
 /*
- @titre
- Voici un titre
- @description
- Voici une description
+@title
+Voici un titre
+@description
+Voici une description
 
- @Markup:
- <div class="test">
-    <div class="test-test"></div>
- </div>
- */
+@Markup:
+<div class="test" style="min-height: 50px; box-shadow: 5px 5px 5px 5px rgba(0, 0, 255, .2);">
+   <div class="test-test"></div>
+</div>
+*/
+.test {
+    width: 50px;
+    height: 50px;
+}
+.test-test {
+    height: 100%;
+    width: 100%;
+    color: #8bff36;
+}
+// SOURCE scss/004_base/011_test3/000_test.scss
+/*
+@title
+Voici un titre
+@description
+Voici une description
+
+@Markup:
+<div class="test" style="min-height: 50px; box-shadow: 5px 5px 5px 5px rgba(0, 0, 255, .2);">
+   <div class="test-test"></div>
+</div>
+
+@Styleguide
+Base.test1.test
+*/
 .test {
   width: 50px;
   height: 50px;
