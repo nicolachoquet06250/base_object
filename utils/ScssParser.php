@@ -6,7 +6,7 @@ namespace project\utils;
 use project\extended\classes\util;
 
 class ScssParser extends util {
-	private $root_dir = null, $base_dir = '/scss/', $scss_suffix = 'scss', $css_file = 'main', $css_suffix = 'css',
+	private $root_dir = null, $base_dir = '/scss/', $scss_suffix = 'scss', $css_file = 'main', $css_suffix = 'css', $last_update_file = 'last_update.txt',
 			$html_doc_dir = 'views/CssDoc', $html_doc_file = 'index.view.html', $php_doc_file = 'cssdoc.php';
 	private $scss_array = [], $docs = [];
 	private $scss_reg_exp, $css_reg_exp;
@@ -97,6 +97,10 @@ class ScssParser extends util {
 		}
 
 		return $this;
+	}
+
+	public function get_last_update_file() {
+		return file_get_contents($this->base_dir.'/'.$this->last_update_file);
 	}
 
 	public function get_css_filename() {
@@ -218,17 +222,21 @@ class ScssParser extends util {
 			</code>
 		</div>
 	</div>';
-			if($cmp < count($this->docs)-1) {
-				$html .= '<hr />';
-			}
+			$html .= '<hr />';
 		}
+		$html .= '	<footer style="text-align: center;">
+		Dernière modification: [last_update]
+	</footer>';
 		$html .= '	</body>
 	</html>';
 
 		if(!is_dir($this->html_doc_dir)) {
 			mkdir($this->html_doc_dir, 0777, true);
 		}
-		file_put_contents($this->html_doc_dir.'/'.$this->html_doc_file, $html);
+		if($html !== file_get_contents($this->html_doc_dir.'/'.$this->html_doc_file)) {
+			file_put_contents($this->html_doc_dir.'/'.$this->html_doc_file, $html);
+			file_put_contents($this->base_dir.'/'.$this->last_update_file, date('Y-m-d'));
+		}
 
 		$php = '<?php
 			
@@ -245,7 +253,8 @@ class ScssParser extends util {
 		
 		return view::get(
 			[\'page_name\' => $page_name],
-			[\'template_name\' => $template_name]
+			[\'template_name\' => $template_name],
+			[\'last_update\' => $_this->get_scss_parser(__DIR__)->get_last_update_file()]
 		);
 	}, [\'__DIR__\', __DIR__]);';
 

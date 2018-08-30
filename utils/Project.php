@@ -86,7 +86,15 @@ class Project extends util {
 		return $view->display(true);
 	}
 
+	/**
+	 * @param $root_dir
+	 * @return null|ScssParser
+	 */
 	public function get_scss_parser($root_dir) {
-		return $this->get_util('ScssParser', $root_dir);
+		/**
+		 * @var ScssParser $scss_parser
+		 */
+		$scss_parser = $this->get_util('ScssParser', $root_dir);
+		return $scss_parser;
 	}
 }

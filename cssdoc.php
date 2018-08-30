@@ -13,6 +13,7 @@
 		
 		return view::get(
 			['page_name' => $page_name],
-			['template_name' => $template_name]
+			['template_name' => $template_name],
+			['last_update' => $_this->get_scss_parser(__DIR__)->get_last_update_file()]
 		);
 	}, ['__DIR__', __DIR__]);
