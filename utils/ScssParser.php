@@ -40,70 +40,88 @@ class ScssParser extends util {
 	}
 
 	public function parse() {
-		/*
-		 * Parcour les répertoires à la racine du répertoire 'test'
-		 */
-		foreach (glob($this->base_dir.'**/*.'.$this->scss_suffix) as $filepath) {
-			$basename = basename($filepath);
-			if (preg_match($this->scss_reg_exp, $basename, $matches)) {
-				$directory_name  								= basename(dirname($filepath));
-				$directory_order 								= (int)strtok($directory_name, '_');
-				$directory_ident 								= strtok('');
+		foreach (new \DirectoryIterator($this->base_dir) as $fileInfo) {
+			if($fileInfo->isDir() && strstr($fileInfo->getBasename(), '_')) {
+				foreach (new \DirectoryIterator($this->base_dir.$fileInfo->getBasename())
+						 as $_fileInfo) {
+					if($_fileInfo->isDir()
+					   && strstr($_fileInfo->getBasename(), '_')) {
+						$path = $this->base_dir.$fileInfo->getBasename().'/'.$_fileInfo->getBasename();
+						foreach (new \DirectoryIterator($path) as $__fileInfo) {
+							if($__fileInfo->isFile()
+							   && (strstr($__fileInfo->getFilename(), '.'.$this->scss_suffix)
+																	  ||
+																	  strstr($__fileInfo->getFilename(), '.'.$this->css_suffix))
+							   && $__fileInfo->getFilename() !== 'main.'.$this->scss_suffix
+							   && $__fileInfo->getFilename() !== 'main.'.$this->css_suffix
+							   && $filepath = $__fileInfo->getPathname()) {
+								// Fichiers à l'étage 2
+								$basename = basename($filepath);
+								$directory = str_replace($basename, '', $filepath);
+								if (preg_match($this->scss_reg_exp, $basename, $matches)) {
+									$directory_name  		= basename(dirname($filepath));
+									$sub_directory_name 	= basename(dirname(str_replace($directory_name.'/'.$basename, '', $directory)));
+									$directory_order		= (int)strtok($sub_directory_name, '_');
+									$directory_ident 		= strtok('');
 
-				$order       									= (int)$matches[1];
-				$this->scss_array[$directory_ident][$basename]  = $filepath;
-				$files_order[$directory_ident][$basename] 		= $order;
-				$directories_order[$directory_ident]        	= $directory_order;
-			}
-		}
-		/*
-		 * Parcour les sous-répertoires
-		 */
-		foreach (glob($this->base_dir.'**/**/*.'.$this->scss_suffix) as $filepath) {
-			$basename = basename($filepath);
-			$directory = str_replace($basename, '', $filepath);
-			if (preg_match($this->scss_reg_exp, $basename, $matches)) {
-				$directory_name  												 = basename(dirname($filepath));
-				$sub_directory_name 											 = basename(dirname(str_replace($directory_name.'/'.$basename, '', $directory)));
-				$directory_order												 = (int)strtok($sub_directory_name, '_');
-				$directory_ident 												 = strtok('');
+									$order       			= (int)$matches[1];
+									$this->scss_array[$directory_ident][$directory_name][$basename]
+														  	= $filepath;
+									$files_order[$directory_ident][$directory_name][$basename]
+														  	= $order;
+									$directories_order[$directory_ident]
+														  	= $directory_order;
+								}
+							}
+						}
+					}
+					elseif ($_fileInfo->isFile()
+							&& (strstr($_fileInfo->getFilename(), '.'.$this->scss_suffix)
+								||
+								strstr($_fileInfo->getFilename(), '.'.$this->css_suffix))
+							&& $_fileInfo->getFilename() !== 'main.'.$this->scss_suffix
+							&& $_fileInfo->getFilename() !== 'main.'.$this->css_suffix
+							&& $filepath = $_fileInfo->getPathname()) {
+						// Fichiers à l'étage 1
 
-				$order       													 = (int)$matches[1];
-				$this->scss_array[$directory_ident][$directory_name][$basename]  = $filepath;
-				$files_order[$directory_ident][$directory_name][$basename] 		 = $order;
-				$directories_order[$directory_ident] 							 = $directory_order;
-			}
-		}
+						$basename = basename($filepath);
+						if (preg_match($this->scss_reg_exp, $basename, $matches)) {
+							$directory_name  	= basename(dirname($filepath));
+							$directory_order 	= (int)strtok($directory_name, '_');
+							$directory_ident 	= strtok('');
 
-		foreach (glob($this->base_dir.'**/*.'.$this->css_suffix) as $filepath) {
-			if(($basename = basename($filepath)) !== 'main.css') {
-				if (preg_match($this->css_reg_exp, $basename, $matches)) {
-					$directory_name  = basename(dirname($filepath));
-					$directory_order = (int)strtok($directory_name, '_');
-					$directory_ident = strtok('');
-
-					$order                                         = (int)$matches[1];
-					$this->scss_array[$directory_ident][$basename] = $filepath;
-					$files_order[$directory_ident][$basename]      = $order;
-					$directories_order[$directory_ident]           = $directory_order;
+							$order       		= (int)$matches[1];
+							$this->scss_array[$directory_ident][$basename]
+												= $filepath;
+							$files_order[$directory_ident][$directory_name][$basename]
+												= $order;
+							$directories_order[$directory_ident]
+												= $directory_order;
+						}
+					}
 				}
 			}
-		}
+			elseif ($fileInfo->isFile()
+					&& (strstr($fileInfo->getFilename(), '.'.$this->scss_suffix)
+						||
+						strstr($fileInfo->getFilename(), '.'.$this->css_suffix))
+					&& $fileInfo->getFilename() !== 'main.'.$this->scss_suffix
+					&& $fileInfo->getFilename() !== 'main.'.$this->css_suffix
+					&& $filepath = $fileInfo->getPathname()) {
+				// fichiers à la racine
+				$basename = basename($filepath);
+				if (preg_match($this->scss_reg_exp, $basename, $matches)) {
+					$directory_name  	= basename(dirname($filepath));
+					$directory_order 	= (int)strtok($directory_name, '_');
+					$directory_ident 	= strtok('');
 
-		foreach (glob($this->base_dir.'**/**/*.'.$this->css_suffix) as $filepath) {
-			$basename = basename($filepath);
-			$directory = str_replace($basename, '', $filepath);
-			if($basename !== 'main.css') {
-				if (preg_match($this->css_reg_exp, $basename, $matches)) {
-					$directory_name     = basename(dirname($filepath));
-					$sub_directory_name = basename(dirname(str_replace($directory_name.'/'.$basename, '', $directory)));
-					$directory_order    = (int)strtok($sub_directory_name, '_');
-					$directory_ident    = strtok('');
-
-					$order                                                          = (int)$matches[1];
-					$this->scss_array[$directory_ident][$directory_name][$basename] = $filepath;
-					$files_order[$directory_ident][$directory_name][$basename]      = $order;
-					$directories_order[$directory_ident]                            = $directory_order;
+					$order       		= (int)$matches[1];
+					$this->scss_array[$directory_ident][$basename]
+									  	= $filepath;
+					$files_order[$directory_ident][$basename]
+									  	= $order;
+					$directories_order[$directory_ident]
+									  	= $directory_order;
 				}
 			}
 		}
@@ -267,14 +285,19 @@ class ScssParser extends util {
 							</b>
 							<ul>';
 			foreach ($sub_cat as $class => $sub_class) {
-				$nav .= '		<li>
-									<b>'.$class.'</b>
-									<ul>';
-				foreach ($sub_class as $sub_sub_class => $id_div) {
-					$nav .= '			<li><a href="#'.$id_div.'">'.$sub_sub_class.'</a></li>';
+				$nav .= '		<li>';
+				if($this->is_array($sub_class)) {
+					$nav .= '					<b>'.$class.'</b>
+										<ul>';
+					foreach ($sub_class as $sub_sub_class => $id_div) {
+						$nav .= '			<li><a class="js-scrollTo" href="#'.$id_div.'">'.$sub_sub_class.'</a></li>';
+					}
+					$nav .= '			</ul>';
 				}
-				$nav .= '			</ul>
-								</li>';
+				else {
+					$nav .= '<a class="js-scrollTo" href="#'.$sub_class.'">'.$class.'</a>';
+				}
+					$nav .= '		</li>';
 			}
 			$nav .= '		</ul>
 						</li>';
@@ -290,11 +313,21 @@ class ScssParser extends util {
 		$html .= '
 		<!-- Optional JavaScript -->
 		<!-- jQuery first, then Popper.js, then Bootstrap JS -->
-		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
 		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
 		<script src="/scss/hightlight/highlight.pack.js"></script>
-		<script>hljs.initHighlightingOnLoad();</script>';
+		<script>
+			$(document).ready(function() {
+				hljs.initHighlightingOnLoad();
+				$(".js-scrollTo").on("click", function() { // Au clic sur un élément
+					let page = $(this).attr("href"); // Page cible
+					let speed = 750; // Durée de l\'animation (en ms)
+					$("html, body").animate( { scrollTop: $(page).offset().top }, speed ); // Go
+					return false;
+				});
+			});
+		</script>';
 		$html .= '	</body>
 	</html>';
 		$html = str_replace('[nav_menu]', $nav, $html);

@@ -115,29 +115,10 @@ echo Project::Accueil(function ($_this, $args) {
 							)->order('prenom')
 							 ->asc()->go();
 
-	$sql_connector->update(user_dao::class, ['nom' => 'Loubet'])->where(['prenom' => 'André'])->go();
-	$sql_connector->delete(user_dao::class)->where(['id', 3, json::EQUALS])->go();
+//	$sql_connector->update(user_dao::class, ['nom' => 'Loubet'])->where(['prenom' => 'André'])->go();
+//	$sql_connector->delete(user_dao::class)->where(['id', 3, json::EQUALS])->go();
 
-	// test avec DirectoryIterator
-	foreach (new \DirectoryIterator(__DIR__.'/scss') as $fileInfo) {
-		if($fileInfo->isDir() && strstr($fileInfo->getBasename(), '_')) {
-			foreach (new \DirectoryIterator(__DIR__.'/scss/'.$fileInfo->getBasename()) as $_fileInfo) {
-				if($_fileInfo->isDir() && strstr($_fileInfo->getBasename(), '_')) {
-					foreach (new \DirectoryIterator(__DIR__.'/scss/'.$fileInfo->getBasename().'/'.$_fileInfo->getBasename()) as $__fileInfo) {
-						if($__fileInfo->isFile() && strstr($__fileInfo->getFilename(), '.scss')) {
-							$_this->var_dump($__fileInfo->getPathname());
-						}
-					}
-				}
-				elseif ($_fileInfo->isFile() && strstr($_fileInfo->getFilename(), '.scss')) {
-					$_this->var_dump($_fileInfo->getPathname());
-				}
-			}
-		}
-		elseif ($fileInfo->isFile() && strstr($fileInfo->getFilename(), '.scss')) {
-			$_this->var_dump($fileInfo->getPathname());
-		}
-	}
+// 	test avec DirectoryIterator
 
 	return view::get(
 		['page_name' => $page_name],

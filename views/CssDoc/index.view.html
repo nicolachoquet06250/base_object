@@ -12,22 +12,21 @@
 		<div class="row">
 			<nav class="col-3" style="min-height: 200px;">
 				<div class="menu" style="position: fixed; top: 0; padding-left: 5px; text-align: center;"><a href="charts.php">charts</a> | <a href="/">Accueil</a> | <a href="forms.php">forms</a> | <a href="tables.php">tables</a> | <a href="cssdoc.php">CssDoc</a> | <a href="register.php">register</a> | <a href="page1.php">Page1</a> | <a href="home.php">home</a> | <a href="login.php">login</a></div><ul style="position: fixed; top: 30px;">	<li>		<b>
-								Components
-							</b>
-							<ul>		<li>
-									<b>test1</b>
-									<ul>			<li><a href="#Voiciuntitre1">test1</a></li>			</ul>
-								</li>		<li>
-									<b>test</b>
-									<ul>			<li><a href="#Voiciuntitre2">test-test</a></li>			</ul>
-								</li>		</ul>
-						</li>	<li>		<b>
 								Base
 							</b>
-							<ul>		<li>
-									<b>test1</b>
-									<ul>			<li><a href="#Voiciuntitre3">test</a></li>			</ul>
-								</li>		</ul>
+							<ul>		<li>					<b>test1</b>
+										<ul>			<li><a class="js-scrollTo" href="#Voiciuntitre3">test</a></li>			</ul>		</li>		</ul>
+						</li>	<li>		<b>
+								Components
+							</b>
+							<ul>		<li>					<b>test1</b>
+										<ul>			<li><a class="js-scrollTo" href="#Voiciuntitre1">test1</a></li>			</ul>		</li>		</ul>
+						</li>	<li>		<b>
+								EBoutique
+							</b>
+							<ul>		<li><a class="js-scrollTo" href="#Eboutiquetestcomponent">test</a>		</li>		<li>					<b>test1</b>
+										<ul>			<li><a class="js-scrollTo" href="#Eboutiquetest1testcomponent">test</a></li>			</ul>		</li>		<li>					<b>test2</b>
+										<ul>			<li><a class="js-scrollTo" href="#Eboutiquetest2testcomponent">test</a></li>			</ul>		</li>		</ul>
 						</li></ul>
 			</nav>
 			<div class="col-9" style="border-left: 1px solid lightgray;">
@@ -35,7 +34,30 @@
 					<h1>Documentation Css</h1>
 				</header>
 				<hr />
-				<main class="container">		<div class="col-12" id="Voiciuntitre1">			<i class="source-file">Fichier source: scss/000_components/000_test1/000_test.scss
+				<main class="container">		<div class="col-12" id="Voiciuntitre3">			<i class="source-file">Fichier source: scss/004_base/011_test3/000_test.scss
+</i>			<h2>Voici un titre 3
+</h2>			<p>Voici une description
+</p>			<div>
+					<b>EXEMPLES</b>
+					<br />
+					<div class="exemples-code" style="margin-bottom: 50px; margin-top: 15px;;">
+						<div class="test" style="min-height: 50px; box-shadow: 5px 5px 5px 5px rgba(0, 0, 255, .2);">
+  <div class="test-test"></div>
+</div>
+
+					</div>
+				</div>
+				<div>
+					<b>CODE SOURCE</b>
+					<br />
+					<div class="source-code">
+						<pre><code class="html">&lt;div class=&quot;test&quot; style=&quot;min-height: 50px; box-shadow: 5px 5px 5px 5px rgba(0, 0, 255, .2);&quot;&gt;
+  &lt;div class=&quot;test-test&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+					</div>
+				</div>
+			</div>			<hr />		<div class="col-12" id="Voiciuntitre1">			<i class="source-file">Fichier source: scss/000_components/000_test1/000_test.scss
 </i>			<h2>Voici un titre 1
 </h2>			<p>Voici une description
 </p>			<div>
@@ -58,8 +80,8 @@
 </code></pre>
 					</div>
 				</div>
-			</div>			<hr />		<div class="col-12" id="Voiciuntitre2">			<i class="source-file">Fichier source: scss/000_components/001_test.css
-</i>			<h2>Voici un titre 2
+			</div>			<hr />		<div class="col-12" id="Eboutiquetestcomponent">			<i class="source-file">Fichier source: scss/005_eboutique/000_test.scss
+</i>			<h2>E-boutique test component
 </h2>			<p>Voici une description
 </p>			<div>
 					<b>EXEMPLES</b>
@@ -81,8 +103,31 @@
 </code></pre>
 					</div>
 				</div>
-			</div>			<hr />		<div class="col-12" id="Voiciuntitre3">			<i class="source-file">Fichier source: scss/004_base/011_test3/000_test.scss
-</i>			<h2>Voici un titre 3
+			</div>			<hr />		<div class="col-12" id="Eboutiquetest1testcomponent">			<i class="source-file">Fichier source: scss/005_eboutique/000_test1/000_test.scss
+</i>			<h2>E-boutique test1-test component
+</h2>			<p>Voici une description
+</p>			<div>
+					<b>EXEMPLES</b>
+					<br />
+					<div class="exemples-code" style="margin-bottom: 50px; margin-top: 15px;;">
+						<div class="test" style="min-height: 50px; box-shadow: 5px 5px 5px 5px rgba(0, 0, 255, .2);">
+  <div class="test-test"></div>
+</div>
+
+					</div>
+				</div>
+				<div>
+					<b>CODE SOURCE</b>
+					<br />
+					<div class="source-code">
+						<pre><code class="html">&lt;div class=&quot;test&quot; style=&quot;min-height: 50px; box-shadow: 5px 5px 5px 5px rgba(0, 0, 255, .2);&quot;&gt;
+  &lt;div class=&quot;test-test&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+</code></pre>
+					</div>
+				</div>
+			</div>			<hr />		<div class="col-12" id="Eboutiquetest2testcomponent">			<i class="source-file">Fichier source: scss/005_eboutique/002_test2/018_test.scss
+</i>			<h2>E-boutique test2-test component
 </h2>			<p>Voici une description
 </p>			<div>
 					<b>EXEMPLES</b>
@@ -111,9 +156,19 @@
 					</div>
 		<!-- Optional JavaScript -->
 		<!-- jQuery first, then Popper.js, then Bootstrap JS -->
-		<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
 		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
 		<script src="/scss/hightlight/highlight.pack.js"></script>
-		<script>hljs.initHighlightingOnLoad();</script>	</body>
+		<script>
+			$(document).ready(function() {
+				hljs.initHighlightingOnLoad();
+				$(".js-scrollTo").on("click", function() { // Au clic sur un élément
+					let page = $(this).attr("href"); // Page cible
+					let speed = 750; // Durée de l'animation (en ms)
+					$("html, body").animate( { scrollTop: $(page).offset().top }, speed ); // Go
+					return false;
+				});
+			});
+		</script>	</body>
 	</html>
