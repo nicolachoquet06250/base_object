@@ -90,7 +90,6 @@ class dao_manager extends dao {
                 }
             }
             $this->throw_exception('User not contains field '.$champ.' equal to '.$value, __LINE__);
-//            throw new Exception('User not contains field '.$champ.' equal to '.$value);
         }
         return null;
     }

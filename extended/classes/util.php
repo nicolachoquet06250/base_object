@@ -19,6 +19,9 @@ class util extends BaseObject {
 		}
 	}
 
+	/**
+	 * @return bool
+	 */
 	public static function is_cli() {
 		if(strstr('cli', php_sapi_name())) {
 			return true;
