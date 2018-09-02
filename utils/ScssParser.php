@@ -7,7 +7,7 @@ use project\extended\classes\util;
 
 class ScssParser extends util {
 	private $root_dir = null, $base_dir = '/scss/', $scss_suffix = 'scss', $css_file = 'main', $css_suffix = 'css', $last_update_file = 'last_update.txt',
-			$html_doc_dir = 'views/CssDoc', $html_doc_file = 'index.view.html', $php_doc_file = 'cssdoc.php';
+			$html_doc_dir = 'layouts/CssDoc', $html_doc_file = 'index.view.html', $php_doc_file = 'cssdoc.php';
 	private $scss_array = [], $docs = [];
 	private $scss_reg_exp, $css_reg_exp;
 
@@ -17,8 +17,7 @@ class ScssParser extends util {
 			$this->root_dir = $root_dir[0];
 		}
 		$this->base_dir     = is_null($this->root_dir) ? __DIR__.$this->base_dir : $this->root_dir.$this->base_dir;
-		$this->css_file     .= '.'.$this->scss_suffix;
-		$this->css_file     = $this->base_dir.$this->css_file;
+		$this->css_file     = $this->base_dir.$this->css_file.'.'.$this->scss_suffix;
 		$this->scss_reg_exp = '/^([0-9]+)_(.+)\.'.$this->scss_suffix.'$/';
 		$this->css_reg_exp = '/^([0-9]+)_(.+)\.'.$this->css_suffix.'$/';
 	}
@@ -42,23 +41,22 @@ class ScssParser extends util {
 	public function parse() {
 		foreach (new \DirectoryIterator($this->base_dir) as $fileInfo) {
 			if($fileInfo->isDir() && strstr($fileInfo->getBasename(), '_')) {
-				foreach (new \DirectoryIterator($this->base_dir.$fileInfo->getBasename())
-						 as $_fileInfo) {
+				foreach (new \DirectoryIterator($this->base_dir.$fileInfo->getBasename()) as $_fileInfo) {
 					if($_fileInfo->isDir()
 					   && strstr($_fileInfo->getBasename(), '_')) {
 						$path = $this->base_dir.$fileInfo->getBasename().'/'.$_fileInfo->getBasename();
 						foreach (new \DirectoryIterator($path) as $__fileInfo) {
 							if($__fileInfo->isFile()
 							   && (strstr($__fileInfo->getFilename(), '.'.$this->scss_suffix)
-																	  ||
-																	  strstr($__fileInfo->getFilename(), '.'.$this->css_suffix))
+										||
+									strstr($__fileInfo->getFilename(), '.'.$this->css_suffix))
 							   && $__fileInfo->getFilename() !== 'main.'.$this->scss_suffix
 							   && $__fileInfo->getFilename() !== 'main.'.$this->css_suffix
 							   && $filepath = $__fileInfo->getPathname()) {
 								// Fichiers à l'étage 2
 								$basename = basename($filepath);
 								$directory = str_replace($basename, '', $filepath);
-								if (preg_match($this->scss_reg_exp, $basename, $matches)) {
+								if (preg_match($this->scss_reg_exp, $basename, $matches) || preg_match($this->css_reg_exp, $basename, $matches)) {
 									$directory_name  		= basename(dirname($filepath));
 									$sub_directory_name 	= basename(dirname(str_replace($directory_name.'/'.$basename, '', $directory)));
 									$directory_order		= (int)strtok($sub_directory_name, '_');
@@ -85,7 +83,7 @@ class ScssParser extends util {
 						// Fichiers à l'étage 1
 
 						$basename = basename($filepath);
-						if (preg_match($this->scss_reg_exp, $basename, $matches)) {
+						if (preg_match($this->scss_reg_exp, $basename, $matches) || preg_match($this->css_reg_exp, $basename, $matches)) {
 							$directory_name  	= basename(dirname($filepath));
 							$directory_order 	= (int)strtok($directory_name, '_');
 							$directory_ident 	= strtok('');
@@ -110,7 +108,7 @@ class ScssParser extends util {
 					&& $filepath = $fileInfo->getPathname()) {
 				// fichiers à la racine
 				$basename = basename($filepath);
-				if (preg_match($this->scss_reg_exp, $basename, $matches)) {
+				if (preg_match($this->scss_reg_exp, $basename, $matches) || preg_match($this->css_reg_exp, $basename, $matches)) {
 					$directory_name  	= basename(dirname($filepath));
 					$directory_order 	= (int)strtok($directory_name, '_');
 					$directory_ident 	= strtok('');
@@ -181,7 +179,8 @@ class ScssParser extends util {
 		<title>Documentation Css</title>
 		
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-		<link rel="stylesheet" href="/scss/hightlight/styles/default.css">
+		<link rel="stylesheet" href="scss/hightlight/styles/default.css">
+		<link rel="stylesheet" href="scss/main.css">
 	</head>
 	<body>
 		<div class="row">
@@ -254,9 +253,7 @@ class ScssParser extends util {
 			$html .= '			<hr />';
 		}
 
-		$nav = '<div class="menu" style="position: fixed; top: 0; padding-left: 5px; text-align: center;">';
-
-		$dir = opendir($this->root_dir.'/views');
+		$dir = opendir($this->root_dir.'/layouts');
 		$max = 0;
 		while (($directory = readdir($dir)) !== false) {
 			if($directory !== '.' && $directory !== '..' && $directory !== 'errors') {
@@ -264,20 +261,22 @@ class ScssParser extends util {
 			}
 		}
 
-		$dir1 = opendir($this->root_dir.'/views');
-		$nb = 0;
-		while (($directory = readdir($dir1)) !== false) {
-			if($directory !== '.' && $directory !== '..' && $directory !== 'errors') {
-				$directory_link = $directory === 'Accueil' ? '/' : strtolower($directory).'.php';
-				$nav .= '<a href="'.$directory_link.'">'.$directory.'</a>';
-				if($nb < $max-1) {
-					$nav .= ' | ';
-				}
-				$nb++;
-			}
-		}
-		$nav .= '</div>';
-		$nav .= '<ul style="position: fixed; top: 30px;">';
+		$dir1 = opendir($this->root_dir.'/layouts');
+//		$nb = 0;
+
+//		$nav = '<div class="menu" style="position: fixed; top: 0; padding-left: 5px; text-align: center;">';
+//		while (($directory = readdir($dir1)) !== false) {
+//			if($directory !== '.' && $directory !== '..' && $directory !== 'errors') {
+//				$directory_link = $directory === 'Accueil' ? '/' : strtolower($directory).'.php';
+//				$nav .= '<a href="'.$directory_link.'">'.$directory.'</a>';
+//				if($nb < $max-1) {
+//					$nav .= ' | ';
+//				}
+//				$nb++;
+//			}
+//		}
+//		$nav .= '</div>';
+		$nav = '<ul style="position: fixed; top: 30px;">';
 		foreach ($stylesgide as $categorie => $sub_cat) {
 			$nav .= '	<li>';
 			$nav .= '		<b>
@@ -316,10 +315,12 @@ class ScssParser extends util {
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
 		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
-		<script src="/scss/hightlight/highlight.pack.js"></script>
+		<script src="scss/hightlight/highlight.pack.js"></script>
+		<script>
+			hljs.initHighlightingOnLoad();
+		</script>
 		<script>
 			$(document).ready(function() {
-				hljs.initHighlightingOnLoad();
 				$(".js-scrollTo").on("click", function() { // Au clic sur un élément
 					let page = $(this).attr("href"); // Page cible
 					let speed = 750; // Durée de l\'animation (en ms)
@@ -361,5 +362,27 @@ class ScssParser extends util {
 	}, [\'__DIR__\', __DIR__]);';
 
 		file_put_contents($this->php_doc_file, $php);
+	}
+
+	public function prepare_main_for_sass_compilation() {
+		$sass = file_get_contents($this->css_file);
+		preg_replace_callback('`(\/\/\ SOURCE\ [a-zA-Z0-9\_\-\.\/]+\n)(\/\*[^*]+\*\/)`', function ($matches) use (&$sass) {
+			$sass = str_replace($matches[1].$matches[2], '', $sass);
+		}, $sass);
+		$sass = str_replace(["\n\n", '}.', '}#'], ['', "}\n.", "]\n#"], $sass);
+		file_put_contents($this->base_dir.'/ready-to-compile.'.$this->scss_suffix, $sass);
+		return $this;
+	}
+
+	public function compile() {
+		$main_file = str_replace('.'.$this->scss_suffix, '.'.$this->css_suffix, $this->css_file);
+		$output = null;
+		exec('node-sass '.$this->base_dir.'/ready-to-compile.scss '.$main_file, $output);
+		unlink($this->base_dir.'/ready-to-compile.scss');
+		unlink($this->css_file);
+		$main_file_content = file_get_contents($main_file);
+		$main_file_content = str_replace("\n", '', $main_file_content);
+		file_put_contents($main_file, $main_file_content);
+		return $output;
 	}
 }

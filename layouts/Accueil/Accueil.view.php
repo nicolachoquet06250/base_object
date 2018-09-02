@@ -1,6 +1,6 @@
 <?php
 
-namespace project\views;
+namespace project\layouts;
 
 use project\extended\classes\view;
 

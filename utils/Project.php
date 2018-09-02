@@ -45,6 +45,7 @@ class Project extends util {
 		$scss_parser = (new Project())->get_scss_parser(__DIR__.'/..');
 		$scss_parser->parse()->get_scss_array();
 		$scss_parser->genere_scss_file()->genere_scss_doc_array()->genere_doc_file();
+		$scss_parser->prepare_main_for_sass_compilation()->compile();
 
 		if(isset($arguments[1]) && gettype($arguments[1]) === 'array') {
 			$args = $arguments[1];

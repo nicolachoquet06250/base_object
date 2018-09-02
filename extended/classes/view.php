@@ -5,10 +5,10 @@ namespace project\extended\classes;
 
 class view extends util {
 	private $complete_path = '';
-	private $view_path = './views';
+	private $view_path = './layouts';
 	private $template_name = '';
 	private $template_file_name = 'index.view.html';
-	private $template_404 = './views/errors/404/index.view.html';
+	private $template_404 = './layouts/errors/404/index.view.html';
 	private $vars = [];
 
 	public function __construct($vars) {
@@ -124,7 +124,7 @@ class view extends util {
 			if (is_file($this->get_complete_path().'/'.$this->get_template_file_name())) {
 				if (is_file($this->get_complete_path().'/'.$this->get_template_name().'.view.php')) {
 					require_once $this->get_complete_path().'/'.$this->get_template_name().'.view.php';
-					$class = 'project\views\\'.$this->get_template_name();
+					$class = 'project\layouts\\'.$this->get_template_name();
 					/**
 					 * @var view $view
 					 */
