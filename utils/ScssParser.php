@@ -152,6 +152,7 @@ class ScssParser extends util {
 				}
 			}
 		}
+		$css_file_content = str_replace(['../', '@import "node_modules'], ['', '@import "../node_modules'], $css_file_content);
 		file_put_contents($this->css_file, $css_file_content);
 		return $this;
 	}
@@ -178,9 +179,30 @@ class ScssParser extends util {
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 		<title>Documentation Css</title>
 		
-		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-		<link rel="stylesheet" href="scss/hightlight/styles/default.css">
 		<link rel="stylesheet" href="scss/main.css">
+		<link rel="stylesheet" href="scss/hightlight/styles/default.css">
+		
+		
+		<!-- Optional JavaScript -->
+		<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+		<script src="node_modules/jquery/dist/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+		<script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+		<script src="scss/hightlight/highlight.pack.js"></script>
+		
+		<script>
+			hljs.initHighlightingOnLoad();
+		</script>
+		<script>
+			$(document).ready(function() {
+				$(".js-scrollTo").on("click", function() { // Au clic sur un élément
+					let page = $(this).attr("href"); // Page cible
+					let speed = 750; // Durée de l\'animation (en ms)
+					$("html, body").animate( { scrollTop: $(page).offset().top }, speed ); // Go
+					return false;
+				});
+			});
+		</script>
 	</head>
 	<body>
 		<div class="row">
@@ -261,21 +283,6 @@ class ScssParser extends util {
 			}
 		}
 
-		$dir1 = opendir($this->root_dir.'/layouts');
-//		$nb = 0;
-
-//		$nav = '<div class="menu" style="position: fixed; top: 0; padding-left: 5px; text-align: center;">';
-//		while (($directory = readdir($dir1)) !== false) {
-//			if($directory !== '.' && $directory !== '..' && $directory !== 'errors') {
-//				$directory_link = $directory === 'Accueil' ? '/' : strtolower($directory).'.php';
-//				$nav .= '<a href="'.$directory_link.'">'.$directory.'</a>';
-//				if($nb < $max-1) {
-//					$nav .= ' | ';
-//				}
-//				$nb++;
-//			}
-//		}
-//		$nav .= '</div>';
 		$nav = '<ul style="position: fixed; top: 30px;">';
 		foreach ($stylesgide as $categorie => $sub_cat) {
 			$nav .= '	<li>';
@@ -309,26 +316,7 @@ class ScssParser extends util {
 					</footer>';
 		$html .= '				</div>
 					</div>';
-		$html .= '
-		<!-- Optional JavaScript -->
-		<!-- jQuery first, then Popper.js, then Bootstrap JS -->
-		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
-		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
-		<script src="scss/hightlight/highlight.pack.js"></script>
-		<script>
-			hljs.initHighlightingOnLoad();
-		</script>
-		<script>
-			$(document).ready(function() {
-				$(".js-scrollTo").on("click", function() { // Au clic sur un élément
-					let page = $(this).attr("href"); // Page cible
-					let speed = 750; // Durée de l\'animation (en ms)
-					$("html, body").animate( { scrollTop: $(page).offset().top }, speed ); // Go
-					return false;
-				});
-			});
-		</script>';
+		$html .= '';
 		$html .= '	</body>
 	</html>';
 		$html = str_replace('[nav_menu]', $nav, $html);
@@ -369,7 +357,6 @@ class ScssParser extends util {
 		preg_replace_callback('`(\/\/\ SOURCE\ [a-zA-Z0-9\_\-\.\/]+\n)(\/\*[^*]+\*\/)`', function ($matches) use (&$sass) {
 			$sass = str_replace($matches[1].$matches[2], '', $sass);
 		}, $sass);
-		$sass = str_replace(["\n\n", '}.', '}#'], ['', "}\n.", "]\n#"], $sass);
 		file_put_contents($this->base_dir.'/ready-to-compile.'.$this->scss_suffix, $sass);
 		return $this;
 	}
