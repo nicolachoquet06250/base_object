@@ -7,7 +7,7 @@ use project\extended\classes\util;
 
 class ScssParser extends util {
 	private $root_dir = null, $base_dir = '/scss/', $scss_suffix = 'scss', $css_file = 'main', $css_suffix = 'css', $last_update_file = 'last_update.txt',
-			$html_doc_dir = 'layouts/CssDoc', $html_doc_file = 'index.view.html', $php_doc_file = 'cssdoc.php';
+			$html_doc_dir = 'layouts/CssDoc', $html_doc_file = 'index.view.html', $php_doc_file = 'doc.php';
 	private $scss_array = [], $docs = [];
 	private $scss_reg_exp, $css_reg_exp;
 
@@ -172,50 +172,139 @@ class ScssParser extends util {
 	}
 
 	public function genere_doc_file() {
-		$html = '<!Doctype html>
-<html style="overflow-x: hidden;">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-		<title>Documentation Css</title>
-		
-		<link rel="stylesheet" href="scss/main.css">
-		<link rel="stylesheet" href="scss/hightlight/styles/default.css">
-		
-		
-		<!-- Optional JavaScript -->
-		<!-- jQuery first, then Popper.js, then Bootstrap JS -->
-		<script src="node_modules/jquery/dist/jquery.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
-		<script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-		<script src="scss/hightlight/highlight.pack.js"></script>
-		
-		<script>
-			hljs.initHighlightingOnLoad();
-		</script>
-		<script>
-			$(document).ready(function() {
-				$(".js-scrollTo").on("click", function() { // Au clic sur un élément
-					let page = $(this).attr("href"); // Page cible
-					let speed = 750; // Durée de l\'animation (en ms)
-					$("html, body").animate( { scrollTop: $(page).offset().top }, speed ); // Go
-					return false;
-				});
-			});
-		</script>
-	</head>
-	<body>
-		<div class="row">
-			<nav class="col-3" style="min-height: 200px;">
-				[nav_menu]
-			</nav>
-			<div class="col-9" style="border-left: 1px solid lightgray;">
-				<header style="text-align: center;">
-					<h1>Documentation Css</h1>
-				</header>
-				<hr />
-				<main class="container">';
-		$stylesgide = [];
+
+		$html = '<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CSS-->
+    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <!-- Font Awesome CSS-->
+    <link rel="stylesheet" href="vendor/font-awesome/css/font-awesome.min.css">
+    <!-- Fontastic Custom icon font-->
+    <link rel="stylesheet" href="css/fontastic.css">
+    <!-- Google fonts - Roboto -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+    <!-- jQuery Circle-->
+    <link rel="stylesheet" href="css/grasp_mobile_progress_circle-1.0.0.min.css">
+    <!-- Custom Scrollbar-->
+    <link rel="stylesheet" href="vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css">
+    <!-- theme stylesheet-->
+    <link rel="stylesheet" href="css/style.default.css" id="theme-stylesheet">
+
+    <link rel="stylesheet" href="scss/hightlight/styles/default.css">
+
+    <link rel="stylesheet" href="scss/main.css">
+    <!-- Custom stylesheet - for your changes-->
+    <link rel="stylesheet" href="css/custom.css">
+    <!-- Favicon-->
+    <link rel="shortcut icon" href="img/css3.png">
+    <!-- Tweaks for older IEs--><!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+    <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="scss/hightlight/highlight.pack.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script>
+        $(document).ready(function() {
+            $(".js-scrollTo").on("click", function() { // Au clic sur un élément
+                let page = $(this).attr("href"); // Page cible
+                let speed = 750; // Durée de l\'animation (en ms)
+                $("html, body").animate( { scrollTop: $(page).offset().top }, speed ); // Go
+                return false;
+            });
+        });
+    </script>
+</head>
+<body>
+<!-- Side Navbar -->
+<nav class="side-navbar">
+    <div class="side-navbar-wrapper">
+        <!-- Sidebar Header    -->
+        <div class="sidenav-header d-flex align-items-center justify-content-center">
+            <!-- User Info-->
+            <div class="sidenav-header-inner text-center">
+                <div class="img-fluid rounded-circle">
+                    <span style="border: 1px solid white; padding: 15px; font-size: 20px; -webkit-border-radius: 35px;-moz-border-radius: 35px;border-radius: 35px;">
+                        NC
+                    </span>
+                </div>
+                <h2 class="h5">Nicolas Choquet</h2>
+                <span>Web Developer</span>
+            </div>
+            <!-- Small Brand information, appears on minimized sidebar-->
+            <div class="sidenav-header-logo">
+                <a href="home.php" class="brand-small text-center">
+                    <strong>N</strong>
+                    <strong class="text-primary">C</strong>
+                </a>
+            </div>
+        </div>
+        <!-- Sidebar Navigation Menus-->
+        <div class="main-menu">
+            <h5 class="sidenav-heading">Doc.</h5>
+            <ul id="side-main-menu" class="side-menu list-unstyled">
+                <li>
+                    <a href="#doc-css" aria-expanded="false" data-toggle="collapse">
+                        <i>
+                            <img src="img/css3.png" style="height: 25px; width: 25px;">
+                        </i>
+                        CSS
+                        <div class="badge badge-info">SASS</div>
+                    </a>
+                    [nav_menu]
+                </li>
+                <!--<li>
+                    <a href="#doc-php" aria-expanded="false" data-toggle="collapse">
+                        <i>
+                            <img src="img/php7.png" style="height: 25px; width: 18px; margin-left: 5px;">
+                        </i>
+                        PHP
+                        <div class="badge badge-info">MVC</div>
+                    </a>
+                    <ul id="doc-php" class="collapse list-unstyled ">
+                        <li>
+                            <a href="#">
+                                <i class="fa fa-folder"></i> Strates
+                            </a>
+                        </li>
+                    </ul>
+                </li>-->
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="page">
+    <!-- navbar-->
+    <header class="header">
+        <nav class="navbar">
+            <div class="container-fluid">
+                <div class="navbar-holder d-flex align-items-center justify-content-between">
+                    <div class="navbar-header">
+                        <a id="toggle-btn" href="#" class="menu-btn">
+                            <i class="icon-bars"> </i>
+                        </a>
+                        <a href="home.php" class="navbar-brand">
+                            <div class="brand-text d-none d-md-inline-block">
+                                <strong class="text-primary">Documentation</strong>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <!-- Updates Section -->
+    <section class="mt-30px mb-30px">
+        <div class="container-fluid">';
 		foreach ($this->docs as $cmp => $doc) {
 			$doc = explode("\n", $doc);
 			foreach ($doc as $i => $value) {
@@ -253,72 +342,97 @@ class ScssParser extends util {
 				}
 			}
 
-			$html .= '		<div class="col-12" id="'.$id.'">';
-			$html .= '			<i class="source-file">Fichier source: '.$doc['source'].'</i>';
-			$html .= '			<h2>'.$doc['title'].'</h2>';
-			$html .= '			<p>'.$doc['description'].'</p>';
-			$html .= '			<div>
-					<b>EXEMPLES</b>
-					<br />
-					<div class="exemples-code" style="margin-bottom: 50px; margin-top: 15px;;">
-						'.$doc['Markup:'].'
-					</div>
-				</div>
-				<div>
-					<b>CODE SOURCE</b>
-					<br />
-					<div class="source-code">
-						<pre><code class="html">'.htmlentities($doc['Markup:']).'</code></pre>
-					</div>
-				</div>
-			</div>';
-			$html .= '			<hr />';
+			$html .= '
+<div class="row">
+	<div class="col-12 card" id="'.$id.'">
+         <div class="card-header">
+              <i class="fa fa-file font-italic" style="font-size: 15px;"> Fichier source: '.$doc['source'].'</i>
+              <h2 class="card-title">'.$doc['title'].'</h2>
+         </div>
+         <div class="card-body">
+               <p>
+                   '.$doc['description'].'
+               </p>
+               <div>
+                   <b>EXEMPLES</b>
+                   <br/>
+                   <div class="exemples-code" style="margin-bottom: 50px; margin-top: 15px;;">
+                       '.$doc['Markup:'].'
+                   </div>
+               </div>
+               <div>
+                    <b>CODE SOURCE</b>
+                    <br/>
+                    <div class="source-code">
+                         <pre><code class="html">'.htmlentities($doc['Markup:']).'</code></pre>
+                    </div>
+               </div>
+         </div>
+    </div>
+</div>
+';
 		}
 
-		$dir = opendir($this->root_dir.'/layouts');
-		$max = 0;
-		while (($directory = readdir($dir)) !== false) {
-			if($directory !== '.' && $directory !== '..' && $directory !== 'errors') {
-				$max++;
-			}
-		}
+    $html .= '        </div>
+    </section>
+    <footer class="main-footer">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-6">
+                    <p>base_object &copy; 2017-2019</p>
+                    <p>Dernières modification: [last_update]</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <div class="row">
+        <div class="col-12">
+            [debug]
+        </div>
+    </div>
+</div>
+<!-- JavaScript files-->
+<script src="js/grasp_mobile_progress_circle-1.0.0.min.js"></script>
+<script src="vendor/jquery.cookie/jquery.cookie.js"></script>
+<script src="vendor/jquery-validation/jquery.validate.min.js"></script>
+<script src="vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js"></script>
+<!-- Main File-->
+<script src="js/front.js"></script>
+</body>
+</html>';
 
-		$nav = '<ul style="position: fixed; top: 30px;">';
+		$nav = '<ul id="doc-css" class="collapse list-unstyled ">';
 		foreach ($stylesgide as $categorie => $sub_cat) {
-			$nav .= '	<li>';
-			$nav .= '		<b>
-								'.$categorie.'
-							</b>
-							<ul>';
+			$nav .= '	<li>'."\n";
+			$nav .= '<a href="#'.strtolower($categorie).'" aria-expanded="false" data-toggle="collapse">
+						<i class="fa fa-folder"></i> '.$categorie.'
+					 </a>
+					 <ul id="'.strtolower($categorie).'" class="collapse list-unstyled">'."\n";
 			foreach ($sub_cat as $class => $sub_class) {
-				$nav .= '		<li>';
+				$nav .= '		<li>'."\n";
 				if($this->is_array($sub_class)) {
-					$nav .= '					<b>'.$class.'</b>
-										<ul>';
+					$nav .= '	<a href="#'.strtolower($categorie).'-'.$class.'" aria-expanded="false" data-toggle="collapse">
+		<i class="fa fa-folder"></i> '.$class.'
+	</a>
+					 <ul id="'.strtolower($categorie).'-'.$class.'" class="collapse list-unstyled">'."\n";
 					foreach ($sub_class as $sub_sub_class => $id_div) {
-						$nav .= '			<li><a class="js-scrollTo" href="#'.$id_div.'">'.$sub_sub_class.'</a></li>';
+						$nav .= '			<li>
+				<a class="js-scrollTo" href="#'.$id_div.'"><i class="fa fa-css3"></i> '.$sub_sub_class.'</a>
+			</li>'."\n";
 					}
-					$nav .= '			</ul>';
+					$nav .= '			</ul>'."\n";
 				}
 				else {
-					$nav .= '<a class="js-scrollTo" href="#'.$sub_class.'">'.$class.'</a>';
+					$nav .= '<a class="js-scrollTo" href="#'.$sub_class.'"><i class="fa fa-css3"></i> '.$class.'</a>'."\n";
 				}
-					$nav .= '		</li>';
+				$nav .= '		</li>'."\n";
 			}
 			$nav .= '		</ul>
-						</li>';
+						</li>'."\n";
 		}
-		$nav .= '</ul>';
-		$html .= '			</main>';
-		$html .= '
-					<footer style="text-align: center;">
-						Dernière modification: [last_update]
-					</footer>';
-		$html .= '				</div>
-					</div>';
-		$html .= '';
-		$html .= '	</body>
-	</html>';
+        $nav .= '</ul>
+		';
+
 		$html = str_replace('[nav_menu]', $nav, $html);
 
 		if(!is_dir($this->html_doc_dir)) {

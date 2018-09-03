@@ -1,6 +1,10 @@
 <?php
-
+	require_once 'extended/traits/http.php';
+	require_once 'extended/traits/php_environement.php';
 	require_once 'extended/traits/manager.php';
+
+	require_once 'extended/classes/debug.php';
+
 	require_once 'extended/classes/BaseObject.php';
 	require_once 'extended/classes/util.php';
 	require_once 'extended/classes/view.php';

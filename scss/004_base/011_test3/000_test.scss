@@ -12,12 +12,11 @@ Voici une description
 @Styleguide
 Base.test1.test
 */
+@import "../../../node_modules/bootstrap/scss/bootstrap";
+@import "../../../node_modules/bootstrap/scss/grid";
 .test {
-  width: 50px;
-  height: 50px;
+  @extend .col-12;
   &-test {
-    height: 100%;
-    width: 100%;
     color: #8bff36;
   }
 }

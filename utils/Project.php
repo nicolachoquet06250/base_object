@@ -3,6 +3,7 @@
 namespace project\utils;
 
 use Exception;
+use project\extended\classes\debug;
 use project\extended\classes\util;
 use project\extended\classes\view;
 
@@ -34,6 +35,11 @@ class Project extends util {
 	}
 
 	public static function __callStatic($name, $arguments) {
+		debug::instence();
+		debug::log(['ceci est le premier log de debug', 'ceci est le second log de debug'], 'log1');
+		debug::log('ceci est le second log de debug', 'log2');
+		debug::log('ceci est le troisième log de debug', 'log3');
+		debug::log('ceci est le quatrieme log de debug', 'log4');
 		$callback = $arguments[0];
 		$catch = null;
 		$args = [];
@@ -72,19 +78,78 @@ class Project extends util {
 				 * @var view $result
 				 */
 				$result->set_template_name($template_name);
-				return $result->display()."\n";
+				return str_replace('[debug]', (debug::is_active() ? self::get_debug() : ''), $result->display())."\n";
 			} elseif (self::is_string($result) || self::is_integer($result)) {
-				return $result;
+				return str_replace('[debug]', (debug::is_active() ? self::get_debug() : ''), $result);
 			} elseif (self::is_array($result)) {
 				self::var_dump($result);
-				return '';
+				return (debug::is_active() ? self::get_debug() : '');
 			}
 		}
 		header("HTTP/1.0 500 Internal Error");
 		$view = view::get(['page_name' => 500], ['template_name' => 500]);
 		$view->set_template_name('errors/500');
 		$view->set_template_404('errors/404');
-		return $view->display(true);
+		return str_replace('[debug]', (debug::is_active() ? self::get_debug() : ''), $view->display(true));
+	}
+
+	public static function get_debug(callable $callback = null) {
+		if($callback) {
+			return $callback(debug::logs());
+		}
+		return self::default_callback_for_write_debug(debug::logs());
+	}
+
+	private static function default_callback_for_write_debug($logs) {
+		$retour = '<table class="table table-bordered" style="width: 100%;">';
+		$retour .= '
+<tr>
+	<th colspan="2" style="text-align: center;">
+		Debug
+	</th>
+</tr>
+';
+		$max = 1;
+		foreach ($logs as $id => $log) {
+			if(self::is_array($log)) {
+				if (count($log) > $max) {
+					$max = count($log);
+				}
+			}
+			if(self::is_array($log)) {
+				$retour .= '
+<tr>
+	<th rowspan="[max_rowspan]">
+		'.$id.'
+	</th>
+</tr>
+';
+				foreach ($log as $item) {
+					$retour .= '
+<tr>
+	<td>
+		'.$item.'
+	</td>
+</tr>
+';
+				}
+			}
+			else {
+				$retour .= '
+<tr>
+	<th>
+		'.$id.'
+	</th>
+	<td>
+		'.$log.'
+	</td>
+</tr>
+';
+			}
+		}
+		$retour .= '</table>';
+		$retour = str_replace('[max_rowspan]', ($max+1), $retour);
+		return $retour;
 	}
 
 	/**
