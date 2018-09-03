@@ -183,7 +183,7 @@ class ScssParser extends util {
     <!-- Bootstrap CSS-->
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
     <!-- Font Awesome CSS-->
-    <link rel="stylesheet" href="vendor/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
     <!-- Fontastic Custom icon font-->
     <link rel="stylesheet" href="css/fontastic.css">
     <!-- Google fonts - Roboto -->
@@ -191,7 +191,7 @@ class ScssParser extends util {
     <!-- jQuery Circle-->
     <link rel="stylesheet" href="css/grasp_mobile_progress_circle-1.0.0.min.css">
     <!-- Custom Scrollbar-->
-    <link rel="stylesheet" href="vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css">
+    <link rel="stylesheet" href="node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css">
     <!-- theme stylesheet-->
     <link rel="stylesheet" href="css/style.default.css" id="theme-stylesheet">
 
@@ -393,9 +393,9 @@ class ScssParser extends util {
 </div>
 <!-- JavaScript files-->
 <script src="js/grasp_mobile_progress_circle-1.0.0.min.js"></script>
-<script src="vendor/jquery.cookie/jquery.cookie.js"></script>
-<script src="vendor/jquery-validation/jquery.validate.min.js"></script>
-<script src="vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js"></script>
+<script src="node_modules/jquery.cookie/jquery.cookie.js"></script>
+<script src="node_modules/jquery-validation/jquery.validate.min.js"></script>
+<script src="node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js"></script>
 <!-- Main File-->
 <script src="js/front.js"></script>
 </body>
