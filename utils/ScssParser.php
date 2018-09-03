@@ -232,7 +232,7 @@ class ScssParser extends util {
         <div class="sidenav-header d-flex align-items-center justify-content-center">
             <!-- User Info-->
             <div class="sidenav-header-inner text-center">
-                <div class="img-fluid rounded-circle">
+                <div class="img-fluid rounded-circle" style="cursor: default;">
                     <span style="border: 1px solid white; padding: 15px; font-size: 20px; -webkit-border-radius: 35px;-moz-border-radius: 35px;border-radius: 35px;">
                         NC
                     </span>
