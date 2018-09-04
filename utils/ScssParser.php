@@ -38,7 +38,42 @@ class ScssParser extends util {
 		return $this->docs;
 	}
 
+	private function parcour($directory, $step = 0) {
+		foreach (new \DirectoryIterator($directory) as $fileInfo) {
+			if (!$fileInfo->isDot() && $fileInfo->isDir() && strstr($fileInfo->getBasename(), '_')) {
+				$this->parcour($directory.'/'.$fileInfo->getBasename(), $step+1);
+			}
+			elseif ($fileInfo->isFile()
+					&& (strstr($fileInfo->getFilename(), '.'.$this->scss_suffix)
+						||
+						strstr($fileInfo->getFilename(), '.'.$this->css_suffix))
+					&& $fileInfo->getFilename() !== 'main.'.$this->scss_suffix
+					&& $fileInfo->getFilename() !== 'main.'.$this->css_suffix
+					&& $filepath = $fileInfo->getPathname()) {
+				// Fichiers à l'étage 1
+
+				$basename = basename($filepath);
+				if (preg_match($this->scss_reg_exp, $basename, $matches) || preg_match($this->css_reg_exp, $basename, $matches)) {
+					if($step === 0) {
+						$this->scss_array[$basename] = $filepath;
+					}
+					elseif($step === 1) {
+						$directory_name  = basename(dirname($filepath));
+						$this->scss_array[$directory_name][$basename] = $filepath;
+					}
+					elseif ($step > 1) {
+						$directory_name     = basename(dirname($filepath));
+						$sub_directory_name = basename(dirname(str_replace($directory_name.'/'.$basename, '', $directory)));
+
+						$this->scss_array[$sub_directory_name.'/'.$directory_name][$basename] = $filepath;
+					}
+				}
+			}
+		}
+	}
+
 	public function parse() {
+//		$this->parcour($this->base_dir);
 		foreach (new \DirectoryIterator($this->base_dir) as $fileInfo) {
 			if (!$fileInfo->isDot()) {
 				if ($fileInfo->isDir() && strstr($fileInfo->getBasename(), '_')) {
@@ -153,7 +188,7 @@ class ScssParser extends util {
 				}
 			}
 		}
-		$css_file_content = str_replace(['../', '@import "node_modules'], ['', '@import "../node_modules'], $css_file_content);
+		$css_file_content = str_replace(['../', '@import "node_modules', 'url("fonts'], ['', '@import "../node_modules', 'url("../fonts'], $css_file_content);
 		file_put_contents($this->css_file, $css_file_content);
 		return $this;
 	}
@@ -186,21 +221,17 @@ class ScssParser extends util {
     <!-- Font Awesome CSS-->
     <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
     <!-- Fontastic Custom icon font-->
-    <link rel="stylesheet" href="css/fontastic.css">
+    <link rel="stylesheet" href="scss/theme-css/fontastic.css">
     <!-- Google fonts - Roboto -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
-    <!-- jQuery Circle-->
-    <link rel="stylesheet" href="css/grasp_mobile_progress_circle-1.0.0.min.css">
     <!-- Custom Scrollbar-->
     <link rel="stylesheet" href="node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css">
-    <!-- theme stylesheet-->
-    <link rel="stylesheet" href="css/style.pink.css" id="theme-stylesheet">
 
     <link rel="stylesheet" href="scss/hightlight/styles/default.css">
 
     <link rel="stylesheet" href="scss/main.css">
     <!-- Custom stylesheet - for your changes-->
-    <link rel="stylesheet" href="css/custom.css">
+    <link rel="stylesheet" href="scss/theme-css/custom.css">
     <!-- Favicon-->
     <link rel="shortcut icon" href="img/css3.png">
     <!-- Tweaks for older IEs--><!--[if lt IE 9]>
@@ -225,7 +256,7 @@ class ScssParser extends util {
         });
     </script>
 </head>
-<body>
+<body class="cssdoc">
 <!-- Side Navbar -->
 <nav class="side-navbar">
     <div class="side-navbar-wrapper">
@@ -244,7 +275,7 @@ class ScssParser extends util {
             <!-- Small Brand information, appears on minimized sidebar-->
             <div class="sidenav-header-logo">
                 <a href="home.php" class="brand-small text-center">
-                    <strong>N</strong>
+                    <strong class="text-primary">N</strong>
                     <strong class="text-primary">C</strong>
                 </a>
             </div>
@@ -345,6 +376,14 @@ class ScssParser extends util {
 
 			$card_markup = '';
 			if(isset($doc['Markup:']) && $doc['Markup:'] !== '') {
+				$markup_array = explode("\n", $doc['Markup:']);
+				$tmp_markup = '';
+				foreach ($markup_array as $i => $markup_line) {
+					if($markup_line !== '') {
+						$tmp_markup .= ($i + 1).'. '.$markup_line."\n";
+					}
+				}
+
 				$card_markup = '
 				<div>
                    <b>EXEMPLES</b>
@@ -357,7 +396,7 @@ class ScssParser extends util {
                     <b>CODE SOURCE</b>
                     <br/>
                     <div class="source-code">
-                         <pre><code class="html">'.htmlentities($doc['Markup:']).'</code></pre>
+                         <pre><code class="html">'.htmlentities($tmp_markup).'</code></pre>
                     </div>
                </div>';
 			}
@@ -482,15 +521,21 @@ class ScssParser extends util {
 		return $this;
 	}
 
+	/**
+	 * @throws \Exception
+	 */
 	public function compile() {
 		$main_file = str_replace('.'.$this->scss_suffix, '.'.$this->css_suffix, $this->css_file);
 		$output = null;
-		exec('node-sass '.$this->base_dir.'/ready-to-compile.scss '.$main_file, $output);
+		$retour = null;
+		exec('node-sass '.$this->base_dir.'/ready-to-compile.scss '.$main_file, $output, $retour);
 		unlink($this->base_dir.'/ready-to-compile.scss');
 		unlink($this->css_file);
 		$main_file_content = file_get_contents($main_file);
 		$main_file_content = str_replace("\n", '', $main_file_content);
 		file_put_contents($main_file, $main_file_content);
-		return $output;
+		if(count($output) === 0) {
+			throw new \Exception('La compilation sass à échoué');
+		}
 	}
 }

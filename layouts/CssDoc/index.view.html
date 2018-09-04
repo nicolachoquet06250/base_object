@@ -10,21 +10,17 @@
     <!-- Font Awesome CSS-->
     <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
     <!-- Fontastic Custom icon font-->
-    <link rel="stylesheet" href="css/fontastic.css">
+    <link rel="stylesheet" href="scss/theme-css/fontastic.css">
     <!-- Google fonts - Roboto -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
-    <!-- jQuery Circle-->
-    <link rel="stylesheet" href="css/grasp_mobile_progress_circle-1.0.0.min.css">
     <!-- Custom Scrollbar-->
     <link rel="stylesheet" href="node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css">
-    <!-- theme stylesheet-->
-    <link rel="stylesheet" href="css/style.pink.css" id="theme-stylesheet">
 
     <link rel="stylesheet" href="scss/hightlight/styles/default.css">
 
     <link rel="stylesheet" href="scss/main.css">
     <!-- Custom stylesheet - for your changes-->
-    <link rel="stylesheet" href="css/custom.css">
+    <link rel="stylesheet" href="scss/theme-css/custom.css">
     <!-- Favicon-->
     <link rel="shortcut icon" href="img/css3.png">
     <!-- Tweaks for older IEs--><!--[if lt IE 9]>
@@ -49,7 +45,7 @@
         });
     </script>
 </head>
-<body>
+<body class="cssdoc">
 <!-- Side Navbar -->
 <nav class="side-navbar">
     <div class="side-navbar-wrapper">
@@ -68,7 +64,7 @@
             <!-- Small Brand information, appears on minimized sidebar-->
             <div class="sidenav-header-logo">
                 <a href="home.php" class="brand-small text-center">
-                    <strong>N</strong>
+                    <strong class="text-primary">N</strong>
                     <strong class="text-primary">C</strong>
                 </a>
             </div>
@@ -96,7 +92,7 @@
 	</a>
 					 <ul id="doc-scss" class="collapse list-unstyled">
 			<li>
-				<a class="js-scrollTo" href="#Styledutemplatehtml"><i class="fa fa-css3"></i> theme</a>
+				<a class="js-scrollTo" href="#Styledutemplatehtml"><i class="fa fa-css3"></i> theme-primary</a>
 			</li>
 			</ul>
 		</li>
@@ -151,16 +147,38 @@
 <div class="row">
 	<div class="col-12 card" id="Styledutemplatehtml">
          <div class="card-header">
-              <i class="fa fa-file font-italic" style="font-size: 15px;"> Fichier source: scss/006_doc-css/002_style-default.scss
+              <i class="fa fa-file font-italic" style="font-size: 15px;"> Fichier source: scss/000_doc-css/001_theme/002_style-default.scss
 </i>
               <h2 class="card-title">Style du template html
 </h2>
          </div>
          <div class="card-body">
                <p>
-                   Style du template html choisis transformé en sass
+                   définis la couleur 'primary'
 
                </p>
+				<div>
+                   <b>EXEMPLES</b>
+                   <br/>
+                   <div class="exemples-code" style="margin-bottom: 50px; margin-top: 15px;;">
+                       <div class="row">
+   <div class="bg-primary col-2"></div>
+   <div class="text-primary border-primary col-10" style="border: 1px solid;">Voici du text</div>
+</div>
+
+                   </div>
+               </div>
+               <div>
+                    <b>CODE SOURCE</b>
+                    <br/>
+                    <div class="source-code">
+                         <pre><code class="html">1. &lt;div class=&quot;row&quot;&gt;
+2.    &lt;div class=&quot;bg-primary col-2&quot;&gt;&lt;/div&gt;
+3.    &lt;div class=&quot;text-primary border-primary col-10&quot; style=&quot;border: 1px solid;&quot;&gt;Voici du text&lt;/div&gt;
+4. &lt;/div&gt;
+</code></pre>
+                    </div>
+               </div>
          </div>
     </div>
 </div>
