@@ -11,6 +11,7 @@
 		$page_name = $args['page_name'];
 		$template_name = $args['template_name'];
 		
+		/** @var Project $_this */
 		return view::get(
 			['page_name' => $page_name],
 			['template_name' => $template_name],

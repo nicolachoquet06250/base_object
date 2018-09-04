@@ -40,86 +40,87 @@ class ScssParser extends util {
 
 	public function parse() {
 		foreach (new \DirectoryIterator($this->base_dir) as $fileInfo) {
-			if($fileInfo->isDir() && strstr($fileInfo->getBasename(), '_')) {
-				foreach (new \DirectoryIterator($this->base_dir.$fileInfo->getBasename()) as $_fileInfo) {
-					if($_fileInfo->isDir()
-					   && strstr($_fileInfo->getBasename(), '_')) {
-						$path = $this->base_dir.$fileInfo->getBasename().'/'.$_fileInfo->getBasename();
-						foreach (new \DirectoryIterator($path) as $__fileInfo) {
-							if($__fileInfo->isFile()
-							   && (strstr($__fileInfo->getFilename(), '.'.$this->scss_suffix)
-										||
-									strstr($__fileInfo->getFilename(), '.'.$this->css_suffix))
-							   && $__fileInfo->getFilename() !== 'main.'.$this->scss_suffix
-							   && $__fileInfo->getFilename() !== 'main.'.$this->css_suffix
-							   && $filepath = $__fileInfo->getPathname()) {
-								// Fichiers à l'étage 2
-								$basename = basename($filepath);
-								$directory = str_replace($basename, '', $filepath);
-								if (preg_match($this->scss_reg_exp, $basename, $matches) || preg_match($this->css_reg_exp, $basename, $matches)) {
-									$directory_name  		= basename(dirname($filepath));
-									$sub_directory_name 	= basename(dirname(str_replace($directory_name.'/'.$basename, '', $directory)));
-									$directory_order		= (int)strtok($sub_directory_name, '_');
-									$directory_ident 		= strtok('');
+			if (!$fileInfo->isDot()) {
+				if ($fileInfo->isDir() && strstr($fileInfo->getBasename(), '_')) {
+					foreach (new \DirectoryIterator($this->base_dir.$fileInfo->getBasename()) as $_fileInfo) {
+						if (!$fileInfo->isDot()) {
+							if ($_fileInfo->isDir() && strstr($_fileInfo->getBasename(), '_')) {
+								$path = $this->base_dir.$fileInfo->getBasename().'/'.$_fileInfo->getBasename();
+								foreach (new \DirectoryIterator($path) as $__fileInfo) {
+									if ($__fileInfo->isFile()
+										&& (strstr($__fileInfo->getFilename(), '.'.$this->scss_suffix)
+											||
+											strstr($__fileInfo->getFilename(), '.'.$this->css_suffix))
+										&& $__fileInfo->getFilename() !== 'main.'.$this->scss_suffix
+										&& $__fileInfo->getFilename() !== 'main.'.$this->css_suffix
+										&& $filepath = $__fileInfo->getPathname()) {
+										// Fichiers à l'étage 2
+										$basename  = basename($filepath);
+										$directory = str_replace($basename, '', $filepath);
+										if (preg_match($this->scss_reg_exp, $basename, $matches) || preg_match($this->css_reg_exp, $basename, $matches)) {
+											$directory_name     = basename(dirname($filepath));
+											$sub_directory_name = basename(dirname(str_replace($directory_name.'/'.$basename, '', $directory)));
+											$directory_order    = (int)strtok($sub_directory_name, '_');
+											$directory_ident    = strtok('');
 
-									$order       			= (int)$matches[1];
-									$this->scss_array[$directory_ident][$directory_name][$basename]
-														  	= $filepath;
+											$order = (int)$matches[1];
+											$this->scss_array[$directory_ident][$directory_name][$basename]
+												   = $filepath;
+											$files_order[$directory_ident][$directory_name][$basename]
+												   = $order;
+											$directories_order[$directory_ident]
+												   = $directory_order;
+										}
+									}
+								}
+							} elseif ($_fileInfo->isFile()
+									  && (strstr($_fileInfo->getFilename(), '.'.$this->scss_suffix)
+										  ||
+										  strstr($_fileInfo->getFilename(), '.'.$this->css_suffix))
+									  && $_fileInfo->getFilename() !== 'main.'.$this->scss_suffix
+									  && $_fileInfo->getFilename() !== 'main.'.$this->css_suffix
+									  && $filepath = $_fileInfo->getPathname()) {
+								// Fichiers à l'étage 1
+
+								$basename = basename($filepath);
+								if (preg_match($this->scss_reg_exp, $basename, $matches) || preg_match($this->css_reg_exp, $basename, $matches)) {
+									$directory_name  = basename(dirname($filepath));
+									$directory_order = (int)strtok($directory_name, '_');
+									$directory_ident = strtok('');
+
+									$order = (int)$matches[1];
+									$this->scss_array[$directory_ident][$basename]
+										   = $filepath;
 									$files_order[$directory_ident][$directory_name][$basename]
-														  	= $order;
+										   = $order;
 									$directories_order[$directory_ident]
-														  	= $directory_order;
+										   = $directory_order;
 								}
 							}
 						}
 					}
-					elseif ($_fileInfo->isFile()
-							&& (strstr($_fileInfo->getFilename(), '.'.$this->scss_suffix)
-								||
-								strstr($_fileInfo->getFilename(), '.'.$this->css_suffix))
-							&& $_fileInfo->getFilename() !== 'main.'.$this->scss_suffix
-							&& $_fileInfo->getFilename() !== 'main.'.$this->css_suffix
-							&& $filepath = $_fileInfo->getPathname()) {
-						// Fichiers à l'étage 1
+				} elseif ($fileInfo->isFile()
+						  && (strstr($fileInfo->getFilename(), '.'.$this->scss_suffix)
+							  ||
+							  strstr($fileInfo->getFilename(), '.'.$this->css_suffix))
+						  && $fileInfo->getFilename() !== 'main.'.$this->scss_suffix
+						  && $fileInfo->getFilename() !== 'main.'.$this->css_suffix
+						  && $filepath = $fileInfo->getPathname()) {
+					// fichiers à la racine
+					$basename = basename($filepath);
+					if (preg_match($this->scss_reg_exp, $basename, $matches) || preg_match($this->css_reg_exp, $basename, $matches)) {
+						$directory_name  = basename(dirname($filepath));
+						$directory_order = (int)strtok($directory_name, '_');
+						$directory_ident = strtok('');
 
-						$basename = basename($filepath);
-						if (preg_match($this->scss_reg_exp, $basename, $matches) || preg_match($this->css_reg_exp, $basename, $matches)) {
-							$directory_name  	= basename(dirname($filepath));
-							$directory_order 	= (int)strtok($directory_name, '_');
-							$directory_ident 	= strtok('');
-
-							$order       		= (int)$matches[1];
-							$this->scss_array[$directory_ident][$basename]
-												= $filepath;
-							$files_order[$directory_ident][$directory_name][$basename]
-												= $order;
-							$directories_order[$directory_ident]
-												= $directory_order;
-						}
+						$order = (int)$matches[1];
+						$this->scss_array[$directory_ident][$basename]
+							   = $filepath;
+						$files_order[$directory_ident][$basename]
+							   = $order;
+						$directories_order[$directory_ident]
+							   = $directory_order;
 					}
-				}
-			}
-			elseif ($fileInfo->isFile()
-					&& (strstr($fileInfo->getFilename(), '.'.$this->scss_suffix)
-						||
-						strstr($fileInfo->getFilename(), '.'.$this->css_suffix))
-					&& $fileInfo->getFilename() !== 'main.'.$this->scss_suffix
-					&& $fileInfo->getFilename() !== 'main.'.$this->css_suffix
-					&& $filepath = $fileInfo->getPathname()) {
-				// fichiers à la racine
-				$basename = basename($filepath);
-				if (preg_match($this->scss_reg_exp, $basename, $matches) || preg_match($this->css_reg_exp, $basename, $matches)) {
-					$directory_name  	= basename(dirname($filepath));
-					$directory_order 	= (int)strtok($directory_name, '_');
-					$directory_ident 	= strtok('');
-
-					$order       		= (int)$matches[1];
-					$this->scss_array[$directory_ident][$basename]
-									  	= $filepath;
-					$files_order[$directory_ident][$basename]
-									  	= $order;
-					$directories_order[$directory_ident]
-									  	= $directory_order;
 				}
 			}
 		}
@@ -193,7 +194,7 @@ class ScssParser extends util {
     <!-- Custom Scrollbar-->
     <link rel="stylesheet" href="node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css">
     <!-- theme stylesheet-->
-    <link rel="stylesheet" href="css/style.default.css" id="theme-stylesheet">
+    <link rel="stylesheet" href="css/style.pink.css" id="theme-stylesheet">
 
     <link rel="stylesheet" href="scss/hightlight/styles/default.css">
 
@@ -342,18 +343,10 @@ class ScssParser extends util {
 				}
 			}
 
-			$html .= '
-<div class="row">
-	<div class="col-12 card" id="'.$id.'">
-         <div class="card-header">
-              <i class="fa fa-file font-italic" style="font-size: 15px;"> Fichier source: '.$doc['source'].'</i>
-              <h2 class="card-title">'.$doc['title'].'</h2>
-         </div>
-         <div class="card-body">
-               <p>
-                   '.$doc['description'].'
-               </p>
-               <div>
+			$card_markup = '';
+			if(isset($doc['Markup:']) && $doc['Markup:'] !== '') {
+				$card_markup = '
+				<div>
                    <b>EXEMPLES</b>
                    <br/>
                    <div class="exemples-code" style="margin-bottom: 50px; margin-top: 15px;;">
@@ -366,7 +359,20 @@ class ScssParser extends util {
                     <div class="source-code">
                          <pre><code class="html">'.htmlentities($doc['Markup:']).'</code></pre>
                     </div>
-               </div>
+               </div>';
+			}
+
+			$html .= '
+<div class="row">
+	<div class="col-12 card" id="'.$id.'">
+         <div class="card-header">
+              <i class="fa fa-file font-italic" style="font-size: 15px;"> Fichier source: '.$doc['source'].'</i>
+              <h2 class="card-title">'.$doc['title'].'</h2>
+         </div>
+         <div class="card-body">
+               <p>
+                   '.$doc['description'].'
+               </p>'.$card_markup.'
          </div>
     </div>
 </div>
@@ -456,6 +462,7 @@ class ScssParser extends util {
 		$page_name = $args[\'page_name\'];
 		$template_name = $args[\'template_name\'];
 		
+		/** @var Project $_this */
 		return view::get(
 			[\'page_name\' => $page_name],
 			[\'template_name\' => $template_name],
