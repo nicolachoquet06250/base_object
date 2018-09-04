@@ -18,17 +18,22 @@ class BaseObject extends \stdClass {
 	private $array = null;
 	private $key = null;
 	protected $gettable_and_settable_classes, $services, $utils, $sql;
+	private $void_json = null;
 
 	/**
 	 * BaseObject constructor.
 	 */
 	public function __construct() {
-		$json = new json();
-		$this->utils = (array)$json->get_from_file('conf/utils', true)->json();
-		$g_a_s_classes = (array)$json->get_from_file('conf/gettable_and_settable_classes', true)->json();
-		$this->services = (array)$json->get_from_file('conf/services', true)->json();
-		$this->sql = (array)$json->get_from_file('conf/sql', true)->json();
+		$this->void_json = new json();
+		$this->utils = $this->get_conf('utils');
+		$g_a_s_classes = $this->get_conf('gettable_and_settable_classes');
+		$this->services = $this->get_conf('services');
+		$this->sql = $this->get_conf('sql');
 		$this->gettable_and_settable_classes($g_a_s_classes);
+	}
+
+	public function get_conf($name, $array = true) {
+		return $array ? (array)$this->void_json->get_from_file('conf/'.$name, true)->json() : $this->void_json->get_from_file('conf/'.$name, true)->json();
 	}
 
 	/**
@@ -64,7 +69,7 @@ class BaseObject extends \stdClass {
 	 * @param mixed ...$arguments
 	 * @return null
 	 */
-	protected function get_service(string $name, ...$arguments) {
+	public function get_service(string $name, ...$arguments) {
 		if(isset($this->services[$name])) {
 			require_once $this->services[$name]->path;
 			$class = (strstr('_manager', $this->services[$name]->class) ? '\project\services\\' : '\project\services\managers\\').$this->services[$name]->class;
@@ -87,7 +92,7 @@ class BaseObject extends \stdClass {
 	 * @param mixed ...$arguments
 	 * @return null|util
 	 */
-	protected function get_util(string $name, ...$arguments) {
+	public function get_util(string $name, ...$arguments) {
 		if(isset($this->utils[$name])) {
 			require_once $this->utils[$name]->path;
 			$class = '\project\utils\\'.$this->utils[$name]->class;
