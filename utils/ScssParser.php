@@ -230,8 +230,6 @@ class ScssParser extends util {
     <link rel="stylesheet" href="scss/hightlight/styles/default.css">
 
     <link rel="stylesheet" href="scss/main.css">
-    <!-- Custom stylesheet - for your changes-->
-    <link rel="stylesheet" href="scss/theme-css/custom.css">
     <!-- Favicon-->
     <link rel="shortcut icon" href="img/css3.png">
     <!-- Tweaks for older IEs--><!--[if lt IE 9]>
@@ -285,7 +283,7 @@ class ScssParser extends util {
             <h5 class="sidenav-heading">Doc.</h5>
             <ul id="side-main-menu" class="side-menu list-unstyled">
                 <li>
-                    <a href="#doc-css" aria-expanded="false" data-toggle="collapse">
+                    <a href="#doc-css" aria-expanded="true" data-toggle="collapse">
                         <i>
                             <img src="img/css3.png" style="height: 25px; width: 25px;">
                         </i>
@@ -294,22 +292,23 @@ class ScssParser extends util {
                     </a>
                     [nav_menu]
                 </li>
-                <!--<li>
-                    <a href="#doc-php" aria-expanded="false" data-toggle="collapse">
+                <li>
+                    <a href="#">
                         <i>
                             <img src="img/php7.png" style="height: 25px; width: 18px; margin-left: 5px;">
                         </i>
                         PHP
                         <div class="badge badge-info">MVC</div>
+                        <div class="badge badge-info">NOT IMPLEMENTED</div>
                     </a>
-                    <ul id="doc-php" class="collapse list-unstyled ">
+                    <!--<ul id="doc-php" class="collapse list-unstyled ">
                         <li>
                             <a href="#">
                                 <i class="fa fa-folder"></i> Strates
                             </a>
                         </li>
-                    </ul>
-                </li>-->
+                    </ul>-->
+                </li>
             </ul>
         </div>
     </div>
@@ -446,7 +445,7 @@ class ScssParser extends util {
 </body>
 </html>';
 
-		$nav = '<ul id="doc-css" class="collapse list-unstyled ">';
+		$nav = '<ul id="doc-css" class="collapse list-unstyled show">';
 		foreach ($stylesgide as $categorie => $sub_cat) {
 			$nav .= '	<li>'."\n";
 			$nav .= '<a href="#'.strtolower($categorie).'" aria-expanded="false" data-toggle="collapse">
