@@ -310,21 +310,39 @@ class ScssParser extends util {
 					}
 				}
 
-				$card_markup = '
-				<div>
-                   <b>EXEMPLES</b>
-                   <br/>
-                   <div class="exemples-code" style="margin-bottom: 50px; margin-top: 15px;;">
-                       '.$doc['Markup'].'
-                   </div>
-               </div>
-               <div>
-                    <b>CODE SOURCE</b>
-                    <br/>
-                    <div class="source-code">
-                         <pre><code class="html">'.htmlentities($tmp_markup).'</code></pre>
-                    </div>
-               </div>';
+				if(!isset($doc['modifiers'])) {
+					$card_markup = '
+					<div>
+					   <b>EXEMPLES</b>
+					   <br/>
+					   <div class="exemples-code" style="margin-bottom: 50px; margin-top: 15px;;">
+						   '.$doc['Markup'].'
+					   </div>
+				   </div>
+				   <div>
+						<b>CODE SOURCE</b>
+						<br/>
+						<div class="source-code">
+							 <pre><code class="html">'.htmlentities($tmp_markup).'</code></pre>
+						</div>
+				   </div>';
+				}
+				else {
+					$derived = explode("\n", $doc['modifiers']);
+					$card_markup = '<div>
+						<b>EXEMPLES</b>
+						<br/>';
+					foreach ($derived as $value) {
+						$class_name = explode(' - ', $value)[0];
+						$class_title = explode(' - ', $value)[1];
+						$card_markup .= '<div>
+							<h2>'.$class_name.'</h2>
+							<p>'.$class_title.'</p>
+							'.str_replace('[class_modifier]', str_replace('.', '', $class_name), $doc['Markup']).'
+						</div>';
+					}
+					$card_markup .= '</div>';
+				}
 			}
 
 			$html .= '
@@ -337,7 +355,8 @@ class ScssParser extends util {
          <div class="card-body">
                <p>
                    '.$description.'
-               </p>'.$card_markup.'
+               </p>
+               '.$card_markup.'
          </div>
     </div>
 </div>
