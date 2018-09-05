@@ -5,7 +5,7 @@ namespace project\services;
 
 use project\extended\traits\singleton;
 
-class meta_service {
+class meta {
 	use singleton;
 	private $metas = [];
 

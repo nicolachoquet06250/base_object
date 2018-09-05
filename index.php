@@ -6,7 +6,7 @@ use project\classes\test_afficher_body;
 use project\dao\user_dao;
 use project\extended\classes\sql_connector;
 use project\services\managers\dao_manager;
-use project\services\meta_service;
+use project\services\meta_;
 use project\sql\json;
 use project\utils\Project;
 use project\extended\classes\view;
@@ -20,7 +20,7 @@ echo Project::Accueil(function ($_this, $metas, $args) {
 	/**
 	 * @var Project $_this
 	 * @var user_dao $user
-	 * @var meta_service $metas
+	 * @var meta_ $metas
 	 */
 	$metas->set_title('Voici mon titre');
 	$prenom = dao_manager::create()->get_dao_from('user', 'prenom', 'Yann')->get_field('prenom');

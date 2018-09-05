@@ -332,6 +332,11 @@ class ScssParser extends util {
 					$card_markup = '<div>
 						<b>EXEMPLES</b>
 						<br/>';
+					$card_markup .= '<div>
+							<h2>default</h2>
+							<p>pas de classe_modifier</p>
+							'.str_replace('[class_modifier]', '', $doc['Markup']).'
+						</div>';
 					foreach ($derived as $value) {
 						$class_name = explode(' - ', $value)[0];
 						$class_title = explode(' - ', $value)[1];
@@ -430,6 +435,7 @@ class ScssParser extends util {
 		}
 		if($html !== file_get_contents($this->html_doc_dir.'/'.$this->html_doc_file)) {
 			file_put_contents($this->html_doc_dir.'/'.$this->html_doc_file, $html);
+
 			file_put_contents($this->base_dir.'/'.$this->last_update_file, date('Y-m-d'));
 		}
 

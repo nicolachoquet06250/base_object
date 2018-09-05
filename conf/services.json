@@ -5,9 +5,14 @@
      "scope": "service"
    },
   "meta": {
-    "path": "services/meta_service.php",
-    "class": "meta_service",
+    "path": "services/meta.php",
+    "class": "meta",
     "type": "singleton",
+    "scope": "service"
+  },
+  "date": {
+    "path": "services/date.php",
+    "class": "date",
     "scope": "service"
   },
   "dao_manager": {
