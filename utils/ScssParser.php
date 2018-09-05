@@ -296,6 +296,9 @@ class ScssParser extends util {
 					$stylesgide[$part1][$part2][$part3] = $id;
 				}
 			}
+			$title = $doc['title'];
+			$source = $doc['source'];
+			$description = $doc['description'];
 
 			$card_markup = '';
 			if(isset($doc['Markup']) && $doc['Markup'] !== '') {
@@ -328,12 +331,12 @@ class ScssParser extends util {
 <div class="row">
 	<div class="col-12 card" id="'.$id.'">
          <div class="card-header">
-              <i class="fa fa-file font-italic" style="font-size: 15px;"> Fichier source: '.$doc['source'].'</i>
-              <h2 class="card-title">'.$doc['title'].'</h2>
+              <i class="fa fa-file font-italic" style="font-size: 15px;"> Fichier source: '.$source.'</i>
+              <h2 class="card-title">'.$title.'</h2>
          </div>
          <div class="card-body">
                <p>
-                   '.$doc['description'].'
+                   '.$description.'
                </p>'.$card_markup.'
          </div>
     </div>
