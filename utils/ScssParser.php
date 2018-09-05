@@ -41,7 +41,8 @@ class ScssParser extends util {
 	private function parcour($directory, $step = 0) {
 		foreach (new \DirectoryIterator($directory) as $fileInfo) {
 			if (!$fileInfo->isDot() && $fileInfo->isDir() && strstr($fileInfo->getBasename(), '_')) {
-				$this->parcour($directory.'/'.$fileInfo->getBasename(), $step+1);
+				$new_directory = substr($directory, strlen($directory)-1, 1) === '/' ? substr($directory, 0, strlen($directory)-1) : $directory;
+				$this->parcour($new_directory.'/'.$fileInfo->getBasename(), $step+1);
 			}
 			elseif ($fileInfo->isFile()
 					&& (strstr($fileInfo->getFilename(), '.'.$this->scss_suffix)
@@ -64,8 +65,13 @@ class ScssParser extends util {
 					elseif ($step > 1) {
 						$directory_name     = basename(dirname($filepath));
 						$sub_directory_name = basename(dirname(str_replace($directory_name.'/'.$basename, '', $directory)));
+						$key = $sub_directory_name.'/'.$directory_name;
+						for($i = 2, $max = $step; $i<$max; $i++) {
+							$dir = str_replace($key, '', $directory);
+							$key = basename($dir).'/'.$key;
+						}
 
-						$this->scss_array[$sub_directory_name.'/'.$directory_name][$basename] = $filepath;
+						$this->scss_array[$key][$basename] = $filepath;
 					}
 				}
 			}
@@ -73,93 +79,9 @@ class ScssParser extends util {
 	}
 
 	public function parse() {
-//		$this->parcour($this->base_dir);
-		foreach (new \DirectoryIterator($this->base_dir) as $fileInfo) {
-			if (!$fileInfo->isDot()) {
-				if ($fileInfo->isDir() && strstr($fileInfo->getBasename(), '_')) {
-					foreach (new \DirectoryIterator($this->base_dir.$fileInfo->getBasename()) as $_fileInfo) {
-						if (!$fileInfo->isDot()) {
-							if ($_fileInfo->isDir() && strstr($_fileInfo->getBasename(), '_')) {
-								$path = $this->base_dir.$fileInfo->getBasename().'/'.$_fileInfo->getBasename();
-								foreach (new \DirectoryIterator($path) as $__fileInfo) {
-									if ($__fileInfo->isFile()
-										&& (strstr($__fileInfo->getFilename(), '.'.$this->scss_suffix)
-											||
-											strstr($__fileInfo->getFilename(), '.'.$this->css_suffix))
-										&& $__fileInfo->getFilename() !== 'main.'.$this->scss_suffix
-										&& $__fileInfo->getFilename() !== 'main.'.$this->css_suffix
-										&& $filepath = $__fileInfo->getPathname()) {
-										// Fichiers à l'étage 2
-										$basename  = basename($filepath);
-										$directory = str_replace($basename, '', $filepath);
-										if (preg_match($this->scss_reg_exp, $basename, $matches) || preg_match($this->css_reg_exp, $basename, $matches)) {
-											$directory_name     = basename(dirname($filepath));
-											$sub_directory_name = basename(dirname(str_replace($directory_name.'/'.$basename, '', $directory)));
-											$directory_order    = (int)strtok($sub_directory_name, '_');
-											$directory_ident    = strtok('');
+		$this->parcour($this->base_dir);
 
-											$order = (int)$matches[1];
-											$this->scss_array[$directory_ident][$directory_name][$basename]
-												   = $filepath;
-											$files_order[$directory_ident][$directory_name][$basename]
-												   = $order;
-											$directories_order[$directory_ident]
-												   = $directory_order;
-										}
-									}
-								}
-							} elseif ($_fileInfo->isFile()
-									  && (strstr($_fileInfo->getFilename(), '.'.$this->scss_suffix)
-										  ||
-										  strstr($_fileInfo->getFilename(), '.'.$this->css_suffix))
-									  && $_fileInfo->getFilename() !== 'main.'.$this->scss_suffix
-									  && $_fileInfo->getFilename() !== 'main.'.$this->css_suffix
-									  && $filepath = $_fileInfo->getPathname()) {
-								// Fichiers à l'étage 1
-
-								$basename = basename($filepath);
-								if (preg_match($this->scss_reg_exp, $basename, $matches) || preg_match($this->css_reg_exp, $basename, $matches)) {
-									$directory_name  = basename(dirname($filepath));
-									$directory_order = (int)strtok($directory_name, '_');
-									$directory_ident = strtok('');
-
-									$order = (int)$matches[1];
-									$this->scss_array[$directory_ident][$basename]
-										   = $filepath;
-									$files_order[$directory_ident][$directory_name][$basename]
-										   = $order;
-									$directories_order[$directory_ident]
-										   = $directory_order;
-								}
-							}
-						}
-					}
-				} elseif ($fileInfo->isFile()
-						  && (strstr($fileInfo->getFilename(), '.'.$this->scss_suffix)
-							  ||
-							  strstr($fileInfo->getFilename(), '.'.$this->css_suffix))
-						  && $fileInfo->getFilename() !== 'main.'.$this->scss_suffix
-						  && $fileInfo->getFilename() !== 'main.'.$this->css_suffix
-						  && $filepath = $fileInfo->getPathname()) {
-					// fichiers à la racine
-					$basename = basename($filepath);
-					if (preg_match($this->scss_reg_exp, $basename, $matches) || preg_match($this->css_reg_exp, $basename, $matches)) {
-						$directory_name  = basename(dirname($filepath));
-						$directory_order = (int)strtok($directory_name, '_');
-						$directory_ident = strtok('');
-
-						$order = (int)$matches[1];
-						$this->scss_array[$directory_ident][$basename]
-							   = $filepath;
-						$files_order[$directory_ident][$basename]
-							   = $order;
-						$directories_order[$directory_ident]
-							   = $directory_order;
-					}
-				}
-			}
-		}
-
+		ksort($this->scss_array);
 		foreach ($this->scss_array as $key => $value) {
 			ksort($this->scss_array[$key]);
 		}
@@ -171,19 +93,18 @@ class ScssParser extends util {
 		$this->parse();
 		$css_file_content = '';
 		foreach ($this->get_scss_array() as $directory => $file_and_directory_array) {
-			foreach ($file_and_directory_array as $file_or_directory => $path_or_array) {
-				if(is_array($path_or_array)) {
-					foreach ($path_or_array as $path) {
-						if(file_get_contents($path) !== '') {
-							$css_file_content .= "\n// SOURCE ".str_replace($this->root_dir.'/', '', $path).
-												 "\n".file_get_contents($path);
-						}
-					}
+			if($this->is_string($file_and_directory_array)) {
+				if(file_get_contents($file_and_directory_array) !== '') {
+					$path = $file_and_directory_array;
+					$css_file_content .= "\n// SOURCE ".str_replace($this->root_dir.'/', '', $path).
+										 "\n".file_get_contents($path);
 				}
-				else {
-					if(file_get_contents($path_or_array) !== '') {
-						$css_file_content .= "\n// SOURCE ".str_replace($this->root_dir.'/', '', $path_or_array).
-											 "\n".file_get_contents($path_or_array);
+			}
+			else {
+				foreach ($file_and_directory_array as $_directory => $path) {
+					if(file_get_contents($path) !== '') {
+						$css_file_content .= "\n// SOURCE ".str_replace($this->root_dir.'/', '', $path).
+											 "\n".file_get_contents($path);
 					}
 				}
 			}
@@ -301,13 +222,6 @@ class ScssParser extends util {
                         <div class="badge badge-info">MVC</div>
                         <div class="badge badge-info">NOT IMPLEMENTED</div>
                     </a>
-                    <!--<ul id="doc-php" class="collapse list-unstyled ">
-                        <li>
-                            <a href="#">
-                                <i class="fa fa-folder"></i> Strates
-                            </a>
-                        </li>
-                    </ul>-->
                 </li>
             </ul>
         </div>
@@ -370,6 +284,14 @@ class ScssParser extends util {
 				}
 				elseif (count($path) === 3) {
 					$stylesgide[$path[0]][$path[1]][$path[2]] = $id;
+				}
+				else {
+					$part1 = $path[0];
+					$part3 = $path[count($path)-1];
+					unset($path[count($path)-1]);
+					unset($path[0]);
+					$part2 = implode('.', $path);
+					$stylesgide[$part1][$part2][$part3] = $id;
 				}
 			}
 
@@ -455,10 +377,10 @@ class ScssParser extends util {
 			foreach ($sub_cat as $class => $sub_class) {
 				$nav .= '		<li>'."\n";
 				if($this->is_array($sub_class)) {
-					$nav .= '	<a href="#'.strtolower($categorie).'-'.$class.'" aria-expanded="false" data-toggle="collapse">
+					$nav .= '	<a href="#'.strtolower($categorie).'-'.str_replace('.', '_', $class).'" aria-expanded="false" data-toggle="collapse">
 		<i class="fa fa-folder"></i> '.$class.'
 	</a>
-					 <ul id="'.strtolower($categorie).'-'.$class.'" class="collapse list-unstyled">'."\n";
+					 <ul id="'.strtolower($categorie).'-'.str_replace('.', '_', $class).'" class="collapse list-unstyled">'."\n";
 					foreach ($sub_class as $sub_sub_class => $id_div) {
 						$nav .= '			<li>
 				<a class="js-scrollTo" href="#'.$id_div.'"><i class="fa fa-css3"></i> '.$sub_sub_class.'</a>
