@@ -70,21 +70,19 @@ if(isset($path_array)) {
 	$tableau_paths = '<ul>';
 	foreach ($path_array as $directory => $file_and_directory_array) {
 		$tableau_paths .= '<li><b>'.$directory.'</b>';
-		$tableau_paths .= '<ul>';
-		foreach ($file_and_directory_array as $file_or_directory => $path_or_array) {
-			$tableau_paths .= '<li>';
-			if (is_array($path_or_array)) {
-				$tableau_paths .= '<ul><b>'.$file_or_directory.'</b>';
-				foreach ($path_or_array as $path) {
-					$tableau_paths .= '<li><i>'.$path.'</i></li>';
-				}
-				$tableau_paths .= '</ul>';
-			} else {
+		if(is_array($file_and_directory_array)) {
+			$tableau_paths .= '<ul>';
+			foreach ($file_and_directory_array as $file_or_directory => $path_or_array) {
+				$tableau_paths .= '<li>';
 				$tableau_paths .= '<i>'.$path_or_array.'</i>';
+				$tableau_paths .= '</li>';
 			}
-			$tableau_paths .= '</li>';
+			$tableau_paths .= '</ul>';
 		}
-		$tableau_paths .= '</ul></li>';
+		else {
+			$tableau_paths .= '<ul><li><i>'.$file_and_directory_array.'</i></li></ul>';
+		}
+		$tableau_paths .= '</li>';
 	}
 	$tableau_paths .= '</ul>';
 }

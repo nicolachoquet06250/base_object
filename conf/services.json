@@ -1,6 +1,18 @@
 {
   "test": {
      "path": "services/test.php",
-     "class": "test"
-   }
+     "class": "test",
+     "scope": "service"
+   },
+  "meta": {
+    "path": "services/meta_service.php",
+    "class": "meta_service",
+    "type": "singleton",
+    "scope": "service"
+  },
+  "dao_manager": {
+    "path": "services/managers/dao_manager.php",
+    "class": "dao_manager",
+    "scope": "manager"
+  }
 }

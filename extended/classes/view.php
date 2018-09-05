@@ -16,6 +16,10 @@ class view extends util {
 		$this->set_vars_array($vars);
 	}
 
+	public function assign($var, $value) {
+		$this->vars[$var] = $value;
+	}
+
 	protected function get_path() {
 		return $this->view_path;
 	}

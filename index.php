@@ -6,21 +6,23 @@ use project\classes\test_afficher_body;
 use project\dao\user_dao;
 use project\extended\classes\sql_connector;
 use project\services\managers\dao_manager;
+use project\services\meta_service;
 use project\sql\json;
 use project\utils\Project;
 use project\extended\classes\view;
 
 require_once 'autoload.php';
 
-echo Project::Accueil(function ($_this, $args) {
+echo Project::Accueil(function ($_this, $metas, $args) {
 
-	$page_name = $args['page_name'];
 	$template_name = $args['template_name'];
 
 	/**
 	 * @var Project $_this
 	 * @var user_dao $user
+	 * @var meta_service $metas
 	 */
+	$metas->set_title('Voici mon titre');
 	$prenom = dao_manager::create()->get_dao_from('user', 'prenom', 'Yann')->get_field('prenom');
 	$src = dao_manager::create()->get_dao_from('slider', 'name', 'Slider 1')->get_field('src');
 
@@ -120,20 +122,21 @@ echo Project::Accueil(function ($_this, $args) {
 
 // 	test avec DirectoryIterator
 
-	return view::get(
-		['page_name' => $page_name],
-		['template_name' => $template_name],
-		['prenom' => $prenom],
-		['src' => $src],
-		['nom' => $nom],
-		['date_naissence' => $new_user->get_field('date_naissence')],
-		['test1' => 'test avec la méthode => '.$_this->get_method(test_afficher_body::class, 'display')],
-		['test2' => 'test sans la méthode => '.$test_afficher_body->display()],
-		['test3' => 'test statique avec la méthode => '
-					.$_this->get_static_method(test_afficher_body::class, 'toto', 'test', 'avec', 'des', 'tapettes')],
-		['test4' => 'test statique sans la méthode => '.test_afficher_body::toto('test', 'avec', 'des', 'tapettes')],
-		['test5' => $_this->is_object($test_afficher_body)],
-		['users' => $users],
-		['path_array' => $_this->get_scss_parser(__DIR__)->parse()->get_scss_array()]
-	);
+	$view = view::get();
+	$view->assign('page_name', $metas->get_title());
+	$view->assign('template_name', $template_name);
+	$view->assign('prenom', $prenom);
+	$view->assign('src', $src);
+	$view->assign('nom', $nom);
+	$view->assign('date_naissence', $new_user->get_field('date_naissence'));
+	$view->assign('test1', 'test avec la méthode => '.$_this->get_method(test_afficher_body::class, 'display'));
+	$view->assign('test2', 'test sans la méthode => '.$test_afficher_body->display());
+	$view->assign('test3', 'test statique avec la méthode => '
+						   		.$_this->get_static_method(test_afficher_body::class, 'toto', 'test', 'avec', 'des', 'tapettes'));
+	$view->assign('test4', 'test statique sans la méthode => '.test_afficher_body::toto('test', 'avec', 'des', 'tapettes'));
+	$view->assign('test5', $_this->is_object($test_afficher_body));
+	$view->assign('users', $users);
+	$view->assign('path_array', $_this->get_scss_parser(__DIR__)->parse()->get_scss_array());
+
+	return $view;
 }, ['__DIR__', __DIR__]);

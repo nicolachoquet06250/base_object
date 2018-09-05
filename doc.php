@@ -7,7 +7,7 @@
 
 	require_once 'autoload.php';
 					
-	echo Project::CssDoc(function ($_this, $args) {
+	echo Project::CssDoc(function ($_this, $metas, $args) {
 		$page_name = $args['page_name'];
 		$template_name = $args['template_name'];
 		

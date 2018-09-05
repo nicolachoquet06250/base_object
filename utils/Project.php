@@ -20,12 +20,13 @@ class Project extends util {
 	public static function main(callable $callback, callable $catch = null, $args = [], $page_name = 'main', $template_name = 'main') {
 		$args['page_name'] = $page_name;
 		$args['template_name'] = $template_name;
+		$project = new Project();
 		try {
-			return $callback(new Project(), $args);
+			return $callback($project, $project->get_service('meta'), $args);
 		}
 		catch (Exception $e) {
 			if($catch) {
-				$catch($e, new Project(), $args);
+				$catch($e, $project, $project->get_service('meta'), $args);
 			}
 			else {
 				echo $e->getMessage()."\n";
@@ -34,6 +35,12 @@ class Project extends util {
 		return null;
 	}
 
+	/**
+	 * @param $name
+	 * @param $arguments
+	 * @return mixed|string
+	 * @throws Exception
+	 */
 	public static function __callStatic($name, $arguments) {
 		debug::instence();
 		debug::log(['ceci est le premier log de debug', 'ceci est le second log de debug'], 'log1');

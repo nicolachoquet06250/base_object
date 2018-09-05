@@ -10,7 +10,7 @@ trait http {
 		}
 		else {
 			if($value) {
-				return $_GET[$key] === $value;
+				return isset($_GET[$key]) ? $_GET[$key] === $value : false;
 			}
 			return $key ? $_GET[$key] : null;
 		}

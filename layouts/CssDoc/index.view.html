@@ -61,7 +61,7 @@
             </div>
             <!-- Small Brand information, appears on minimized sidebar-->
             <div class="sidenav-header-logo">
-                <a href="home.php" class="brand-small text-center">
+                <a href="doc.php" class="brand-small text-center">
                     <strong class="text-primary">N</strong>
                     <strong class="text-primary">C</strong>
                 </a>
@@ -99,6 +99,23 @@
 		</li>
 		</ul>
 						</li>
+	<li>
+<a href="#components" aria-expanded="false" data-toggle="collapse">
+						<i class="fa fa-folder"></i> Components
+					 </a>
+					 <ul id="components" class="collapse list-unstyled">
+		<li>
+	<a href="#components-Login" aria-expanded="false" data-toggle="collapse">
+		<i class="fa fa-folder"></i> Login
+	</a>
+					 <ul id="components-Login" class="collapse list-unstyled">
+			<li>
+				<a class="js-scrollTo" href="#Logincard"><i class="fa fa-css3"></i> login-card</a>
+			</li>
+			</ul>
+		</li>
+		</ul>
+						</li>
 </ul>
 		
                 </li>
@@ -126,7 +143,7 @@
                         <a id="toggle-btn" href="#" class="menu-btn">
                             <i class="icon-bars"> </i>
                         </a>
-                        <a href="home.php" class="navbar-brand">
+                        <a href="doc.php" class="navbar-brand">
                             <div class="brand-text d-none d-md-inline-block">
                                 <strong class="text-primary">Documentation</strong>
                             </div>
@@ -194,6 +211,69 @@
          </div>
     </div>
 </div>
+
+<div class="row">
+	<div class="col-12 card" id="Logincard">
+         <div class="card-header">
+              <i class="fa fa-file font-italic" style="font-size: 15px;"> Fichier source: scss/001_components/001_login/000_login-card.scss
+</i>
+              <h2 class="card-title">Login-card
+</h2>
+         </div>
+         <div class="card-body">
+               <p>
+                   Composant card pour la page login
+
+               </p>
+				<div>
+                   <b>EXEMPLES</b>
+                   <br/>
+                   <div class="exemples-code" style="margin-bottom: 50px; margin-top: 15px;;">
+                       <div class="website">
+   <div class="login">
+       <div class="login-header">
+           <h2 class="login-header__title">Voici mon titre</h2>
+       </div>
+       <div class="login-body">
+           <p>Voici le body de la page de login</p>
+           <div class="form-group">
+               <input class="form-control" type="text" placeholder="text" />
+               <input class="form-control" type="email" placeholder="email" />
+               <input class="form-control" type="password" placeholder="password" />
+               <input class="btn btn-primary" type="button" value="button" />
+           </div>
+       </div>
+   </div>
+</div>
+
+                   </div>
+               </div>
+               <div>
+                    <b>CODE SOURCE</b>
+                    <br/>
+                    <div class="source-code">
+                         <pre><code class="html">1. &lt;div class=&quot;website&quot;&gt;
+2.    &lt;div class=&quot;login&quot;&gt;
+3.        &lt;div class=&quot;login-header&quot;&gt;
+4.            &lt;h2 class=&quot;login-header__title&quot;&gt;Voici mon titre&lt;/h2&gt;
+5.        &lt;/div&gt;
+6.        &lt;div class=&quot;login-body&quot;&gt;
+7.            &lt;p&gt;Voici le body de la page de login&lt;/p&gt;
+8.            &lt;div class=&quot;form-group&quot;&gt;
+9.                &lt;input class=&quot;form-control&quot; type=&quot;text&quot; placeholder=&quot;text&quot; /&gt;
+10.                &lt;input class=&quot;form-control&quot; type=&quot;email&quot; placeholder=&quot;email&quot; /&gt;
+11.                &lt;input class=&quot;form-control&quot; type=&quot;password&quot; placeholder=&quot;password&quot; /&gt;
+12.                &lt;input class=&quot;btn btn-primary&quot; type=&quot;button&quot; value=&quot;button&quot; /&gt;
+13.            &lt;/div&gt;
+14.        &lt;/div&gt;
+15.    &lt;/div&gt;
+16. &lt;/div&gt;
+</code></pre>
+                    </div>
+               </div>
+         </div>
+    </div>
+</div>
         </div>
     </section>
     <footer class="main-footer">
@@ -215,7 +295,7 @@
 <!-- JavaScript files-->
 <script src="js/grasp_mobile_progress_circle-1.0.0.min.js"></script>
 <script src="node_modules/jquery.cookie/jquery.cookie.js"></script>
-<script src="node_modules/jquery-validation/jquery.validate.min.js"></script>
+<script src="node_modules/jquery-validation/dist/jquery.validate.min.js"></script>
 <script src="node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js"></script>
 <!-- Main File-->
 <script src="js/front.js"></script>

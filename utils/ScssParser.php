@@ -83,7 +83,9 @@ class ScssParser extends util {
 
 		ksort($this->scss_array);
 		foreach ($this->scss_array as $key => $value) {
-			ksort($this->scss_array[$key]);
+			if($this->is_array($value)) {
+				ksort($this->scss_array[$key]);
+			}
 		}
 
 		return $this;
@@ -193,7 +195,7 @@ class ScssParser extends util {
             </div>
             <!-- Small Brand information, appears on minimized sidebar-->
             <div class="sidenav-header-logo">
-                <a href="home.php" class="brand-small text-center">
+                <a href="doc.php" class="brand-small text-center">
                     <strong class="text-primary">N</strong>
                     <strong class="text-primary">C</strong>
                 </a>
@@ -237,7 +239,7 @@ class ScssParser extends util {
                         <a id="toggle-btn" href="#" class="menu-btn">
                             <i class="icon-bars"> </i>
                         </a>
-                        <a href="home.php" class="navbar-brand">
+                        <a href="doc.php" class="navbar-brand">
                             <div class="brand-text d-none d-md-inline-block">
                                 <strong class="text-primary">Documentation</strong>
                             </div>
@@ -296,8 +298,8 @@ class ScssParser extends util {
 			}
 
 			$card_markup = '';
-			if(isset($doc['Markup:']) && $doc['Markup:'] !== '') {
-				$markup_array = explode("\n", $doc['Markup:']);
+			if(isset($doc['Markup']) && $doc['Markup'] !== '') {
+				$markup_array = explode("\n", $doc['Markup']);
 				$tmp_markup = '';
 				foreach ($markup_array as $i => $markup_line) {
 					if($markup_line !== '') {
@@ -310,7 +312,7 @@ class ScssParser extends util {
                    <b>EXEMPLES</b>
                    <br/>
                    <div class="exemples-code" style="margin-bottom: 50px; margin-top: 15px;;">
-                       '.$doc['Markup:'].'
+                       '.$doc['Markup'].'
                    </div>
                </div>
                <div>
@@ -360,7 +362,7 @@ class ScssParser extends util {
 <!-- JavaScript files-->
 <script src="js/grasp_mobile_progress_circle-1.0.0.min.js"></script>
 <script src="node_modules/jquery.cookie/jquery.cookie.js"></script>
-<script src="node_modules/jquery-validation/jquery.validate.min.js"></script>
+<script src="node_modules/jquery-validation/dist/jquery.validate.min.js"></script>
 <script src="node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js"></script>
 <!-- Main File-->
 <script src="js/front.js"></script>
@@ -418,7 +420,7 @@ class ScssParser extends util {
 
 	require_once \'autoload.php\';
 					
-	echo Project::CssDoc(function ($_this, $args) {
+	echo Project::CssDoc(function ($_this, $metas, $args) {
 		$page_name = $args[\'page_name\'];
 		$template_name = $args[\'template_name\'];
 		
@@ -429,8 +431,9 @@ class ScssParser extends util {
 			[\'last_update\' => $_this->get_scss_parser(__DIR__)->get_last_update_file()]
 		);
 	}, [\'__DIR__\', __DIR__]);';
-
-		file_put_contents($this->php_doc_file, $php);
+		if(!is_file($this->php_doc_file)) {
+			file_put_contents($this->php_doc_file, $php);
+		}
 	}
 
 	public function prepare_main_for_sass_compilation() {

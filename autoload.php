@@ -2,6 +2,7 @@
 	require_once 'extended/traits/http.php';
 	require_once 'extended/traits/php_environement.php';
 	require_once 'extended/traits/manager.php';
+	require_once 'extended/traits/singleton.php';
 
 	require_once 'extended/classes/debug.php';
 

@@ -1,6 +1,7 @@
 <?php
 
 namespace project\extended\classes;
+use project\extended\traits\singleton;
 use project\services\test;
 use project\utils\ArrayList;
 use project\utils\json;
@@ -72,7 +73,18 @@ class BaseObject extends \stdClass {
 	public function get_service(string $name, ...$arguments) {
 		if(isset($this->services[$name])) {
 			require_once $this->services[$name]->path;
-			$class = (strstr('_manager', $this->services[$name]->class) ? '\project\services\\' : '\project\services\managers\\').$this->services[$name]->class;
+			if(isset($this->services[$name]->scope)) {
+				$class = ($this->services[$name]->scope === 'manager' ? '\project\services\managers\\' : '\project\services\\').$this->services[$name]->class;
+			}
+			else {
+				$class = (strstr('_manager', $this->services[$name]->class) ? '\project\services\managers\\' : '\project\services\\').$this->services[$name]->class;
+			}
+			if(isset($this->services[$name]->type) && $this->services[$name]->type === 'singleton') {
+				/**
+				 * @var singleton $class
+				 */
+				return $class::instence($arguments);
+			}
 			return new $class($arguments);
 		}
 		return null;
