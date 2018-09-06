@@ -1,5 +1,5 @@
 /*
-@Styleguide
+@styleguide
 DOC.scss.theme.primary
 
 @title
@@ -8,11 +8,13 @@ Style du template html
 @description
 définis la couleur 'primary'
 
-@Markup
-<div class="row">
-    <div class="bg-primary col-2"></div>
-    <div class="text-primary border-primary col-10" style="border: 1px solid;">Voici du text</div>
-</div>
+@modifiers
+.bg-primary .text-white .col-12 - fond primaire
+.text-primary .col-12 - text primaire
+.border-primary .col-12 - bordure primaire
+
+@markup
+<div class="cssdoc [class_modifier]" style="border: 1px solid;">Voici du text</div>
 */
 
 //==========================================================

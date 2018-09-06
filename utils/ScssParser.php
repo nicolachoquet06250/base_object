@@ -139,35 +139,30 @@ class ScssParser extends util {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Documentation</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Bootstrap CSS-->
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
-    <!-- Font Awesome CSS-->
     <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
-    <!-- Fontastic Custom icon font-->
     <link rel="stylesheet" href="scss/theme-css/fontastic.css">
-    <!-- Google fonts - Roboto -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
-    <!-- Custom Scrollbar-->
     <link rel="stylesheet" href="node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css">
-
-    <link rel="stylesheet" href="scss/hightlight/styles/default.css">
-
+	<link href="scss/syntax_hightlighter/shCore.css" rel="stylesheet" type="text/css">
+	<link href="scss/syntax_hightlighter/shThemeDefault.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="scss/main.css">
-    <!-- Favicon-->
     <link rel="shortcut icon" href="img/css3.png">
+    
     <!-- Tweaks for older IEs--><!--[if lt IE 9]>
     <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="node_modules/jquery/dist/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
     <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="scss/hightlight/highlight.pack.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
+	<script src=\'js/syntax_hightlighter/shCore.js\' type=\'text/javascript\'></script>
+	<script src=\'js/syntax_hightlighter/shBrushXml.js\' type=\'text/javascript\'></script>
+	<script src=\'js/syntax_hightlighter/shBrushJScript.js\' type=\'text/javascript\'></script>
+	<script src=\'js/syntax_hightlighter/shBrushPhp.js\' type=\'text/javascript\'></script>
     <script>
         $(document).ready(function() {
+            SyntaxHighlighter.all();
             $(".js-scrollTo").on("click", function() { // Au clic sur un élément
                 let page = $(this).attr("href"); // Page cible
                 let speed = 750; // Durée de l\'animation (en ms)
@@ -176,6 +171,11 @@ class ScssParser extends util {
             });
         });
     </script>
+    <style>
+		.syntaxhighlighter.xml .toolbar {
+			display: none !important;
+		}
+	</style>
 </head>
 <body class="cssdoc">
 <!-- Side Navbar -->
@@ -275,9 +275,9 @@ class ScssParser extends util {
 			}
 			$doc = $new_doc_array;
 			$id = str_replace([' ', '-', '\'', ',', '[', ']', "\n"], ['', '', '_', '_', '6', '3', ''], $doc['title']);
-			if(isset($doc['Styleguide'])) {
-				$doc['Styleguide'] = str_replace("\n", '', $doc['Styleguide']);
-				$path = explode('.', $doc['Styleguide']);
+			if(isset($doc['styleguide'])) {
+				$doc['styleguide'] = str_replace("\n", '', $doc['styleguide']);
+				$path = explode('.', $doc['styleguide']);
 				if(count($path) === 1) {
 					$stylesgide[$path[0]] = $id;
 				}
@@ -301,53 +301,50 @@ class ScssParser extends util {
 			$description = $doc['description'];
 
 			$card_markup = '';
-			if(isset($doc['Markup']) && $doc['Markup'] !== '') {
-				$markup_array = explode("\n", $doc['Markup']);
-				$tmp_markup = '';
-				foreach ($markup_array as $i => $markup_line) {
-					if($markup_line !== '') {
-						$tmp_markup .= ($i + 1).'. '.$markup_line."\n";
-					}
-				}
+			if(isset($doc['markup']) && $doc['markup'] !== '') {
+				$tmp_markup = $doc['markup'];
 
 				if(!isset($doc['modifiers'])) {
 					$card_markup = '
 					<div>
 					   <b>EXEMPLES</b>
 					   <br/>
-					   <div class="exemples-code" style="margin-bottom: 50px; margin-top: 15px;;">
-						   '.$doc['Markup'].'
+					   <div class="exemples-code" style="margin-bottom: 50px; margin-top: 15px;">
+						   '.$doc['markup'].'
 					   </div>
-				   </div>
-				   <div>
-						<b>CODE SOURCE</b>
-						<br/>
-						<div class="source-code">
-							 <pre><code class="html">'.htmlentities($tmp_markup).'</code></pre>
-						</div>
 				   </div>';
 				}
 				else {
-					$derived = explode("\n", $doc['modifiers']);
+					$modifiers = explode("\n", $doc['modifiers']);
 					$card_markup = '<div>
 						<b>EXEMPLES</b>
 						<br/>';
-					$card_markup .= '<div>
+					$card_markup .= '<div class="exemples-code" style="margin-bottom: 50px; margin-top: 15px;">';
+					$card_markup .= '<div class="mb-3">
 							<h2>default</h2>
-							<p>pas de classe_modifier</p>
-							'.str_replace('[class_modifier]', '', $doc['Markup']).'
+							'.str_replace('[class_modifier]', '', $doc['markup']).'
 						</div>';
-					foreach ($derived as $value) {
-						$class_name = explode(' - ', $value)[0];
-						$class_title = explode(' - ', $value)[1];
-						$card_markup .= '<div>
-							<h2>'.$class_name.'</h2>
-							<p>'.$class_title.'</p>
-							'.str_replace('[class_modifier]', str_replace('.', '', $class_name), $doc['Markup']).'
-						</div>';
+					foreach ($modifiers as $modifier) {
+						if($modifier !== '') {
+							$class_name  = explode(' - ', $modifier)[0];
+							$class_title = explode(' - ', $modifier)[1];
+							$card_markup .= '<div class="mb-3">
+								<h2>'.ucfirst($class_title).'</h2>
+								<p>'.$class_name.'</p>
+								'.str_replace('[class_modifier]', str_replace('.', '', $class_name), $doc['markup']).'
+							</div>';
+						}
 					}
 					$card_markup .= '</div>';
+					$card_markup .= '</div>';
 				}
+				$card_markup .= '<div>
+						<b>CODE SOURCE</b>
+						<br/>
+						<div class="source-code">
+							 <pre class="brush: xml;">'.htmlentities($tmp_markup).'</pre>
+						</div>
+				   </div>';
 			}
 
 			$html .= '

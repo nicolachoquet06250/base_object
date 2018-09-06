@@ -5,35 +5,30 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Documentation</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Bootstrap CSS-->
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
-    <!-- Font Awesome CSS-->
     <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
-    <!-- Fontastic Custom icon font-->
     <link rel="stylesheet" href="scss/theme-css/fontastic.css">
-    <!-- Google fonts - Roboto -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
-    <!-- Custom Scrollbar-->
     <link rel="stylesheet" href="node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css">
-
-    <link rel="stylesheet" href="scss/hightlight/styles/default.css">
-
+	<link href="scss/syntax_hightlighter/shCore.css" rel="stylesheet" type="text/css">
+	<link href="scss/syntax_hightlighter/shThemeDefault.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="scss/main.css">
-    <!-- Favicon-->
     <link rel="shortcut icon" href="img/css3.png">
+    
     <!-- Tweaks for older IEs--><!--[if lt IE 9]>
     <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="node_modules/jquery/dist/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
     <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="scss/hightlight/highlight.pack.js"></script>
-    <script>hljs.initHighlightingOnLoad();</script>
+	<script src='js/syntax_hightlighter/shCore.js' type='text/javascript'></script>
+	<script src='js/syntax_hightlighter/shBrushXml.js' type='text/javascript'></script>
+	<script src='js/syntax_hightlighter/shBrushJScript.js' type='text/javascript'></script>
+	<script src='js/syntax_hightlighter/shBrushPhp.js' type='text/javascript'></script>
     <script>
         $(document).ready(function() {
+            SyntaxHighlighter.all();
             $(".js-scrollTo").on("click", function() { // Au clic sur un élément
                 let page = $(this).attr("href"); // Page cible
                 let speed = 750; // Durée de l'animation (en ms)
@@ -42,6 +37,11 @@
             });
         });
     </script>
+    <style>
+		.syntaxhighlighter.xml .toolbar {
+			display: none !important;
+		}
+	</style>
 </head>
 <body class="cssdoc">
 <!-- Side Navbar -->
@@ -89,9 +89,6 @@
 		<i class="fa fa-folder"></i> scss.theme
 	</a>
 					 <ul id="doc-scss_theme" class="collapse list-unstyled">
-			<li>
-				<a class="js-scrollTo" href="#Fontastic"><i class="fa fa-css3"></i> fontastic</a>
-			</li>
 			<li>
 				<a class="js-scrollTo" href="#Styledutemplatehtml"><i class="fa fa-css3"></i> primary</a>
 			</li>
@@ -187,27 +184,33 @@
                    définis la couleur 'primary'
 
                </p>
-               
-					<div>
-					   <b>EXEMPLES</b>
-					   <br/>
-					   <div class="exemples-code" style="margin-bottom: 50px; margin-top: 15px;;">
-						   <div class="row">
-   <div class="bg-primary col-2"></div>
-   <div class="text-primary border-primary col-10" style="border: 1px solid;">Voici du text</div>
-</div>
+               <div>
+						<b>EXEMPLES</b>
+						<br/><div class="exemples-code" style="margin-bottom: 50px; margin-top: 15px;"><div class="mb-3">
+							<h2>default</h2>
+							<div class="cssdoc " style="border: 1px solid;">Voici du text</div>
 
-					   </div>
-				   </div>
-				   <div>
+						</div><div class="mb-3">
+								<h2>Fond primaire</h2>
+								<p>.bg-primary .text-white .col-12</p>
+								<div class="cssdoc bg-primary text-white col-12" style="border: 1px solid;">Voici du text</div>
+
+							</div><div class="mb-3">
+								<h2>Text primaire</h2>
+								<p>.text-primary .col-12</p>
+								<div class="cssdoc text-primary col-12" style="border: 1px solid;">Voici du text</div>
+
+							</div><div class="mb-3">
+								<h2>Bordure primaire</h2>
+								<p>.border-primary .col-12</p>
+								<div class="cssdoc border-primary col-12" style="border: 1px solid;">Voici du text</div>
+
+							</div></div></div><div>
 						<b>CODE SOURCE</b>
 						<br/>
 						<div class="source-code">
-							 <pre><code class="html">1. &lt;div class=&quot;row&quot;&gt;
-2.    &lt;div class=&quot;bg-primary col-2&quot;&gt;&lt;/div&gt;
-3.    &lt;div class=&quot;text-primary border-primary col-10&quot; style=&quot;border: 1px solid;&quot;&gt;Voici du text&lt;/div&gt;
-4. &lt;/div&gt;
-</code></pre>
+							 <pre class="brush: xml;">&lt;div class=&quot;cssdoc [class_modifier]&quot; style=&quot;border: 1px solid;&quot;&gt;Voici du text&lt;/div&gt;
+</pre>
 						</div>
 				   </div>
          </div>
@@ -231,7 +234,7 @@
 					<div>
 					   <b>EXEMPLES</b>
 					   <br/>
-					   <div class="exemples-code" style="margin-bottom: 50px; margin-top: 15px;;">
+					   <div class="exemples-code" style="margin-bottom: 50px; margin-top: 15px;">
 						   <div class="container website">
    <div class="login">
        <div class="login-header">
@@ -250,28 +253,27 @@
 </div>
 
 					   </div>
-				   </div>
-				   <div>
+				   </div><div>
 						<b>CODE SOURCE</b>
 						<br/>
 						<div class="source-code">
-							 <pre><code class="html">1. &lt;div class=&quot;container website&quot;&gt;
-2.    &lt;div class=&quot;login&quot;&gt;
-3.        &lt;div class=&quot;login-header&quot;&gt;
-4.            &lt;h2 class=&quot;login-header__title&quot;&gt;Voici mon titre&lt;/h2&gt;
-5.        &lt;/div&gt;
-6.        &lt;div class=&quot;login-body&quot;&gt;
-7.            &lt;p&gt;Voici le body de la page de login&lt;/p&gt;
-8.            &lt;div class=&quot;form-group&quot;&gt;
-9.                &lt;input class=&quot;form-control&quot; type=&quot;text&quot; placeholder=&quot;text&quot; /&gt;
-10.                &lt;input class=&quot;form-control&quot; type=&quot;email&quot; placeholder=&quot;email&quot; /&gt;
-11.                &lt;input class=&quot;form-control&quot; type=&quot;password&quot; placeholder=&quot;password&quot; /&gt;
-12.                &lt;input class=&quot;btn btn-primary&quot; type=&quot;button&quot; value=&quot;button&quot; /&gt;
-13.            &lt;/div&gt;
-14.        &lt;/div&gt;
-15.    &lt;/div&gt;
-16. &lt;/div&gt;
-</code></pre>
+							 <pre class="brush: xml;">&lt;div class=&quot;container website&quot;&gt;
+   &lt;div class=&quot;login&quot;&gt;
+       &lt;div class=&quot;login-header&quot;&gt;
+           &lt;h2 class=&quot;login-header__title&quot;&gt;Voici mon titre&lt;/h2&gt;
+       &lt;/div&gt;
+       &lt;div class=&quot;login-body&quot;&gt;
+           &lt;p&gt;Voici le body de la page de login&lt;/p&gt;
+           &lt;div class=&quot;form-group&quot;&gt;
+               &lt;input class=&quot;form-control&quot; type=&quot;text&quot; placeholder=&quot;text&quot; /&gt;
+               &lt;input class=&quot;form-control&quot; type=&quot;email&quot; placeholder=&quot;email&quot; /&gt;
+               &lt;input class=&quot;form-control&quot; type=&quot;password&quot; placeholder=&quot;password&quot; /&gt;
+               &lt;input class=&quot;btn btn-primary&quot; type=&quot;button&quot; value=&quot;button&quot; /&gt;
+           &lt;/div&gt;
+       &lt;/div&gt;
+   &lt;/div&gt;
+&lt;/div&gt;
+</pre>
 						</div>
 				   </div>
          </div>
