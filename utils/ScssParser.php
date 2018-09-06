@@ -119,15 +119,27 @@ class ScssParser extends util {
 			if($this->is_string($file_and_directory_array)) {
 				if(file_get_contents($file_and_directory_array) !== '') {
 					$path = $file_and_directory_array;
-					$css_file_content .= "\n// SOURCE ".str_replace($this->root_dir.'/', '', $path).
-										 "\n".file_get_contents($path);
+					if($this->root_dir_core) {
+						$css_file_content .= "\n// SOURCE ".str_replace((strpos($path, $this->root_dir_core) ? $this->root_dir_core : $this->root_dir_custom).'/', '', $path).
+											 "\n".file_get_contents($path);
+					}
+					else {
+						$css_file_content .= "\n// SOURCE ".str_replace($this->root_dir.'/', '', $path).
+											 "\n".file_get_contents($path);
+					}
 				}
 			}
 			else {
 				foreach ($file_and_directory_array as $_directory => $path) {
 					if(file_get_contents($path) !== '') {
-						$css_file_content .= "\n// SOURCE ".str_replace($this->root_dir.'/', '', $path).
-											 "\n".file_get_contents($path);
+						if($this->root_dir_core) {
+							$css_file_content .= "\n// SOURCE ".str_replace((strpos($path, $this->root_dir_core) ? $this->root_dir_core : $this->root_dir_custom).'/', '', $path).
+												 "\n".file_get_contents($path);
+						}
+						else {
+							$css_file_content .= "\n// SOURCE ".str_replace($this->root_dir.'/', '', $path).
+												 "\n".file_get_contents($path);
+						}
 					}
 				}
 			}
