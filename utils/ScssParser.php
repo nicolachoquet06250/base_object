@@ -134,7 +134,7 @@ class ScssParser extends util {
 		}
 		$css_file_content = str_replace(['../', '@import "node_modules', 'url("fonts'], ['', '@import "../node_modules', 'url("../fonts'], $css_file_content);
 		if($this->root_dir_core) {
-			$this->css_file = str_replace($this->base_dir, $this->root_dir_core, $this->css_file);
+			$this->css_file = str_replace($this->base_dir, $this->root_dir_core.'/', $this->css_file);
 		}
 		file_put_contents($this->css_file, $css_file_content);
 
