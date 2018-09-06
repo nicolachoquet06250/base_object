@@ -8,6 +8,7 @@ use project\extended\classes\util;
 use project\extended\classes\view;
 
 class Project extends util {
+	private static $callback = null;
 
 	/**
 	 * @param callable $callback
@@ -47,15 +48,18 @@ class Project extends util {
 		debug::log('ceci est le second log de debug', 'log2');
 		debug::log('ceci est le troisième log de debug', 'log3');
 		debug::log('ceci est le quatrieme log de debug', 'log4');
+
 		$callback = $arguments[0];
 		$catch = null;
 		$args = [];
 		$template_name = null;
 
 		/**
+		 * @var DocGenerator $doc_generator
 		 * @var ScssParser $scss_parser
 		 */
-		$scss_parser = (new Project())->get_scss_parser(__DIR__.'/..');
+		$doc_generator = (new Project())->get_util('DocGenerator', __DIR__.'/..');
+		$scss_parser = $doc_generator->get_scss_parser(__DIR__.'/../scss', __DIR__.'/../scss2');
 		$scss_parser->parse()->get_scss_array();
 		$scss_parser->genere_scss_file()->genere_scss_doc_array()->genere_doc_file();
 		$scss_parser->prepare_main_for_sass_compilation()->compile();
@@ -101,8 +105,12 @@ class Project extends util {
 	}
 
 	public static function get_debug(callable $callback = null) {
-		if($callback) {
+		if($callback && !self::$callback) {
+			self::$callback = $callback;
 			return $callback(debug::logs());
+		}
+		elseif (self::$callback) {
+			return self::$callback(debug::logs());
 		}
 		return self::default_callback_for_write_debug(debug::logs());
 	}

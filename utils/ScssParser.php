@@ -6,10 +6,11 @@ namespace project\utils;
 use project\extended\classes\util;
 
 class ScssParser extends util {
-	private $root_dir = null, $base_dir = '/scss/', $scss_suffix = 'scss', $css_file = 'main', $css_suffix = 'css', $last_update_file = 'last_update.txt',
+	private $root_dir = null, $root_dir_core = null, $root_dir_custom = null, $base_dir = '/scss/', $scss_suffix = 'scss', $css_file = 'main', $css_suffix = 'css', $last_update_file = 'last_update.txt',
 			$html_doc_dir = 'layouts/CssDoc', $html_doc_file = 'index.view.html', $php_doc_file = 'doc.php';
 	private $scss_array = [], $docs = [];
 	private $scss_reg_exp, $css_reg_exp;
+	private $enable_last_updated = true;
 
 	public function __construct($root_dir = null) {
 		parent::__construct();
@@ -22,8 +23,23 @@ class ScssParser extends util {
 		$this->css_reg_exp = '/^([0-9]+)_(.+)\.'.$this->css_suffix.'$/';
 	}
 
+	public function set_html_file($path) {
+		$this->html_doc_file = $path;
+	}
+
+	public function set_php_file($path = null) {
+		$this->php_doc_file = $path;
+	}
+
+	public function set_root_dir($type, $path) {
+		$this->{'root_dir_'.$type} = $path;
+	}
+
 	public function get_last_update_file() {
-		return file_get_contents($this->base_dir.'/'.$this->last_update_file);
+		if(is_file($this->base_dir.'/'.$this->last_update_file) && $this->enable_last_updated) {
+			return file_get_contents($this->base_dir.'/'.$this->last_update_file);
+		}
+		return '';
 	}
 
 	public function get_css_filename() {
@@ -39,39 +55,38 @@ class ScssParser extends util {
 	}
 
 	private function parcour($directory, $step = 0) {
-		foreach (new \DirectoryIterator($directory) as $fileInfo) {
-			if (!$fileInfo->isDot() && $fileInfo->isDir() && strstr($fileInfo->getBasename(), '_')) {
-				$new_directory = substr($directory, strlen($directory)-1, 1) === '/' ? substr($directory, 0, strlen($directory)-1) : $directory;
-				$this->parcour($new_directory.'/'.$fileInfo->getBasename(), $step+1);
-			}
-			elseif ($fileInfo->isFile()
-					&& (strstr($fileInfo->getFilename(), '.'.$this->scss_suffix)
-						||
-						strstr($fileInfo->getFilename(), '.'.$this->css_suffix))
-					&& $fileInfo->getFilename() !== 'main.'.$this->scss_suffix
-					&& $fileInfo->getFilename() !== 'main.'.$this->css_suffix
-					&& $filepath = $fileInfo->getPathname()) {
-				// Fichiers à l'étage 1
+		if(is_dir($directory)) {
+			foreach (new \DirectoryIterator($directory) as $fileInfo) {
+				if (!$fileInfo->isDot() && $fileInfo->isDir() && strstr($fileInfo->getBasename(), '_')) {
+					$new_directory = substr($directory, strlen($directory) - 1, 1) === '/' ? substr($directory, 0, strlen($directory) - 1) : $directory;
+					$this->parcour($new_directory.'/'.$fileInfo->getBasename(), $step + 1);
+				} elseif ($fileInfo->isFile()
+						  && (strstr($fileInfo->getFilename(), '.'.$this->scss_suffix)
+							  ||
+							  strstr($fileInfo->getFilename(), '.'.$this->css_suffix))
+						  && $fileInfo->getFilename() !== 'main.'.$this->scss_suffix
+						  && $fileInfo->getFilename() !== 'main.'.$this->css_suffix
+						  && $filepath = $fileInfo->getPathname()) {
+					// Fichiers à l'étage 1
 
-				$basename = basename($filepath);
-				if (preg_match($this->scss_reg_exp, $basename, $matches) || preg_match($this->css_reg_exp, $basename, $matches)) {
-					if($step === 0) {
-						$this->scss_array[$basename] = $filepath;
-					}
-					elseif($step === 1) {
-						$directory_name  = basename(dirname($filepath));
-						$this->scss_array[$directory_name][$basename] = $filepath;
-					}
-					elseif ($step > 1) {
-						$directory_name     = basename(dirname($filepath));
-						$sub_directory_name = basename(dirname(str_replace($directory_name.'/'.$basename, '', $directory)));
-						$key = $sub_directory_name.'/'.$directory_name;
-						for($i = 2, $max = $step; $i<$max; $i++) {
-							$dir = str_replace($key, '', $directory);
-							$key = basename($dir).'/'.$key;
+					$basename = basename($filepath);
+					if (preg_match($this->scss_reg_exp, $basename, $matches) || preg_match($this->css_reg_exp, $basename, $matches)) {
+						if ($step === 0) {
+							$this->scss_array[$basename] = $filepath;
+						} elseif ($step === 1) {
+							$directory_name                               = basename(dirname($filepath));
+							$this->scss_array[$directory_name][$basename] = $filepath;
+						} elseif ($step > 1) {
+							$directory_name     = basename(dirname($filepath));
+							$sub_directory_name = basename(dirname(str_replace($directory_name.'/'.$basename, '', $directory)));
+							$key                = $sub_directory_name.'/'.$directory_name;
+							for ($i = 2, $max = $step; $i < $max; $i++) {
+								$dir = str_replace($key, '', $directory);
+								$key = basename($dir).'/'.$key;
+							}
+
+							$this->scss_array[$key][$basename] = $filepath;
 						}
-
-						$this->scss_array[$key][$basename] = $filepath;
 					}
 				}
 			}
@@ -79,7 +94,13 @@ class ScssParser extends util {
 	}
 
 	public function parse() {
-		$this->parcour($this->base_dir);
+		if($this->root_dir_core && $this->root_dir_custom) {
+			$this->parcour($this->root_dir_core);
+			$this->parcour($this->root_dir_custom);
+		}
+		else {
+			$this->parcour($this->base_dir);
+		}
 
 		ksort($this->scss_array);
 		foreach ($this->scss_array as $key => $value) {
@@ -112,7 +133,11 @@ class ScssParser extends util {
 			}
 		}
 		$css_file_content = str_replace(['../', '@import "node_modules', 'url("fonts'], ['', '@import "../node_modules', 'url("../fonts'], $css_file_content);
+		if($this->root_dir_core) {
+			$this->css_file = str_replace($this->base_dir, $this->root_dir_core, $this->css_file);
+		}
 		file_put_contents($this->css_file, $css_file_content);
+
 		return $this;
 	}
 
@@ -252,6 +277,7 @@ class ScssParser extends util {
     <!-- Updates Section -->
     <section class="mt-30px mb-30px">
         <div class="container-fluid">';
+		$stylesguide = [];
 		foreach ($this->docs as $cmp => $doc) {
 			$doc = explode("\n", $doc);
 			foreach ($doc as $i => $value) {
@@ -279,13 +305,13 @@ class ScssParser extends util {
 				$doc['styleguide'] = str_replace("\n", '', $doc['styleguide']);
 				$path = explode('.', $doc['styleguide']);
 				if(count($path) === 1) {
-					$stylesgide[$path[0]] = $id;
+					$stylesguide[$path[0]] = $id;
 				}
 				elseif (count($path) === 2) {
-					$stylesgide[$path[0]][$path[1]] = $id;
+					$stylesguide[$path[0]][$path[1]] = $id;
 				}
 				elseif (count($path) === 3) {
-					$stylesgide[$path[0]][$path[1]][$path[2]] = $id;
+					$stylesguide[$path[0]][$path[1]][$path[2]] = $id;
 				}
 				else {
 					$part1 = $path[0];
@@ -293,76 +319,11 @@ class ScssParser extends util {
 					unset($path[count($path)-1]);
 					unset($path[0]);
 					$part2 = implode('.', $path);
-					$stylesgide[$part1][$part2][$part3] = $id;
+					$stylesguide[$part1][$part2][$part3] = $id;
 				}
 			}
-			$title = $doc['title'];
-			$source = $doc['source'];
-			$description = $doc['description'];
 
-			$card_markup = '';
-			if(isset($doc['markup']) && $doc['markup'] !== '') {
-				$tmp_markup = $doc['markup'];
-
-				if(!isset($doc['modifiers'])) {
-					$card_markup = '
-					<div>
-					   <b>EXEMPLES</b>
-					   <br/>
-					   <div class="exemples-code" style="margin-bottom: 50px; margin-top: 15px;">
-						   '.$doc['markup'].'
-					   </div>
-				   </div>';
-				}
-				else {
-					$modifiers = explode("\n", $doc['modifiers']);
-					$card_markup = '<div>
-						<b>EXEMPLES</b>
-						<br/>';
-					$card_markup .= '<div class="exemples-code" style="margin-bottom: 50px; margin-top: 15px;">';
-					$card_markup .= '<div class="mb-3">
-							<h2>default</h2>
-							'.str_replace('[class_modifier]', '', $doc['markup']).'
-						</div>';
-					foreach ($modifiers as $modifier) {
-						if($modifier !== '') {
-							$class_name  = explode(' - ', $modifier)[0];
-							$class_title = explode(' - ', $modifier)[1];
-							$card_markup .= '<div class="mb-3">
-								<h2>'.ucfirst($class_title).'</h2>
-								<p>'.$class_name.'</p>
-								'.str_replace('[class_modifier]', str_replace('.', '', $class_name), $doc['markup']).'
-							</div>';
-						}
-					}
-					$card_markup .= '</div>';
-					$card_markup .= '</div>';
-				}
-				$card_markup .= '<div>
-						<b>CODE SOURCE</b>
-						<br/>
-						<div class="source-code">
-							 <pre class="brush: xml;">'.htmlentities($tmp_markup).'</pre>
-						</div>
-				   </div>';
-			}
-
-			$html .= '
-<div class="row">
-	<div class="col-12 card" id="'.$id.'">
-         <div class="card-header">
-              <i class="fa fa-file font-italic" style="font-size: 15px;"> Fichier source: '.$source.'</i>
-              <h2 class="card-title">'.$title.'</h2>
-         </div>
-         <div class="card-body">
-               <p>
-                   '.$description.'
-               </p>
-               '.$card_markup.'
-         </div>
-    </div>
-</div>
-';
+			$html .= $this->get_util('DocGenerator')::code_card($id, $doc, 'css');
 		}
 
     $html .= '        </div>
@@ -371,10 +332,12 @@ class ScssParser extends util {
         <div class="container-fluid">
             <div class="row">
                 <div class="col-sm-6">
-                    <p>base_object &copy; 2017-2019</p>
-                    <p>Dernières modification: [last_update]</p>
-                </div>
-            </div>
+                    <p>base_object &copy; 2017-2019</p>';
+		if($this->enable_last_updated) {
+			$html .= '	<p>Dernières modification: [last_update]</p>';
+		}
+		$html .= '</div>
+        	</div>
         </div>
     </footer>
     <div class="row">
@@ -393,50 +356,20 @@ class ScssParser extends util {
 </body>
 </html>';
 
-		$nav = '<ul id="doc-css" class="collapse list-unstyled show">';
-		foreach ($stylesgide as $categorie => $sub_cat) {
-			$nav .= '	<li>'."\n";
-			$nav .= '<a href="#'.strtolower($categorie).'" aria-expanded="false" data-toggle="collapse">
-						<i class="fa fa-folder"></i> '.$categorie.'
-					 </a>
-					 <ul id="'.strtolower($categorie).'" class="collapse list-unstyled">'."\n";
-			foreach ($sub_cat as $class => $sub_class) {
-				$nav .= '		<li>'."\n";
-				if($this->is_array($sub_class)) {
-					$nav .= '	<a href="#'.strtolower($categorie).'-'.str_replace('.', '_', $class).'" aria-expanded="false" data-toggle="collapse">
-		<i class="fa fa-folder"></i> '.$class.'
-	</a>
-					 <ul id="'.strtolower($categorie).'-'.str_replace('.', '_', $class).'" class="collapse list-unstyled">'."\n";
-					foreach ($sub_class as $sub_sub_class => $id_div) {
-						$nav .= '			<li>
-				<a class="js-scrollTo" href="#'.$id_div.'"><i class="fa fa-css3"></i> '.$sub_sub_class.'</a>
-			</li>'."\n";
-					}
-					$nav .= '			</ul>'."\n";
-				}
-				else {
-					$nav .= '<a class="js-scrollTo" href="#'.$sub_class.'"><i class="fa fa-css3"></i> '.$class.'</a>'."\n";
-				}
-				$nav .= '		</li>'."\n";
-			}
-			$nav .= '		</ul>
-						</li>'."\n";
-		}
-        $nav .= '</ul>
-		';
-
-		$html = str_replace('[nav_menu]', $nav, $html);
+		$html = str_replace('[nav_menu]', $this->get_util('DocGenerator')::menu($stylesguide, 'css'), $html);
 
 		if(!is_dir($this->html_doc_dir)) {
 			mkdir($this->html_doc_dir, 0777, true);
 		}
 		if($html !== file_get_contents($this->html_doc_dir.'/'.$this->html_doc_file)) {
 			file_put_contents($this->html_doc_dir.'/'.$this->html_doc_file, $html);
-
-			file_put_contents($this->base_dir.'/'.$this->last_update_file, date('Y-m-d'));
+			if($this->enable_last_updated) {
+				file_put_contents($this->base_dir.'/'.$this->last_update_file, date('Y-m-d'));
+			}
 		}
 
-		$php = '<?php
+		if($this->php_doc_file) {
+			$php = '<?php
 			
 	namespace project;
 			
@@ -456,8 +389,9 @@ class ScssParser extends util {
 			[\'last_update\' => $_this->get_scss_parser(__DIR__)->get_last_update_file()]
 		);
 	}, [\'__DIR__\', __DIR__]);';
-		if(!is_file($this->php_doc_file)) {
-			file_put_contents($this->php_doc_file, $php);
+			if (!is_file($this->php_doc_file)) {
+				file_put_contents($this->php_doc_file, $php);
+			}
 		}
 	}
 
@@ -466,7 +400,12 @@ class ScssParser extends util {
 		preg_replace_callback('`(\/\/\ SOURCE\ [a-zA-Z0-9\_\-\.\/]+\n)(\/\*[^*]+\*\/)`', function ($matches) use (&$sass) {
 			$sass = str_replace($matches[1].$matches[2], '', $sass);
 		}, $sass);
-		file_put_contents($this->base_dir.'/ready-to-compile.'.$this->scss_suffix, $sass);
+		if($this->root_dir_core) {
+			file_put_contents($this->root_dir_core.'/ready-to-compile.'.$this->scss_suffix, $sass);
+		}
+		else {
+			file_put_contents($this->base_dir.'/ready-to-compile.'.$this->scss_suffix, $sass);
+		}
 		return $this;
 	}
 
@@ -477,8 +416,13 @@ class ScssParser extends util {
 		$main_file = str_replace('.'.$this->scss_suffix, '.'.$this->css_suffix, $this->css_file);
 		$output = null;
 		$retour = null;
-		exec('node-sass '.$this->base_dir.'/ready-to-compile.scss '.$main_file, $output, $retour);
-		unlink($this->base_dir.'/ready-to-compile.scss');
+		if($this->root_dir_core) {
+			exec('node-sass '.$this->root_dir_core.'/ready-to-compile.scss '.$main_file, $output, $retour);
+		}
+		else {
+			exec('node-sass '.$this->base_dir.'/ready-to-compile.scss '.$main_file, $output, $retour);
+		}
+		unlink(($this->root_dir_core ? $this->root_dir_core : $this->base_dir).'/ready-to-compile.scss');
 		unlink($this->css_file);
 		$main_file_content = file_get_contents($main_file);
 		$main_file_content = str_replace("\n", '', $main_file_content);

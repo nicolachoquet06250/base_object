@@ -1,0 +1,69 @@
+/*
+@styleguide
+Components.Login.login-card-toto
+
+@title
+Login-card
+
+@description
+Composant card pour la page login
+
+@markup
+<div class="container website">
+    <div class="login">
+        <div class="login-header">
+            <h2 class="login-header__title">Voici mon titre</h2>
+        </div>
+        <div class="login-body">
+            <p>Voici le body de la page de login</p>
+            <div class="form-group">
+                <input class="form-control" type="text" placeholder="text" />
+                <input class="form-control" type="email" placeholder="email" />
+                <input class="form-control" type="password" placeholder="password" />
+                <input class="btn btn-primary" type="button" value="button" />
+            </div>
+        </div>
+    </div>
+</div>
+*/
+.website {
+  .login {
+    @extend .card;
+    @extend .bg-primary;
+    &-header {
+      color: $white;
+      @extend .bg-primary;
+      @extend .card-header;
+      &__title {
+        @extend .card-title;
+      }
+    }
+    &-body {
+      @extend .card-body;
+      p {
+        color: $white !important;
+      }
+      .form-control {
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid $white;
+        color: $white;
+        &:focus {
+          outline: none;
+        }
+      }
+      .btn.btn-primary {
+        margin-top: 2px;
+        background: $primary;
+        color: $white;
+        border: none;
+        border-bottom: 1px solid $white;
+        &:hover {
+          border-bottom: 1px solid $primary;
+          background: $white;
+          color: $primary;
+        }
+      }
+    }
+  }
+}
