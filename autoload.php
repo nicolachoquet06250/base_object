@@ -19,3 +19,5 @@
 	require_once 'classes/test_afficher_body.php';
 
 	require_once 'utils/Project.php';
+
+	const ROOT_PATH = __DIR__.'/';

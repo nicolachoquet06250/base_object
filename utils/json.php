@@ -60,7 +60,7 @@ class json extends util {
 	 * @return json
 	 */
 	public static function get_from_file(string $file, bool $assoc = false): json {
-		return new json(json_decode(file_get_contents($file.'.json', $assoc)));
+		return new json(json_decode(file_get_contents(ROOT_PATH.$file.'.json', $assoc)));
 	}
 
 }

@@ -72,7 +72,7 @@ class BaseObject extends \stdClass {
 	 */
 	public function get_service(string $name, ...$arguments) {
 		if(isset($this->services[$name])) {
-			require_once $this->services[$name]->path;
+			require_once ROOT_PATH.$this->services[$name]->path;
 			if(isset($this->services[$name]->scope)) {
 				$class = ($this->services[$name]->scope === 'manager' ? '\project\services\managers\\' : '\project\services\\').$this->services[$name]->class;
 			}
@@ -106,7 +106,7 @@ class BaseObject extends \stdClass {
 	 */
 	public function get_util(string $name, ...$arguments) {
 		if(isset($this->utils[$name])) {
-			require_once $this->utils[$name]->path;
+			require_once ROOT_PATH.$this->utils[$name]->path;
 			$class = '\project\utils\\'.$this->utils[$name]->class;
 			return new $class($arguments);
 		}
