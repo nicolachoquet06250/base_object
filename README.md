@@ -22,3 +22,6 @@ il suffit de rajouter cette ligne de code au debut du script php :
 
 Vous n'avez plus qu'à vous mettre dans le répertoir de 
 votre projet dans un terminal et taper la commande `npm install`
+
+#Mémo
+Génération d'images de test de n'importe quelle taille : `http://via.placeholder.com/<X>x<Y>`

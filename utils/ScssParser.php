@@ -7,7 +7,7 @@ use project\extended\classes\util;
 
 class ScssParser extends util {
 	private $root_dir = null, $root_dir_core = null, $root_dir_custom = null, $base_dir = '/scss/', $scss_suffix = 'scss', $css_file = 'main', $css_suffix = 'css', $last_update_file = 'last_update.txt',
-			$html_doc_dir = 'layouts/CssDoc', $html_doc_file = 'index.view.html', $php_doc_file = 'doc.php';
+			$html_doc_dir = 'layouts/CssDoc/', $html_doc_file = 'index.view.html', $php_doc_file = 'doc.php';
 	private $scss_array = [], $docs = [];
 	private $scss_reg_exp, $css_reg_exp;
 	private $enable_last_updated = true;
@@ -21,6 +21,13 @@ class ScssParser extends util {
 		$this->css_file     = $this->base_dir.$this->css_file.'.'.$this->scss_suffix;
 		$this->scss_reg_exp = '/^([0-9]+)_(.+)\.'.$this->scss_suffix.'$/';
 		$this->css_reg_exp = '/^([0-9]+)_(.+)\.'.$this->css_suffix.'$/';
+	}
+
+	public function set_html_doc($path) {
+		if(substr($path, strlen($path)-1, 1) !== '/') {
+			$path .= '/';
+		}
+		$this->html_doc_dir = $path;
 	}
 
 	public function set_html_file($path) {
@@ -120,7 +127,7 @@ class ScssParser extends util {
 				if(file_get_contents($file_and_directory_array) !== '') {
 					$path = $file_and_directory_array;
 					if($this->root_dir_core) {
-						$css_file_content .= "\n// SOURCE ".str_replace((strpos($path, $this->root_dir_core) ? $this->root_dir_core : $this->root_dir_custom).'/', '', $path).
+						$css_file_content .= "\n// SOURCE ".str_replace([$this->root_dir_core.'/', $this->root_dir_custom.'/'], '', $path).
 											 "\n".file_get_contents($path);
 					}
 					else {
@@ -133,7 +140,7 @@ class ScssParser extends util {
 				foreach ($file_and_directory_array as $_directory => $path) {
 					if(file_get_contents($path) !== '') {
 						if($this->root_dir_core) {
-							$css_file_content .= "\n// SOURCE ".str_replace((strpos($path, $this->root_dir_core) ? $this->root_dir_core : $this->root_dir_custom).'/', '', $path).
+							$css_file_content .= "\n// SOURCE ".str_replace([$this->root_dir_core.'/', $this->root_dir_custom.'/'], '', $path).
 												 "\n".file_get_contents($path);
 						}
 						else {
@@ -178,13 +185,11 @@ class ScssParser extends util {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
-    <link rel="stylesheet" href="scss/theme-css/fontastic.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
-    <link rel="stylesheet" href="node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css">
 	<link href="scss/syntax_hightlighter/shCore.css" rel="stylesheet" type="text/css">
 	<link href="scss/syntax_hightlighter/shThemeDefault.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="scss/main.css">
-    <link rel="shortcut icon" href="img/css3.png">
+    <link rel="shortcut icon" href="/img/css3.png">
     
     <!-- Tweaks for older IEs--><!--[if lt IE 9]>
     <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
@@ -193,10 +198,10 @@ class ScssParser extends util {
     <script src="node_modules/jquery/dist/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
     <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-	<script src=\'js/syntax_hightlighter/shCore.js\' type=\'text/javascript\'></script>
-	<script src=\'js/syntax_hightlighter/shBrushXml.js\' type=\'text/javascript\'></script>
-	<script src=\'js/syntax_hightlighter/shBrushJScript.js\' type=\'text/javascript\'></script>
-	<script src=\'js/syntax_hightlighter/shBrushPhp.js\' type=\'text/javascript\'></script>
+	<script src="js/syntax_hightlighter/shCore.js" type="text/javascript"></script>
+	<script src="js/syntax_hightlighter/shBrushXml.js" type="text/javascript"></script>
+	<script src="js/syntax_hightlighter/shBrushJScript.js" type="text/javascript"></script>
+	<script src="js/syntax_hightlighter/shBrushPhp.js" type="text/javascript"></script>
     <script>
         $(document).ready(function() {
             SyntaxHighlighter.all();
@@ -359,9 +364,6 @@ class ScssParser extends util {
     </div>
 </div>
 <!-- JavaScript files-->
-<script src="js/grasp_mobile_progress_circle-1.0.0.min.js"></script>
-<script src="node_modules/jquery.cookie/jquery.cookie.js"></script>
-<script src="node_modules/jquery-validation/dist/jquery.validate.min.js"></script>
 <script src="node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js"></script>
 <!-- Main File-->
 <script src="js/front.js"></script>
