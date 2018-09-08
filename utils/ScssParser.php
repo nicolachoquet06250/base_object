@@ -183,25 +183,25 @@ class ScssParser extends util {
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Documentation</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../node_modules/font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
-	<link href="scss/syntax_hightlighter/shCore.css" rel="stylesheet" type="text/css">
-	<link href="scss/syntax_hightlighter/shThemeDefault.css" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="scss/main.css">
-    <link rel="shortcut icon" href="/img/css3.png">
+	<link href="../scss/syntax_hightlighter/shCore.css" rel="stylesheet" type="text/css">
+	<link href="../scss/syntax_hightlighter/shThemeDefault.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="../scss/main.css">
+    <link rel="shortcut icon" href="../img/css3.png">
     
     <!-- Tweaks for older IEs--><!--[if lt IE 9]>
     <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
 
-    <script src="node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../node_modules/jquery/dist/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
-    <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-	<script src="js/syntax_hightlighter/shCore.js" type="text/javascript"></script>
-	<script src="js/syntax_hightlighter/shBrushXml.js" type="text/javascript"></script>
-	<script src="js/syntax_hightlighter/shBrushJScript.js" type="text/javascript"></script>
-	<script src="js/syntax_hightlighter/shBrushPhp.js" type="text/javascript"></script>
+    <script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script src="../js/syntax_hightlighter/shCore.js" type="text/javascript"></script>
+	<script src="../js/syntax_hightlighter/shBrushXml.js" type="text/javascript"></script>
+	<script src="../js/syntax_hightlighter/shBrushJScript.js" type="text/javascript"></script>
+	<script src="../js/syntax_hightlighter/shBrushPhp.js" type="text/javascript"></script>
     <script>
         $(document).ready(function() {
             SyntaxHighlighter.all();
@@ -250,7 +250,7 @@ class ScssParser extends util {
                 <li>
                     <a href="#doc-css" aria-expanded="true" data-toggle="collapse">
                         <i>
-                            <img src="img/css3.png" style="height: 25px; width: 25px;">
+                            <img src="../img/css3.png" style="height: 25px; width: 25px;">
                         </i>
                         CSS
                         <div class="badge badge-info">SASS</div>
@@ -260,7 +260,7 @@ class ScssParser extends util {
                 <li>
                     <a href="#">
                         <i>
-                            <img src="img/php7.png" style="height: 25px; width: 18px; margin-left: 5px;">
+                            <img src="../img/php7.png" style="height: 25px; width: 18px; margin-left: 5px;">
                         </i>
                         PHP
                         <div class="badge badge-info">MVC</div>
@@ -364,21 +364,27 @@ class ScssParser extends util {
     </div>
 </div>
 <!-- JavaScript files-->
-<script src="node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js"></script>
+<script src="../node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js"></script>
 <!-- Main File-->
-<script src="js/front.js"></script>
+<script src="../js/front.js"></script>
 </body>
 </html>';
 
 		$html = str_replace('[nav_menu]', $this->get_util('DocGenerator')::menu($stylesguide, 'css'), $html);
 
-		if(!is_dir($this->html_doc_dir)) {
-			mkdir($this->html_doc_dir, 0777, true);
+		if(!is_dir(ROOT_PATH.$this->html_doc_dir)) {
+			mkdir(ROOT_PATH.$this->html_doc_dir, 0777, true);
 		}
-		if($html !== file_get_contents($this->html_doc_dir.'/'.$this->html_doc_file)) {
-			file_put_contents($this->html_doc_dir.'/'.$this->html_doc_file, $html);
+		if(!file_exists(ROOT_PATH.$this->html_doc_dir.$this->html_doc_file) || $html !== file_get_contents(ROOT_PATH.$this->html_doc_dir.$this->html_doc_file)) {
+			file_put_contents(ROOT_PATH.$this->html_doc_dir.$this->html_doc_file, $html);
 			if($this->enable_last_updated) {
-				file_put_contents($this->base_dir.'/'.$this->last_update_file, date('Y-m-d'));
+				if($this->root_dir_core) {
+					file_put_contents(realpath($this->root_dir_core).'/'.$this->last_update_file, date('Y-m-d'));
+				}
+				else {
+					file_put_contents(realpath($this->base_dir).'/'.$this->last_update_file, date('Y-m-d'));
+				}
+
 			}
 		}
 
@@ -400,11 +406,11 @@ class ScssParser extends util {
 		return view::get(
 			[\'page_name\' => $page_name],
 			[\'template_name\' => $template_name],
-			[\'last_update\' => $_this->get_scss_parser(__DIR__)->get_last_update_file()]
+			[\'last_update\' => $_this->get_scss_parser(ROOT_PATH)->get_last_update_file()]
 		);
-	}, [\'__DIR__\', __DIR__]);';
+	});';
 			if (!is_file($this->php_doc_file)) {
-				file_put_contents($this->php_doc_file, $php);
+				file_put_contents(ROOT_PATH.$this->php_doc_file, $php);
 			}
 		}
 	}

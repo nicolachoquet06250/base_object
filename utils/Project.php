@@ -7,6 +7,8 @@ use project\extended\classes\debug;
 use project\extended\classes\util;
 use project\extended\classes\view;
 
+ini_set('display_errors', 'on');
+
 class Project extends util {
 	private static $callback = null;
 
@@ -58,10 +60,12 @@ class Project extends util {
 		 * @var DocGenerator $doc_generator
 		 * @var ScssParser $scss_parser
 		 */
-		$doc_generator = (new Project())->get_util('DocGenerator', __DIR__.'/..');
-		$scss_parser = $doc_generator->get_scss_parser(__DIR__.'/../scss', __DIR__.'/../scss2');
+		$doc_generator = (new Project())->get_util('DocGenerator', ROOT_PATH);
+		$scss_parser = $doc_generator->get_scss_parser(ROOT_PATH.'scss', ROOT_PATH.'scss2');
 		$scss_parser->parse()->get_scss_array();
-		$scss_parser->genere_scss_file()->genere_scss_doc_array()->genere_doc_file();
+		$scss_parser->genere_scss_file()->genere_scss_doc_array();
+		$scss_parser->set_php_file('index.php');
+		$scss_parser->genere_doc_file();
 		$scss_parser->prepare_main_for_sass_compilation()->compile();
 
 		if(isset($arguments[1]) && gettype($arguments[1]) === 'array') {

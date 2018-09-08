@@ -5,10 +5,10 @@ namespace project\extended\classes;
 
 class view extends util {
 	private $complete_path = '';
-	private $view_path = './layouts';
+	private $view_path = ROOT_PATH.'layouts';
 	private $template_name = '';
 	private $template_file_name = 'index.view.html';
-	private $template_404 = './layouts/errors/404/index.view.html';
+	private $template_404 = ROOT_PATH.'layouts/errors/404/index.view.html';
 	private $vars = [];
 
 	public function __construct($vars) {
