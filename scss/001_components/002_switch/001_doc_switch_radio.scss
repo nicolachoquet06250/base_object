@@ -1,0 +1,37 @@
+/*
+@styleguide
+Components.Form.radio
+
+@title
+Radios personnalisés
+
+@description
+décrit les radio boutons personnaliés en switches avec un style IOS 7.
+
+@markup
+<div class="row">
+
+    <div class="col-6">
+
+        <div class="switchery">
+          <label class="label switchery-toggle">
+            <input type="radio" name="radio" id="switch3" />
+            <div class="switchery-toggle-control"></div>
+          </label>
+        </div>
+
+    </div>
+
+    <div class="col-6">
+
+        <div class="switchery">
+          <label class="label switchery-toggle">
+            <input type="radio" name="radio" id="switch4" />
+            <div class="switchery-toggle-control"></div>
+          </label>
+        </div>
+
+    </div>
+
+</div>
+*/

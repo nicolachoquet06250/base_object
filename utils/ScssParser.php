@@ -4,8 +4,10 @@ namespace project\utils;
 
 
 use project\extended\classes\util;
+use project\extended\traits\http;
 
 class ScssParser extends util {
+	use http;
 	private $root_dir = null, $root_dir_core = null, $root_dir_custom = null, $base_dir = '/scss/', $scss_suffix = 'scss', $css_file = 'main', $css_suffix = 'css', $last_update_file = 'last_update.txt',
 			$html_doc_dir = 'layouts/CssDoc/', $html_doc_file = 'index.view.html', $php_doc_file = 'doc.php';
 	private $scss_array = [], $docs = [];
@@ -151,7 +153,7 @@ class ScssParser extends util {
 				}
 			}
 		}
-		$css_file_content = str_replace(['../', '@import "node_modules', 'url("fonts'], ['', '@import "../node_modules', 'url("../fonts'], $css_file_content);
+		$css_file_content = str_replace(['../', '@import "node_modules', 'url("fonts'], ['', '@import "../node_modules', 'url("../../fonts'], $css_file_content);
 		if($this->root_dir_core) {
 			$this->css_file = str_replace($this->base_dir, $this->root_dir_core.'/', $this->css_file);
 		}
@@ -188,7 +190,7 @@ class ScssParser extends util {
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
 	<link href="../scss/syntax_hightlighter/shCore.css" rel="stylesheet" type="text/css">
 	<link href="../scss/syntax_hightlighter/shThemeDefault.css" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="../scss/main.css">
+    <link rel="stylesheet" href="../scss/concat/main.css">
     <link rel="shortcut icon" href="../img/css3.png">
     
     <!-- Tweaks for older IEs--><!--[if lt IE 9]>
@@ -196,12 +198,15 @@ class ScssParser extends util {
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
 
     <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../node_modules/jquery.cookie/jquery.cookie.js"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
     <script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
 	<script src="../js/syntax_hightlighter/shCore.js" type="text/javascript"></script>
 	<script src="../js/syntax_hightlighter/shBrushXml.js" type="text/javascript"></script>
 	<script src="../js/syntax_hightlighter/shBrushJScript.js" type="text/javascript"></script>
 	<script src="../js/syntax_hightlighter/shBrushPhp.js" type="text/javascript"></script>
+	<script src="../node_modules/jquery-circle-progress/dist/circle-progress.min.js" type="text/javascript"></script>
     <script>
         $(document).ready(function() {
             SyntaxHighlighter.all();
@@ -237,7 +242,7 @@ class ScssParser extends util {
             </div>
             <!-- Small Brand information, appears on minimized sidebar-->
             <div class="sidenav-header-logo">
-                <a href="doc.php" class="brand-small text-center">
+                <a href="//'.self::http_server('HTTP_HOST').'/'.self::http_server('REQUEST_URI').'" class="brand-small text-center">
                     <strong class="text-primary">N</strong>
                     <strong class="text-primary">C</strong>
                 </a>
@@ -441,6 +446,18 @@ class ScssParser extends util {
 		}
 		else {
 			exec('node-sass '.$this->base_dir.'/ready-to-compile.scss '.$main_file, $output, $retour);
+		}
+		if(file_exists($main_file)) {
+			if(!is_dir($this->root_dir_core.'/concat')) {
+				mkdir($this->root_dir_core.'/concat', 0777);
+			}
+			exec('mv '.$main_file.' '.$this->root_dir_core.'/concat/main.css');
+			if(is_file($this->root_dir_core.'/concat/main.css')) {
+				if(is_file($main_file)) {
+					unlink($main_file);
+				}
+				$main_file = $this->root_dir_core.'/concat/main.css';
+			}
 		}
 		unlink(($this->root_dir_core ? $this->root_dir_core : $this->base_dir).'/ready-to-compile.scss');
 		unlink($this->css_file);

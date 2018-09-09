@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
 	<link href="../scss/syntax_hightlighter/shCore.css" rel="stylesheet" type="text/css">
 	<link href="../scss/syntax_hightlighter/shThemeDefault.css" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="../scss/main.css">
+    <link rel="stylesheet" href="../scss/concat/main.css">
     <link rel="shortcut icon" href="../img/css3.png">
     
     <!-- Tweaks for older IEs--><!--[if lt IE 9]>
@@ -18,12 +18,15 @@
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
 
     <script src="../node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="../node_modules/jquery.cookie/jquery.cookie.js"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
     <script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
 	<script src="../js/syntax_hightlighter/shCore.js" type="text/javascript"></script>
 	<script src="../js/syntax_hightlighter/shBrushXml.js" type="text/javascript"></script>
 	<script src="../js/syntax_hightlighter/shBrushJScript.js" type="text/javascript"></script>
 	<script src="../js/syntax_hightlighter/shBrushPhp.js" type="text/javascript"></script>
+	<script src="../node_modules/jquery-circle-progress/dist/circle-progress.min.js" type="text/javascript"></script>
     <script>
         $(document).ready(function() {
             SyntaxHighlighter.all();
@@ -59,7 +62,7 @@
             </div>
             <!-- Small Brand information, appears on minimized sidebar-->
             <div class="sidenav-header-logo">
-                <a href="doc.php" class="brand-small text-center">
+                <a href="//localhost//base_object/doc/" class="brand-small text-center">
                     <strong class="text-primary">N</strong>
                     <strong class="text-primary">C</strong>
                 </a>
@@ -112,6 +115,19 @@
 			</li>
 			<li>
 				<a class="js-scrollTo" href="#doc-css_Logincard"><i class="fa fa-css3"></i> login-card</a>
+			</li>
+			</ul>
+		</li>
+		<li>
+	<a href="#doc-css_components-Form" aria-expanded="false" data-toggle="collapse">
+		<i class="fa fa-folder"></i> Form
+	</a>
+					 <ul id="doc-css_components-Form" class="collapse list-unstyled">
+			<li>
+				<a class="js-scrollTo" href="#doc-css_Switchespersonnalisés"><i class="fa fa-css3"></i> switch</a>
+			</li>
+			<li>
+				<a class="js-scrollTo" href="#doc-css_Radiospersonnalisés"><i class="fa fa-css3"></i> radio</a>
 			</li>
 			</ul>
 		</li>
@@ -337,6 +353,140 @@
                &lt;input class=&quot;form-control&quot; type=&quot;password&quot; placeholder=&quot;password&quot; /&gt;
                &lt;input class=&quot;btn btn-primary&quot; type=&quot;button&quot; value=&quot;button&quot; /&gt;
            &lt;/div&gt;
+       &lt;/div&gt;
+   &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+						</div>
+				   </div>
+         </div>
+    </div>
+</div>
+
+<div class="row">
+	<div class="col-12 card" id="doc-css_Switchespersonnalisés">
+         <div class="card-header">
+              <i class="fa fa-file font-italic text-truncate" style="font-size: 15px; width: 100%;"> Fichier source: 001_components/002_switch/000_switchery.scss
+</i>
+              <h2 class="card-title">Switches personnalisés
+</h2>
+         </div>
+         <div class="card-body">
+               <p>
+                   décrit les switches de la lib Switchery avec un style IOS7.
+
+               </p>
+               
+					<div>
+					   <b>EXEMPLES</b>
+					   <br/>
+					   <div class="exemples-code" style="margin-bottom: 50px; margin-top: 15px;">
+						   <div class="row">
+   <div class="col-6">
+       <div class="switchery">
+         <label class="label switchery-toggle">
+           <input type="checkbox" id="switch1" />
+           <div class="switchery-toggle-control"></div>
+         </label>
+       </div>
+   </div>
+   <div class="col-6">
+       <div class="switchery">
+         <label class="label switchery-toggle">
+           <input type="checkbox"  id="switch2" />
+           <div class="switchery-toggle-control"></div>
+         </label>
+       </div>
+   </div>
+</div>
+
+					   </div>
+				   </div><div>
+						<b>CODE SOURCE</b>
+						<br/>
+						<div class="source-code">
+							 <pre class="brush: xml;">&lt;div class=&quot;row&quot;&gt;
+   &lt;div class=&quot;col-6&quot;&gt;
+       &lt;div class=&quot;switchery&quot;&gt;
+         &lt;label class=&quot;label switchery-toggle&quot;&gt;
+           &lt;input type=&quot;checkbox&quot; id=&quot;switch1&quot; /&gt;
+           &lt;div class=&quot;switchery-toggle-control&quot;&gt;&lt;/div&gt;
+         &lt;/label&gt;
+       &lt;/div&gt;
+   &lt;/div&gt;
+   &lt;div class=&quot;col-6&quot;&gt;
+       &lt;div class=&quot;switchery&quot;&gt;
+         &lt;label class=&quot;label switchery-toggle&quot;&gt;
+           &lt;input type=&quot;checkbox&quot;  id=&quot;switch2&quot; /&gt;
+           &lt;div class=&quot;switchery-toggle-control&quot;&gt;&lt;/div&gt;
+         &lt;/label&gt;
+       &lt;/div&gt;
+   &lt;/div&gt;
+&lt;/div&gt;
+</pre>
+						</div>
+				   </div>
+         </div>
+    </div>
+</div>
+
+<div class="row">
+	<div class="col-12 card" id="doc-css_Radiospersonnalisés">
+         <div class="card-header">
+              <i class="fa fa-file font-italic text-truncate" style="font-size: 15px; width: 100%;"> Fichier source: 001_components/002_switch/001_doc_switch_radio.scss
+</i>
+              <h2 class="card-title">Radios personnalisés
+</h2>
+         </div>
+         <div class="card-body">
+               <p>
+                   décrit les radio boutons personnaliés en switches avec un style IOS 7.
+
+               </p>
+               
+					<div>
+					   <b>EXEMPLES</b>
+					   <br/>
+					   <div class="exemples-code" style="margin-bottom: 50px; margin-top: 15px;">
+						   <div class="row">
+   <div class="col-6">
+       <div class="switchery">
+         <label class="label switchery-toggle">
+           <input type="radio" name="radio" id="switch3" />
+           <div class="switchery-toggle-control"></div>
+         </label>
+       </div>
+   </div>
+   <div class="col-6">
+       <div class="switchery">
+         <label class="label switchery-toggle">
+           <input type="radio" name="radio" id="switch4" />
+           <div class="switchery-toggle-control"></div>
+         </label>
+       </div>
+   </div>
+</div>
+
+					   </div>
+				   </div><div>
+						<b>CODE SOURCE</b>
+						<br/>
+						<div class="source-code">
+							 <pre class="brush: xml;">&lt;div class=&quot;row&quot;&gt;
+   &lt;div class=&quot;col-6&quot;&gt;
+       &lt;div class=&quot;switchery&quot;&gt;
+         &lt;label class=&quot;label switchery-toggle&quot;&gt;
+           &lt;input type=&quot;radio&quot; name=&quot;radio&quot; id=&quot;switch3&quot; /&gt;
+           &lt;div class=&quot;switchery-toggle-control&quot;&gt;&lt;/div&gt;
+         &lt;/label&gt;
+       &lt;/div&gt;
+   &lt;/div&gt;
+   &lt;div class=&quot;col-6&quot;&gt;
+       &lt;div class=&quot;switchery&quot;&gt;
+         &lt;label class=&quot;label switchery-toggle&quot;&gt;
+           &lt;input type=&quot;radio&quot; name=&quot;radio&quot; id=&quot;switch4&quot; /&gt;
+           &lt;div class=&quot;switchery-toggle-control&quot;&gt;&lt;/div&gt;
+         &lt;/label&gt;
        &lt;/div&gt;
    &lt;/div&gt;
 &lt;/div&gt;
