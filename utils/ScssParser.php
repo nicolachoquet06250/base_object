@@ -9,7 +9,7 @@ use project\extended\traits\http;
 class ScssParser extends util {
 	use http;
 	private $root_dir = null, $root_dir_core = null, $root_dir_custom = null, $base_dir = '/scss/', $scss_suffix = 'scss', $css_file = 'main', $css_suffix = 'css', $last_update_file = 'last_update.txt',
-			$html_doc_dir = 'layouts/CssDoc/', $html_doc_file = 'index.view.html', $php_doc_file = 'doc.php';
+			$html_doc_dir = 'layouts/CssDoc/', $html_doc_file = 'index.view.html', $php_doc_file = 'index.php';
 	private $scss_array = [], $docs = [];
 	private $scss_reg_exp, $css_reg_exp;
 	private $enable_last_updated = true;
@@ -56,6 +56,7 @@ class ScssParser extends util {
 	}
 
 	public function get_scss_array() {
+		$this->parse();
 		return $this->scss_array;
 	}
 
@@ -178,127 +179,12 @@ class ScssParser extends util {
 
 	public function genere_doc_file() {
 
-		$html = '<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Documentation</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../node_modules/font-awesome/css/font-awesome.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
-	<link href="../scss/syntax_hightlighter/shCore.css" rel="stylesheet" type="text/css">
-	<link href="../scss/syntax_hightlighter/shThemeDefault.css" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="../scss/concat/main.css">
-    <link rel="shortcut icon" href="../img/css3.png">
-    
-    <!-- Tweaks for older IEs--><!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
+		/**
+		 * @var DocGenerator $doc_generator;
+		 */
+		$doc_generator = $this->get_util('DocGenerator');
 
-    <script src="../node_modules/jquery/dist/jquery.min.js"></script>
-    <script src="../node_modules/jquery.cookie/jquery.cookie.js"></script>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
-    <script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-	<script src="../js/syntax_hightlighter/shCore.js" type="text/javascript"></script>
-	<script src="../js/syntax_hightlighter/shBrushXml.js" type="text/javascript"></script>
-	<script src="../js/syntax_hightlighter/shBrushJScript.js" type="text/javascript"></script>
-	<script src="../js/syntax_hightlighter/shBrushPhp.js" type="text/javascript"></script>
-	<script src="../node_modules/jquery-circle-progress/dist/circle-progress.min.js" type="text/javascript"></script>
-    <script>
-        $(document).ready(function() {
-            SyntaxHighlighter.all();
-            $(".js-scrollTo").on("click", function() { // Au clic sur un élément
-                let page = $(this).attr("href"); // Page cible
-                let speed = 750; // Durée de l\'animation (en ms)
-                $("html, body").animate( { scrollTop: $(page).offset().top }, speed ); // Go
-                return false;
-            });
-        });
-    </script>
-    <style>
-		.syntaxhighlighter.xml .toolbar {
-			display: none !important;
-		}
-	</style>
-</head>
-<body class="cssdoc">
-<!-- Side Navbar -->
-<nav class="side-navbar">
-    <div class="side-navbar-wrapper">
-        <!-- Sidebar Header    -->
-        <div class="sidenav-header d-flex align-items-center justify-content-center">
-            <!-- User Info-->
-            <div class="sidenav-header-inner text-center">
-                <div class="img-fluid rounded-circle" style="cursor: default;">
-                    <span style="border: 1px solid white; padding: 15px; font-size: 20px; -webkit-border-radius: 35px;-moz-border-radius: 35px;border-radius: 35px;">
-                        NC
-                    </span>
-                </div>
-                <h2 class="h5">Nicolas Choquet</h2>
-                <span>Web Developer</span>
-            </div>
-            <!-- Small Brand information, appears on minimized sidebar-->
-            <div class="sidenav-header-logo">
-                <a href="//'.self::http_server('HTTP_HOST').'/'.self::http_server('REQUEST_URI').'" class="brand-small text-center">
-                    <strong class="text-primary">N</strong>
-                    <strong class="text-primary">C</strong>
-                </a>
-            </div>
-        </div>
-        <!-- Sidebar Navigation Menus-->
-        <div class="main-menu">
-            <h5 class="sidenav-heading">Doc.</h5>
-            <ul id="side-main-menu" class="side-menu list-unstyled">
-                <li>
-                    <a href="#doc-css" aria-expanded="true" data-toggle="collapse">
-                        <i>
-                            <img src="../img/css3.png" style="height: 25px; width: 25px;">
-                        </i>
-                        CSS
-                        <div class="badge badge-info">SASS</div>
-                    </a>
-                    [nav_menu]
-                </li>
-                <li>
-                    <a href="#">
-                        <i>
-                            <img src="../img/php7.png" style="height: 25px; width: 18px; margin-left: 5px;">
-                        </i>
-                        PHP
-                        <div class="badge badge-info">MVC</div>
-                        <div class="badge badge-info">NOT IMPLEMENTED</div>
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
-<div class="page">
-    <!-- navbar-->
-    <header class="header">
-        <nav class="navbar">
-            <div class="container-fluid">
-                <div class="navbar-holder d-flex align-items-center justify-content-between">
-                    <div class="navbar-header">
-                        <a id="toggle-btn" href="#" class="menu-btn">
-                            <i class="icon-bars"> </i>
-                        </a>
-                        <a href="doc.php" class="navbar-brand">
-                            <div class="brand-text d-none d-md-inline-block">
-                                <strong class="text-primary">Documentation</strong>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <!-- Updates Section -->
-    <section class="mt-30px mb-30px">
-        <div class="container-fluid">';
+		$block_css = '';
 		$stylesguide = [];
 		foreach ($this->docs as $cmp => $doc) {
 			$doc = explode("\n", $doc);
@@ -345,37 +231,16 @@ class ScssParser extends util {
 				}
 			}
 
-			$html .= $this->get_util('DocGenerator')::code_card($id, $doc, 'css');
+			$block_css .= $doc_generator::code_card($id, $doc, 'css');
 		}
 
-    $html .= '        </div>
-    </section>
-    <footer class="main-footer">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-sm-6">
-                    <p>base_object &copy; 2017-2019</p>';
-		if($this->enable_last_updated) {
-			$html .= '	<p>Dernières modification: [last_update]</p>';
-		}
-		$html .= '</div>
-        	</div>
-        </div>
-    </footer>
-    <div class="row">
-        <div class="col-12">
-            [debug]
-        </div>
-    </div>
-</div>
-<!-- JavaScript files-->
-<script src="../node_modules/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js"></script>
-<!-- Main File-->
-<script src="../js/front.js"></script>
-</body>
-</html>';
+		$html = $doc_generator::genere_template_file($this->enable_last_updated);
 
-		$html = str_replace('[nav_menu]', $this->get_util('DocGenerator')::menu($stylesguide, 'css'), $html);
+		$html = str_replace('[css_nav_menu]', $doc_generator::menu($stylesguide, 'css'), $html);
+		$html = str_replace('[css_doc_page]', $block_css, $html);
+
+		$html = str_replace('[php_nav_menu]', '', $html);
+		$html = str_replace('[php_doc_page]', '', $html);
 
 		if(!is_dir(ROOT_PATH.$this->html_doc_dir)) {
 			mkdir(ROOT_PATH.$this->html_doc_dir, 0777, true);

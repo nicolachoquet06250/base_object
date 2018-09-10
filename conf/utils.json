@@ -22,5 +22,9 @@
   "ScssParser": {
     "path": "utils/ScssParser.php",
     "class": "ScssParser"
+  },
+  "PhpParser": {
+    "path": "utils/PhpParser.php",
+    "class": "PhpParser"
   }
 }
