@@ -2,15 +2,18 @@
 
 namespace project\extended\classes;
 use project\extended\traits\singleton;
+use const project\ROOT_PATH;
 use project\services\test;
 use project\utils\ArrayList;
 use project\utils\json;
 
 /**
+ * @title
  * Class BaseObject
  *
- * @method test get_service_test()
- * @method test set_service_test()
+ * @method
+ * test get_service_test()
+ * test set_service_test()
  */
 class BaseObject extends \stdClass {
 	/**
@@ -38,9 +41,12 @@ class BaseObject extends \stdClass {
 	}
 
 	/**
-	 * @param $name
-	 * @param $arguments
-	 * @return null
+	 * @param
+	 * $name
+	 * @param
+	 * $arguments
+	 * @return
+	 * null
 	 */
 	public function __call($name, $arguments) {
 		$method_parts = explode('_', $name);
@@ -56,9 +62,12 @@ class BaseObject extends \stdClass {
 	}
 
 	/**
-	 * @param $name
-	 * @param $arguments
-	 * @return mixed
+	 * @param
+	 * $name
+	 * @param
+	 * $arguments
+	 * @return
+	 * mixed
 	 */
 	public static function __callStatic($name, $arguments) {
 		$o = new BaseObject();
@@ -66,9 +75,12 @@ class BaseObject extends \stdClass {
 	}
 
 	/**
-	 * @param string $name
-	 * @param mixed ...$arguments
-	 * @return null
+	 * @param
+	 * string $name
+	 * @param
+	 * mixed ...$arguments
+	 * @return
+	 * null
 	 */
 	public function get_service(string $name, ...$arguments) {
 		if(isset($this->services[$name])) {
@@ -91,18 +103,24 @@ class BaseObject extends \stdClass {
 	}
 
 	/**
-	 * @param string $name
-	 * @param mixed ...$arguments
-	 * @return null
+	 * @param
+	 * string $name
+	 * @param
+	 * mixed ...$arguments
+	 * @return
+	 * null
 	 */
 	protected function set_service(string $name, ...$arguments) {
 		return $this->get_service($name, $arguments);
 	}
 
 	/**
-	 * @param string $name
-	 * @param mixed ...$arguments
-	 * @return null|util
+	 * @param
+	 * string $name
+	 * @param
+	 * mixed ...$arguments
+	 * @return
+	 * null|util
 	 */
 	public function get_util(string $name, ...$arguments) {
 		if(isset($this->utils[$name])) {
@@ -114,16 +132,20 @@ class BaseObject extends \stdClass {
 	}
 
 	/**
-	 * @param string $name
-	 * @param mixed ...$arguments
+	 * @param
+	 * string $name
+	 * @param
+	 * mixed ...$arguments
 	 */
 	protected function set_util(string $name, ...$arguments) {
 		$this->get_util($name, $arguments);
 	}
 
 	/**
-	 * @param array|null $gettable_and_settable_classes
-	 * @return $this
+	 * @param
+	 * array|null $gettable_and_settable_classes
+	 * @return
+	 * $this
 	 */
 	protected function gettable_and_settable_classes(array $gettable_and_settable_classes = null) {
 		if($gettable_and_settable_classes !== null) {
@@ -134,8 +156,10 @@ class BaseObject extends \stdClass {
 	}
 
 	/**
-	 * @param ArrayList $arrayList
-	 * @return $this
+	 * @param
+	 * ArrayList $arrayList
+	 * @return
+	 * $this
 	 */
 	public function set_arraylist(ArrayList $arrayList) {
 		$this->array = $arrayList;
@@ -149,8 +173,10 @@ class BaseObject extends \stdClass {
 	}
 
 	/**
-	 * @param int $key
-	 * @return $this
+	 * @param
+	 * int $key
+	 * @return
+	 * $this
 	 */
 	public function set_key(int $key) {
 		$this->key = $key;

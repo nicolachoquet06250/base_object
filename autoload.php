@@ -1,10 +1,20 @@
 <?php
 
+namespace project;
+
 /**
+ * @author
+ * Nicolas Choquet
+ *
+ * @description
  * test toto tata
+ *
+ * @markup
+ * <?php
+ * 	echo "lol";
+ *
  */
-function autoload()
-{
+function autoload() {
 	require_once 'extended/traits/http.php';
 	require_once 'extended/traits/php_environement.php';
 	require_once 'extended/traits/manager.php';

@@ -4,6 +4,7 @@ namespace project\utils;
 
 use project\extended\classes\util;
 use project\extended\traits\http;
+use const project\ROOT_PATH;
 
 class PhpParser extends util {
 	use http;
@@ -15,12 +16,7 @@ class PhpParser extends util {
 
 	public function __construct($root_dir = null) {
 		parent::__construct();
-		if(is_array($root_dir) && !empty($root_dir)) {
-			$this->set_root_dir('*', $root_dir[0]);
-		}
-		else {
-			$this->set_root_dir('*', ROOT_PATH);
-		}
+		$this->set_root_dir('*', (is_array($root_dir) && !empty($root_dir) ? $root_dir[0] : ROOT_PATH));
 		$this->php_doc_file     = $this->get_root_dir().$this->php_doc_file;
 		$this->php_reg_exp = '`([a-zA-Z0-9\-\_\.]+)\.'.$this->php_suffix.'`';
 	}
@@ -38,6 +34,7 @@ class PhpParser extends util {
 
 	public function set_php_file($path = null) {
 		$this->php_doc_file = $path;
+		return $this;
 	}
 
 	public function set_root_dir($type, $path) {
@@ -66,19 +63,20 @@ class PhpParser extends util {
 	private function parcour($directory, $step = 0) {
 		if(is_dir($directory)) {
 			foreach (new \DirectoryIterator($directory) as $fileInfo) {
-				if (!$fileInfo->isDot() && $fileInfo->isDir() && substr($fileInfo->getBasename(), 0, 1) !== '.') {
+				if (!$fileInfo->isDot() && $fileInfo->isDir() && substr($fileInfo->getBasename(), 0, 1) !== '.' && !strpos($directory, '/node_modules')) {
 					$new_directory = substr($directory, strlen($directory) - 1, 1) === '/' ? substr($directory, 0, strlen($directory) - 1) : $directory;
 					$this->parcour($new_directory.'/'.$fileInfo->getBasename(), $step + 1);
 				} elseif ($fileInfo->isFile() && strstr($fileInfo->getFilename(), '.'.$this->php_suffix) && $filepath = $fileInfo->getPathname()) {
-
 					$basename = basename($filepath);
 					if (preg_match($this->php_reg_exp, $basename, $matches)) {
 						if ($step === 0) {
 							$this->php_array[$basename] = $filepath;
-						} elseif ($step === 1) {
+						}
+						elseif ($step === 1) {
 							$directory_name                               = basename(dirname($filepath));
 							$this->php_array[$directory_name][$basename] = $filepath;
-						} elseif ($step > 1) {
+						}
+						elseif ($step > 1) {
 							$directory_name     = basename(dirname($filepath));
 							$sub_directory_name = basename(dirname(str_replace($directory_name.'/'.$basename, '', $directory)));
 							$key                = $sub_directory_name.'/'.$directory_name;
@@ -172,7 +170,7 @@ class PhpParser extends util {
 				$namespace    = '';
 				$is     = null;
 				$file_content = file_get_contents($path);
-				if(preg_match('`namespace ([^;]+);[^µ]+c\nlass ([a-zA-Z0-9\_]+)\ `', $file_content,$matches)) {
+				if(preg_match('`namespace ([^;]+);[^µ]+\nclass ([a-zA-Z0-9\_]+)\ `', $file_content,$matches)) {
 					$is = 'class';
 					$namespace = $matches[1];
 					$class = $matches[2];
@@ -182,7 +180,7 @@ class PhpParser extends util {
 					$namespace = $matches[1];
 					$class = $matches[2];
 				}
-				elseif(preg_match('`namespace ([^;]+);[^µ]+\nfunction ([a-zA-Z0-9\_]+)\ `', $file_content,$matches)) {
+				elseif(preg_match('`namespace ([^;]+);[^µ]+\nfunction\ ([a-zA-Z0-9\_]+)\(`', $file_content,$matches)) {
 					$is = 'function';
 					$namespace = $matches[1];
 					$class = $matches[2];
@@ -190,7 +188,9 @@ class PhpParser extends util {
 
 				if($is) {
 					$tmp[$key] = [
-						'source'      => $path,
+						'source'    => $this->root_dir_core ? str_replace([$this->root_dir_core.'/', $this->root_dir_custom.'/'], '', $path)
+							: str_replace($this->root_dir.'/', '', $path),
+						'path' 		=> $path,
 						'is'        => $is,
 						'namespace' => $namespace,
 						$is         => $class
@@ -213,7 +213,7 @@ class PhpParser extends util {
 						$namespace = $matches[1];
 						$class = $matches[2];
 					}
-					elseif(preg_match('`namespace ([^;]+);[^µ]+\nfunction ([a-zA-Z0-9\_]+)\ `', $file_content,$matches)) {
+					elseif(preg_match('`namespace ([^;]+);[^µ]+\nfunction\ ([a-zA-Z0-9\_]+)\(`', $file_content,$matches)) {
 						$is = 'function';
 						$namespace = $matches[1];
 						$class = $matches[2];
@@ -221,7 +221,9 @@ class PhpParser extends util {
 
 					if($is) {
 						$tmp[$key][$_key] = [
-							'source'      => $_path,
+							'source'    => $this->root_dir_core ? str_replace([$this->root_dir_core.'/', $this->root_dir_custom.'/'], '', $_path)
+								: str_replace($this->root_dir.'/', '', $_path),
+							'path' 		=> $_path,
 							'is'        => $is,
 							'namespace' => $namespace,
 							$is         => $class
@@ -232,9 +234,9 @@ class PhpParser extends util {
 		}
 
 		foreach ($tmp as $key => $infos) {
-			if($this->is_array($infos)) {
+			if($this->is_array($infos) && !isset($infos['path'])) {
 				foreach ($infos as $_key => $_infos) {
-					require_once $_infos['source'];
+					require_once $_infos['path'];
 					$is = $_infos['is'];
 					$class = '\Reflection'.ucfirst($is);
 					$namespace = $_infos['namespace'];
@@ -248,7 +250,7 @@ class PhpParser extends util {
 					if($is === 'class') {
 						foreach (get_class_vars($complete_class) as $var => $value) {
 							$prop = (new \ReflectionProperty($complete_class, $var));
-							if($prop->isPublic() || $prop->isProtected()) {
+							if(!$prop->isPrivate()) {
 								if ($doc = $prop->getDocComment()) {
 									$tmp[$key][$_key]['vars'][$var] = $doc;
 								}
@@ -256,15 +258,17 @@ class PhpParser extends util {
 						}
 						foreach (get_class_methods($complete_class) as $method) {
 							$methode = (new \ReflectionMethod($complete_class, $method));
-							if ($doc = $methode->getDocComment()) {
-								$tmp[$key][$_key]['methods'][$method] = $doc;
+							if(!$methode->isPrivate()) {
+								if ($doc = $methode->getDocComment()) {
+									$tmp[$key][$_key]['methods'][$method] = $doc;
+								}
 							}
 						}
 					}
 				}
 			}
 			else {
-				require_once $infos['source'];
+				require_once $infos['path'];
 				$is = $infos['is'];
 				$class = '\Reflection'.ucfirst($is);
 				$namespace = $infos['namespace'];
@@ -296,5 +300,253 @@ class PhpParser extends util {
 		$this->docs = $tmp;
 
 		return $this;
+	}
+
+	public function genere_doc_file($html = null) {
+		/**
+		 * @var DocGenerator $doc_generator;
+		 */
+		$doc_generator = $this->get_util('DocGenerator');
+
+		$block_php = '';
+		$stylesguide = [];
+		foreach ($this->docs as $key => $doc) {
+			if(isset($doc['path'])) {
+				if (isset($doc['_comment'])) {
+					$doc_comment = explode("\n", $doc['_comment']);
+					unset($doc_comment[count($doc_comment) - 1]);
+					unset($doc_comment[0]);
+					foreach ($doc_comment as $i => $value) {
+						if ($value === '' || $value === ' ' || $value === ' *') {
+							unset($doc_comment[$i]);
+						}
+						if (substr($value, 0, 3) === ' * ') {
+							$doc_comment[$i] = substr($value, 3, strlen($value) - 1);
+						}
+					}
+					$new_doc_array = [];
+					$last_key      = '';
+					$cmp           = 0;
+					foreach ($doc_comment as $i => $value) {
+						if (substr($value, 0, 1) === '@') {
+							$last_key                 = str_replace('@', '', $value);
+							$new_doc_array[$last_key] = '';
+							$cmp                      = 0;
+						} else {
+							$new_doc_array[$last_key] .= $cmp === 0 ? $value : "\n".$value;
+							$cmp++;
+						}
+					}
+					$doc_comment = $new_doc_array;
+
+					if (!isset($doc_comment['title'])) {
+						$doc_comment['title'] = ucfirst($doc[$doc['is']]);
+					}
+					if (!isset($doc_comment['styleguide'])) {
+						$doc_comment['styleguide'] = str_replace('\\', '.', $doc['namespace'].'.'.$doc[$doc['is']]);
+					}
+				}
+				if (isset($doc['methods'])) {
+					foreach ($doc['methods'] as $method => $_comment) {
+//						$this->var_dump($method, $_comment, __FILE__.' '.__LINE__);
+					}
+				}
+				if (isset($doc['vars'])) {
+					foreach ($doc['vars'] as $var => $_comment) {
+//						$this->var_dump($var, $_comment, __FILE__.' '.__LINE__);
+					}
+				}
+
+				if(isset($doc_comment)) {
+					$id = str_replace([' ', '-', '\'', ',', '[', ']', "\n"], ['', '', '_', '_', '6', '3', ''], $doc_comment['title']);
+					if (isset($doc_comment['styleguide'])) {
+						$doc_comment['styleguide'] = str_replace("\n", '', $doc_comment['styleguide']);
+						$path                      = explode('.', $doc_comment['styleguide']);
+						if (count($path) === 1) {
+							$stylesguide[$path[0]] = $id;
+						} elseif (count($path) === 2) {
+							$stylesguide[$path[0]][$path[1]] = $id;
+						} elseif (count($path) === 3) {
+							$stylesguide[$path[0]][$path[1]][$path[2]] = $id;
+						} else {
+							$part1 = $path[0];
+							$part3 = $path[count($path) - 1];
+							unset($path[count($path) - 1]);
+							unset($path[0]);
+							$part2                               = implode('.', $path);
+							$stylesguide[$part1][$part2][$part3] = $id;
+						}
+					}
+				}
+			}
+			else {
+				foreach ($doc as $_key => $_doc) {
+					if(isset($_doc['_comment'])) {
+						$doc_comment = explode("\n", $_doc['_comment']);
+						unset($doc_comment[count($doc_comment) - 1]);
+						unset($doc_comment[0]);
+						foreach ($doc_comment as $i => $value) {
+							if ($value === '' || $value === ' ' || $value === ' *') {
+								unset($doc_comment[$i]);
+							}
+							if (substr($value, 0, 3) === ' * ') {
+								$doc_comment[$i] = substr($value, 3, strlen($value) - 1);
+							}
+						}
+						$new_doc_array = [];
+						$last_key      = '';
+						$cmp           = 0;
+						foreach ($doc_comment as $i => $value) {
+							if (substr($value, 0, 1) === '@') {
+								$last_key                 = str_replace('@', '', $value);
+								$new_doc_array[$last_key] = '';
+								$cmp                      = 0;
+							} else {
+								$new_doc_array[$last_key] .= $cmp === 0 ? $value : "\n".$value;
+								$cmp++;
+							}
+						}
+						$doc_comment = $new_doc_array;
+
+						if (!isset($doc_comment['title'])) {
+							$doc_comment['title'] = ucfirst($_doc[$_doc['is']]);
+						}
+						if (!isset($doc_comment['styleguide'])) {
+							$doc_comment['styleguide'] = str_replace('\\', '.', $_doc['namespace'].'.'.$_doc[$_doc['is']]);
+						}
+//						$this->var_dump($doc_comment);
+					}
+					if (isset($_doc['methods'])) {
+						foreach ($_doc['methods'] as $method => $_comment) {
+							$doc_comment = explode("\n", $_comment);
+							unset($doc_comment[count($doc_comment) - 1]);
+							unset($doc_comment[0]);
+							foreach ($doc_comment as $i => $value) {
+								if ($value === '' || $value === ' ' || $value === ' *') {
+									unset($doc_comment[$i]);
+								}
+								if (substr($value, 0, 3) === ' * ') {
+									$doc_comment[$i] = substr($value, 3, strlen($value) - 1);
+								}
+							}
+							$new_doc_array = [];
+							$last_key      = '';
+							$cmp           = 0;
+							foreach ($doc_comment as $i => $value) {
+								if (substr($value, 0, 1) === '@') {
+									$last_key                 = str_replace('@', '', $value);
+									$new_doc_array[$last_key] = '';
+									$cmp                      = 0;
+								} else {
+									$new_doc_array[$last_key] .= $cmp === 0 ? $value : "\n".$value;
+									$cmp++;
+								}
+							}
+							$doc_comment = $new_doc_array;
+
+							if (!isset($doc_comment['title'])) {
+								$doc_comment['title'] = ucfirst($method);
+							}
+							if (!isset($doc_comment['styleguide'])) {
+								$this->var_dump($method, __FILE__.' '.__LINE__);
+								$doc_comment['styleguide'] = str_replace('\\', '.', $_doc['namespace'].'.'.$_doc[$_doc['is']].'.'.$method);
+							}
+							$this->var_dump($doc_comment);
+//							$this->var_dump($method, $_comment, __FILE__.' '.__LINE__);
+						}
+					}
+					if (isset($_doc['vars'])) {
+						foreach ($_doc['vars'] as $var => $_comment) {
+//							$this->var_dump($var, $_comment, __FILE__.' '.__LINE__);
+						}
+					}
+					if(isset($doc_comment)) {
+						$id = str_replace([' ', '-', '\'', ',', '[', ']', "\n"], ['', '', '_', '_', '6', '3', ''], $doc_comment['title']);
+						if (isset($doc_comment['styleguide'])) {
+							$doc_comment['styleguide'] = str_replace("\n", '', $doc_comment['styleguide']);
+							$path                      = explode('.', $doc_comment['styleguide']);
+							if (count($path) === 1) {
+								$stylesguide[$path[0]] = $id;
+							} elseif (count($path) === 2) {
+								$stylesguide[$path[0]][$path[1]] = $id;
+							} elseif (count($path) === 3) {
+								$stylesguide[$path[0]][$path[1]][$path[2]] = $id;
+							} else {
+								$part1 = $path[0];
+								$part3 = $path[count($path) - 1];
+								unset($path[count($path) - 1]);
+								unset($path[0]);
+								$part2                               = implode('.', $path);
+								$stylesguide[$part1][$part2][$part3] = $id;
+							}
+						}
+					}
+				}
+//				foreach ($doc as $_key => $_doc) {
+//					$doc_comment = explode("\n", $_doc['_comment']);
+//					unset($doc_comment[count($doc_comment) - 1]);
+//					unset($doc_comment[0]);
+//					foreach ($doc_comment as $i => $value) {
+//						if ($value === '' || $value === ' ' || $value === ' *') {
+//							unset($doc_comment[$i]);
+//						}
+//						if (substr($value, 0, 3) === ' * ') {
+//							$doc_comment[$i] = substr($value, 3, strlen($value) - 1);
+//						}
+//					}
+//					$new_doc_array = [];
+//					$last_key      = '';
+//					$cmp           = 0;
+//					foreach ($doc_comment as $i => $value) {
+//						if (substr($value, 0, 1) === '@') {
+//							$last_key                 = str_replace('@', '', $value);
+//							$new_doc_array[$last_key] = '';
+//							$cmp                      = 0;
+//						} else {
+//							$new_doc_array[$last_key] .= $cmp === 0 ? $value : "\n".$value;
+//							$cmp++;
+//						}
+//					}
+//					$doc_comment = $new_doc_array;
+//
+//					if (!isset($doc_comment['title'])) {
+//						$doc_comment['title'] = ucfirst($_doc[$_doc['is']]);
+//					}
+//					if (!isset($doc_comment['styleguide'])) {
+//						$doc_comment['styleguide'] = str_replace('\\', '.', $_doc['namespace'].'.'.$_doc[$_doc['is']]);
+//					}
+//				}
+			}
+
+//			$block_php .= $doc_generator::code_card($id, $doc_comment, 'php');
+//			$this->var_dump($doc_comment, __FILE__.' '.__LINE__);
+		}
+		$this->var_dump($stylesguide, __FILE__.' '.__LINE__);
+		exit();
+
+		if(is_null($html)) {
+			$html = $doc_generator::genere_template_file($this->enable_last_updated);
+		}
+
+		$html = str_replace('[php_nav_menu]', $doc_generator::menu($stylesguide, 'php'), $html);
+		$html = str_replace('[php_doc_page]', $block_php, $html);
+
+		if(!is_dir(ROOT_PATH.$this->html_doc_dir)) {
+			mkdir(ROOT_PATH.$this->html_doc_dir, 0777, true);
+		}
+		$html_doc_file_complete_path = ROOT_PATH.$this->html_doc_dir.$this->html_doc_file;
+		if(!file_exists($html_doc_file_complete_path) || $html !== file_get_contents($html_doc_file_complete_path)) {
+			file_put_contents($html_doc_file_complete_path, $html);
+			if($this->enable_last_updated) {
+				if($this->root_dir_core) {
+					file_put_contents(realpath($this->root_dir_core).'/'.$this->last_update_file, date('Y-m-d'));
+				}
+				else {
+					file_put_contents(realpath($this->base_dir).'/'.$this->last_update_file, date('Y-m-d'));
+				}
+
+			}
+		}
+		return [$html_doc_file_complete_path, $html];
 	}
 }

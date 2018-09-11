@@ -2,20 +2,18 @@
 			
 	namespace project;
 			
-	use project\extended\classes\debug;
 	use project\extended\classes\view;
 	use project\utils\DocGenerator;
 	use project\utils\PhpParser;
 	use project\utils\Project;
 
 	require_once '../autoload.php';
-
 	function CssDoc() {
 		return Project::CssDoc(function ($_this, $metas, $args) {
 			$page_name     = $args['page_name'];
 			$template_name = $args['template_name'];
-
-			debug::log(['ceci est le premier log de debug', 'ceci est le second log de debug'], 'log18');
+			
+			
 
 			/** @var Project $_this */
 			/** @var DocGenerator $doc_generator */
@@ -31,4 +29,11 @@
 			);
 		});
 	}
-	echo CssDoc();
+	$dir = str_replace(dirname(__DIR__), '', __DIR__).'/';
+
+	if(Project::http_server('REQUEST_URI') === $dir.'css') {
+		echo CssDoc();
+	}
+	else {
+		echo CssDoc();
+	}

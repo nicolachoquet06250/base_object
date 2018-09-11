@@ -5,6 +5,7 @@ namespace project\utils;
 
 use project\extended\classes\util;
 use project\extended\traits\http;
+use const project\ROOT_PATH;
 
 class ScssParser extends util {
 	use http;
@@ -16,9 +17,7 @@ class ScssParser extends util {
 
 	public function __construct($root_dir = null) {
 		parent::__construct();
-		if(is_array($root_dir) && !empty($root_dir)) {
-			$this->root_dir = $root_dir[0];
-		}
+		$this->set_root_dir('*', (is_array($root_dir) && !empty($root_dir) ? $root_dir[0] : ROOT_PATH));
 		$this->base_dir     = is_null($this->root_dir) ? __DIR__.$this->base_dir : $this->root_dir.$this->base_dir;
 		$this->css_file     = $this->base_dir.$this->css_file.'.'.$this->scss_suffix;
 		$this->scss_reg_exp = '/^([0-9]+)_(.+)\.'.$this->scss_suffix.'$/';
@@ -38,6 +37,7 @@ class ScssParser extends util {
 
 	public function set_php_file($path = null) {
 		$this->php_doc_file = $path;
+		return $this;
 	}
 
 	public function set_root_dir($type, $path) {
@@ -177,8 +177,7 @@ class ScssParser extends util {
 		return $this;
 	}
 
-	public function genere_doc_file() {
-
+	public function genere_doc_file($html = null) {
 		/**
 		 * @var DocGenerator $doc_generator;
 		 */
@@ -234,19 +233,19 @@ class ScssParser extends util {
 			$block_css .= $doc_generator::code_card($id, $doc, 'css');
 		}
 
-		$html = $doc_generator::genere_template_file($this->enable_last_updated);
+		if(is_null($html)) {
+			$html = $doc_generator::genere_template_file($this->enable_last_updated);
+		}
 
 		$html = str_replace('[css_nav_menu]', $doc_generator::menu($stylesguide, 'css'), $html);
 		$html = str_replace('[css_doc_page]', $block_css, $html);
 
-		$html = str_replace('[php_nav_menu]', '', $html);
-		$html = str_replace('[php_doc_page]', '', $html);
-
 		if(!is_dir(ROOT_PATH.$this->html_doc_dir)) {
 			mkdir(ROOT_PATH.$this->html_doc_dir, 0777, true);
 		}
-		if(!file_exists(ROOT_PATH.$this->html_doc_dir.$this->html_doc_file) || $html !== file_get_contents(ROOT_PATH.$this->html_doc_dir.$this->html_doc_file)) {
-			file_put_contents(ROOT_PATH.$this->html_doc_dir.$this->html_doc_file, $html);
+		$html_doc_file_complete_path = ROOT_PATH.$this->html_doc_dir.$this->html_doc_file;
+		if(!file_exists($html_doc_file_complete_path) || $html !== file_get_contents($html_doc_file_complete_path)) {
+			file_put_contents($html_doc_file_complete_path, $html);
 			if($this->enable_last_updated) {
 				if($this->root_dir_core) {
 					file_put_contents(realpath($this->root_dir_core).'/'.$this->last_update_file, date('Y-m-d'));
@@ -257,32 +256,7 @@ class ScssParser extends util {
 
 			}
 		}
-
-		if($this->php_doc_file) {
-			$php = '<?php
-			
-	namespace project;
-			
-	use project\extended\classes\view;
-	use project\utils\Project;
-
-	require_once \'autoload.php\';
-					
-	echo Project::CssDoc(function ($_this, $metas, $args) {
-		$page_name = $args[\'page_name\'];
-		$template_name = $args[\'template_name\'];
-		
-		/** @var Project $_this */
-		return view::get(
-			[\'page_name\' => $page_name],
-			[\'template_name\' => $template_name],
-			[\'last_update\' => $_this->get_scss_parser(ROOT_PATH)->get_last_update_file()]
-		);
-	});';
-			if (!is_file($this->php_doc_file)) {
-				file_put_contents(ROOT_PATH.$this->php_doc_file, $php);
-			}
-		}
+		return [$html_doc_file_complete_path, $html];
 	}
 
 	public function prepare_main_for_sass_compilation() {

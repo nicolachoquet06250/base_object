@@ -3,6 +3,8 @@
 namespace project\extended\classes;
 
 
+use const project\ROOT_PATH;
+
 class view extends util {
 	private $complete_path = '';
 	private $view_path = ROOT_PATH.'layouts';

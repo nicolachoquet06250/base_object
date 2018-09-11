@@ -6,10 +6,15 @@ use Exception;
 use project\extended\classes\debug;
 use project\extended\classes\util;
 use project\extended\classes\view;
+use project\extended\traits\http;
+use const project\ROOT_PATH;
 
-ini_set('display_errors', 'on');
+if(!is_null(http::http_get('debug'))) {
+	ini_set('display_errors', http::http_get('debug'));
+}
 
 class Project extends util {
+	use http;
 	private static $callback = null;
 
 	/**
@@ -61,9 +66,10 @@ class Project extends util {
 		 */
 		$doc_generator = (new Project())->get_util('DocGenerator', ROOT_PATH);
 		$doc_generator->active_scss_doc()
-					  ->active_php_doc()
+					  ->active_php_doc(false)
 					  ->get_scss_parser(ROOT_PATH.'scss', ROOT_PATH.'scss2')
 					  ->genere_scss_doc()
+					  ->genere_php_doc()
 					  ->compile_scss();
 
 		if(isset($arguments[1]) && gettype($arguments[1]) === 'array') {

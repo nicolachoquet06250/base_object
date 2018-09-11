@@ -3,6 +3,7 @@
 namespace project\utils;
 
 use project\extended\classes\util;
+use const project\ROOT_PATH;
 
 class json extends util {
 	private $json;

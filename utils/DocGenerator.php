@@ -5,6 +5,7 @@ namespace project\utils;
 
 use project\extended\classes\util;
 use project\extended\traits\http;
+use const project\ROOT_PATH;
 
 class DocGenerator extends util {
 	use http;
@@ -14,6 +15,8 @@ class DocGenerator extends util {
 	private $php_doc_enabled = true;
 	private $scss_parser = null;
 	private $php_parser = null;
+	private $doc_dir = 'doc/';
+	private $doc_file = 'index.php';
 
 	public function __construct($root_dir = null) {
 		parent::__construct();
@@ -284,6 +287,91 @@ class DocGenerator extends util {
 		return $html;
 	}
 
+	public static function create_php_page($path, $function_name, $logs_array = []) {
+		if(self::is_string($function_name)) {
+			$function_name = [$function_name];
+			$logs_array = [$logs_array];
+		}
+		$default_function = $function_name[0];
+		$php_header = '<?php
+			
+	namespace project;
+			
+	use project\extended\classes\view;
+	use project\utils\DocGenerator;
+	use project\utils\PhpParser;
+	use project\utils\Project;
+
+	require_once \'../autoload.php\';';
+
+		$php = $php_header;
+
+		foreach ($function_name as $id => $func_name) {
+			$php .= '
+	function '.$func_name.'() {
+		return Project::'.$func_name.'(function ($_this, $metas, $args) {
+			$page_name     = $args[\'page_name\'];
+			$template_name = $args[\'template_name\'];
+			
+			';
+			if(isset($logs_array[$id])) {
+				foreach ($logs_array[$id] as $key => $log) {
+					if (self::is_array($log)) {
+						$php .= '			debug::log([\''.implode("', '", $log).'\'], \''.$key.'\');';
+					} else {
+						$php .= '			debug::log(\''.$log.'\', \''.$key.'\');';
+					}
+				}
+			}
+			$php .= '
+
+			/** @var Project $_this */
+			/** @var DocGenerator $doc_generator */
+			/** @var PhpParser $php_parser */
+			$doc_generator = $_this->get_util(\'DocGenerator\');
+			$php_parser    = $doc_generator->get_php_parser();
+			$php_parser->genere_php_doc_array();
+
+			return view::get(
+				[\'page_name\' => $page_name],
+				[\'template_name\' => $template_name],
+				[\'last_update\' => $_this->get_scss_parser(ROOT_PATH)->get_last_update_file()]
+			);
+		});
+	}
+	';
+		}
+		$php .= '$dir = str_replace(dirname(__DIR__), \'\', __DIR__).\'/\';'."\n";
+		$max = count($function_name);
+		foreach ($function_name as $id => $func_name) {
+			if($id === 0) {
+				$uri = str_replace('Doc', '', $func_name);
+				$uri = strtolower($uri);
+				$php .= '
+	if(Project::http_server(\'REQUEST_URI\') === $dir.\''.$uri.'\') {
+		echo '.$func_name.'();
+	}';
+			}
+			elseif ($id < $max && $id !== 0) {
+				$uri = str_replace('Doc', '', $func_name);
+				$uri = strtolower($uri);
+				$php .= '
+	elseif(Project::http_server(\'REQUEST_URI\') === $dir.\''.$uri.'\') {
+		echo '.$func_name.'();
+	}';
+			}
+		}
+
+		$php .= '
+	else {
+		echo '.$default_function.'();
+	}';
+
+		if (!file_exists($path) || (file_exists($path) && $php !== file_get_contents($path))) {
+			file_put_contents($path, $php);
+		}
+	}
+
 	/**
 	 * @param array ...$root_dirs
 	 * @return DocGenerator
@@ -333,15 +421,37 @@ class DocGenerator extends util {
 					->compile();
 	}
 
+	/**
+	 * @return $this
+	 * @throws \ReflectionException
+	 */
 	public function genere_scss_doc() {
 		if($this->scss_doc_enabled) {
 			/**
 			 * @var ScssParser $scss_parser
+			 * @var PhpParser $php_parser
 			 */
+			$this->get_scss_parser(ROOT_PATH.'scss', ROOT_PATH.'scss2');
 			if ($scss_parser = $this->scss_parser) {
-				$scss_parser->genere_scss_file()->genere_scss_doc_array();
-				$scss_parser->set_php_file('index.php');
-				$scss_parser->genere_doc_file();
+				$scss_parser->genere_scss_file()
+							->genere_scss_doc_array()
+							->set_php_file('index.php');
+				list($path, $html) = $scss_parser->genere_doc_file();
+				if(!$this->php_doc_enabled) {
+					$html = str_replace('[php_nav_menu]', '', $html);
+					$html = str_replace('[php_doc_page]', '', $html);
+					file_put_contents($path, $html);
+					self::create_php_page(ROOT_PATH.$this->doc_dir.$this->doc_file, 'CssDoc');
+				}
+				else {
+					if($php_parser = $this->php_parser
+									 && (strpos('[php_nav_menu]', $html) !== false || strpos('[php_doc_page]', $html) !== false)) {
+						$php_parser->genere_php_doc_array()
+								   ->set_php_file('index.php')
+								   ->genere_doc_file($html);
+					}
+					self::create_php_page(ROOT_PATH.$this->doc_dir.$this->doc_file, ['CssDoc', 'PhpDoc']);
+				}
 			}
 		}
 		return $this;
@@ -355,9 +465,29 @@ class DocGenerator extends util {
 		if($this->php_doc_enabled) {
 			/**
 			 * @var PhpParser $php_parser
+			 * @var ScssParser $scss_parser
 			 */
+			$this->get_php_parser();
 			if ($php_parser = $this->php_parser) {
-				$php_parser->genere_php_doc_array();
+				$php_parser->genere_php_doc_array()
+						   ->set_php_file('index.php');
+				list($path, $html) = $php_parser->genere_doc_file();
+				if(!$this->scss_doc_enabled) {
+					$html = str_replace('[css_nav_menu]', '', $html);
+					$html = str_replace('[css_doc_page]', '', $html);
+					file_put_contents($path, $html);
+					self::create_php_page(ROOT_PATH.$this->doc_dir.$this->php_doc_file, 'PhpDoc');
+				}
+				else {
+					if($scss_parser = $this->scss_parser
+									  && (strpos('[css_nav_menu]', $html) !== false || strpos('[css_doc_page]', $html) !== false)) {
+						$scss_parser->genere_scss_file()
+									->genere_scss_doc_array()
+									->set_php_file('index.php')
+									->genere_doc_file($html);
+					}
+					self::create_php_page(ROOT_PATH.$this->doc_dir.$this->php_doc_file, ['CssDoc', 'PhpDoc']);
+				}
 			}
 		}
 		return $this;
