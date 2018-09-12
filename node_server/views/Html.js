@@ -1,14 +1,10 @@
 "use strict";
+let view = require('../core/view');
 
-module.exports = class Html {
+module.exports = class Html extends view {
     constructor(response, http_code: number) {
-        this.response = response;
-        this.http_code = http_code;
+        super(response, http_code);
         this._message = '';
-    }
-
-    message(message: string) {
-        this._message = message;
     }
 
     display() {

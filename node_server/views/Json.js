@@ -1,14 +1,7 @@
-module.exports = class Json {
-    constructor(response, http_code) {
-        this.response = response;
-        this.http_code = http_code;
-        this._message = [];
-    }
+"use strict";
+let view = require('../core/view');
 
-    message(message) {
-        this._message = message;
-    }
-
+module.exports = class Json extends view {
     display() {
         this.response.writeHead(this.http_code, {'Content-Type': 'application/json'});
         if(typeof this._message !== 'string') {
