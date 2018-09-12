@@ -2,13 +2,15 @@
 let view = require('../core/view');
 
 module.exports = class Html extends view {
-    constructor(response, http_code: number) {
-        super(response, http_code);
+    after_construct() {
         this._message = '';
     }
 
-    display() {
+    http_code_and_type_parameter() {
         this.response.writeHead(this.http_code, {'Content-Type': 'text/html'});
+    }
+
+    display() {
         this.response.write(this._message);
     }
 };

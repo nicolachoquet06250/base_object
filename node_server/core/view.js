@@ -5,6 +5,16 @@ module.exports = class view {
         this.response = response;
         this.http_code = http_code;
         this._message = [];
+        this.http_code_and_type_parameter();
+        this.after_construct();
+    }
+
+    after_construct() {}
+
+    http_code_and_type_parameter() {}
+
+    get_response() {
+        return this.response;
     }
 
     message(message) {
