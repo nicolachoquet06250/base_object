@@ -3,7 +3,7 @@
 module.exports = class Controller1 {
     constructor(response) {
         this.response = response;
-        throw new Error('Voici un message d erreur');
+        // throw new Error('Voici un message d erreur');
     }
 
     model() {}
