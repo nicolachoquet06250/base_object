@@ -54,4 +54,16 @@ trait http {
 	public static function http_request($key = null) {
 		return $key ? $_REQUEST[$key] : null;
 	}
+
+	public static function get_host() {
+		return self::http_server('HTTP_HOST');
+	}
+
+	public static function get_uri() {
+		return self::http_server('REQUEST_URI');
+	}
+
+	public static function get_complete_current_url() {
+		return self::get_host().'/'.self::get_uri();
+	}
 }

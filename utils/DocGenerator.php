@@ -197,7 +197,7 @@ class DocGenerator extends util {
             </div>
             <!-- Small Brand information, appears on minimized sidebar-->
             <div class="sidenav-header-logo">
-                <a href="//'.self::http_server('HTTP_HOST').'/'.self::http_server('REQUEST_URI').'" class="brand-small text-center">
+                <a href="//'.self::get_complete_current_url().'" class="brand-small text-center">
                     <strong class="text-primary">N</strong>
                     <strong class="text-primary">C</strong>
                 </a>
@@ -242,7 +242,7 @@ class DocGenerator extends util {
                         <a id="toggle-btn" href="#" class="menu-btn">
                             <i class="icon-bars"> </i>
                         </a>
-                        <a href="//'.self::http_server('HTTP_HOST').'/'.self::http_server('REQUEST_URI').'" class="navbar-brand">
+                        <a href="//'.self::get_complete_current_url().'" class="navbar-brand">
                             <div class="brand-text d-none d-md-inline-block">
                                 <strong class="text-primary">Documentation</strong>
                             </div>
@@ -419,19 +419,30 @@ class DocGenerator extends util {
 		$scss_parser = $this->scss_parser;
 		$scss_parser->prepare_main_for_sass_compilation()
 					->compile();
+
+		return $this;
 	}
 
 	/**
+	 * @param array $root_dirs
 	 * @return $this
 	 * @throws \ReflectionException
 	 */
-	public function genere_scss_doc() {
+	public function genere_scss_doc(...$root_dirs) {
 		if($this->scss_doc_enabled) {
 			/**
 			 * @var ScssParser $scss_parser
 			 * @var PhpParser $php_parser
 			 */
-			$this->get_scss_parser(ROOT_PATH.'scss', ROOT_PATH.'scss2');
+			if(empty($root_dirs)) {
+				$this->get_scss_parser(ROOT_PATH);
+			}
+			elseif(count($root_dirs) === 1) {
+				$this->get_scss_parser($root_dirs[0]);
+			}
+			else {
+				$this->get_scss_parser(ROOT_PATH.'scss', ROOT_PATH.'scss2');
+			}
 			if ($scss_parser = $this->scss_parser) {
 				$scss_parser->genere_scss_file()
 							->genere_scss_doc_array()

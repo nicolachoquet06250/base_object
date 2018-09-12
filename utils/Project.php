@@ -65,12 +65,9 @@ class Project extends util {
 		 * @var DocGenerator $doc_generator
 		 */
 		$doc_generator = (new Project())->get_util('DocGenerator', ROOT_PATH);
-		$doc_generator->active_scss_doc()
-					  ->active_php_doc(false)
-					  ->get_scss_parser(ROOT_PATH.'scss', ROOT_PATH.'scss2')
-					  ->genere_scss_doc()
-					  ->genere_php_doc()
-					  ->compile_scss();
+		$doc_generator->active_scss_doc()->active_php_doc(false)
+					  ->get_scss_parser(ROOT_PATH.'scss', ROOT_PATH.'scss2')->genere_scss_doc(ROOT_PATH.'scss', ROOT_PATH.'scss2')->compile_scss()
+					  ->genere_php_doc();
 
 		if(isset($arguments[1]) && gettype($arguments[1]) === 'array') {
 			$args = $arguments[1];
