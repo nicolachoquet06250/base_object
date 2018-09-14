@@ -1,10 +1,14 @@
 "use strict";
 
+let constants = require('./constantes');
+let object_base = require(constants.CorePath + '/Object');
+
 module.exports = class view {
     constructor(response, http_code) {
         this.response = response;
         this.http_code = http_code;
         this._message = [];
+        this.object = new object_base('');
         this.http_code_and_type_parameter();
         this.after_construct();
     }

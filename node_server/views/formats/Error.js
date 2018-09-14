@@ -1,9 +1,13 @@
 "use strict";
-let http_server = require('../core/http_server');
-
-let view = require('../core/view');
+let constants = require('../../core/constantes');
+let utils = require(constants.CorePath + '/utils');
+let view = require(constants.CorePath + '/view');
 
 module.exports = class Error extends view {
+    after_construct() {
+        this.object.setClass('Error');
+    }
+
     http_code_and_type_parameter() {
         this.response.writeHead(
             this.http_code, this._type === 'json' ?
@@ -45,6 +49,6 @@ module.exports = class Error extends view {
 
     display() {
         this.response.write(this._type === 'html' ? this.html_error() : this.json_error());
-        http_server.log(this._request, this.response, this._message);
+        utils.http_log(this._request, this.response, this._message);
     }
 };
