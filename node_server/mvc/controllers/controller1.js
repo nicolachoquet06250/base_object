@@ -1,4 +1,6 @@
 "use strict";
+let view = require('../../views/Json');
+let Error = require('../../views/Error');
 
 module.exports = class Controller1 {
     constructor(request, response) {
@@ -10,10 +12,9 @@ module.exports = class Controller1 {
 
     view() {
         this.model();
-        let view = require('../../views/Json');
-        let Error = require('../../views/Error');
+        let error = false;
 
-        let error = true;
+        let view_obj = new view(this.response, 200);
 
         if(error) {
             let Error_obj = new Error(this.response, 500);
@@ -21,17 +22,15 @@ module.exports = class Controller1 {
             Error_obj.message('Erreur de serveur');
             return Error_obj;
         }
-        else {
-            let view_obj = new view(this.response, 200);
-            view_obj.message(
-                [
-                    {
-                        'status': 200,
-                        'message': 'Success'
-                    }
-                ]
-            );
-            return view_obj;
-        }
+
+        view_obj.message(
+            [
+                {
+                    'status': 200,
+                    'message': 'Success'
+                }
+            ]
+        );
+        return view_obj;
     }
 };

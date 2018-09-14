@@ -1,6 +1,7 @@
 "use strict";
 let http_server = require('./core/http_server');
 let http = new http_server();
+let Error = require('./views/Error');
 
 let default_extension = 'json';
 
@@ -10,7 +11,7 @@ http.createServer((request, response, log) => {
         let view = new ctrl(request, response).view();
 
         if(typeof view === "object"
-            && view instanceof require('./views/Error')) {
+            && view instanceof Error) {
             if(request.url.indexOf('.', 0)) {
                 let url = request.url;
                 let extention = url.split('.')[1];
@@ -25,12 +26,14 @@ http.createServer((request, response, log) => {
                 }
             }
         }
+        else {
+            log(request, response, null);
+        }
         view.display();
-        log(request, response, null);
         response.end();
     }
     catch (e) {
-        log(request, response, e.message);
+        log(request, response, e.toString());
         process.exit();
     }
 }, 1337);
