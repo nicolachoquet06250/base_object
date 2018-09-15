@@ -3,7 +3,6 @@ let constants = require('../../core/constantes');
 let view = require(constants.CorePath + '/view');
 let fs = require('fs');
 let utils = require(constants.CorePath + '/utils');
-let object_base = require(constants.CorePath + '/Object');
 
 module.exports = class Template extends view {
     after_construct() {

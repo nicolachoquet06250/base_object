@@ -1,5 +1,4 @@
 "use strict";
-
 let constants = require('./constantes');
 let object_base = require(constants.CorePath + '/Object');
 

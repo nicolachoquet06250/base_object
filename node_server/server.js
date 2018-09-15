@@ -1,6 +1,5 @@
 "use strict";
 let constants = require('./core/constantes');
-let utils = require(constants.CorePath + '/utils');
 let fs = require('fs');
 let http_server = require(constants.CorePath + '/http_server');
 let http = new http_server();
