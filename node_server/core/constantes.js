@@ -25,5 +25,7 @@ module.exports = new class constants {
         this.LogSyntax = '[{date}] {host} [{statusCode}]: {url} {message}';
         this.LogExtension = '.log';
         this.StaticsPath = this.RootPath + '/statics';
+
+        this.ServerHomeMessage = 'Server running on url ' + this.Host + ':' + this.ServerPort;
     }
 };

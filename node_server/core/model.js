@@ -3,16 +3,19 @@ let constants = require('./constantes');
 let object_base = require(constants.CorePath + '/Object');
 
 module.exports = class model {
-    constructor() {
+    constructor(methode, args) {
         this.object = new object_base('');
         this.results = [];
+        this.methode = methode;
+        this.args = args;
         this.after_construct();
     }
 
     after_construct() {}
 
-    execute(methode, args) {
-        eval('this.' + methode + '(args);');
+    execute() {
+        this.results = eval('this.' + this.methode + '();');
+        return this.results;
     }
 
     get_results() {

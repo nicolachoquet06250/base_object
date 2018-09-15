@@ -84,4 +84,34 @@ module.exports = class utils {
     static ucfirst(string) {
         return string.charAt(0).toUpperCase() + string.substring(1).toLowerCase();
     }
+
+    static get_object_methods(path_class) {
+        path_class += '.js';
+
+        let class_content = fs.readFileSync(path_class).toString();
+
+        let regex = /\/\*\*\ \@method\ \*\/\n?[\t|\ ]{0,}([a-zA-Z0-9_\-]+)\(\) {/gi;
+
+        let methodes = [];
+        let matches;
+
+        while ((matches = regex.exec(class_content)) !== null) {
+            if (matches.index === regex.lastIndex) {
+                regex.lastIndex++;
+            }
+
+            methodes[methodes.length] = matches[1];
+        }
+        return methodes;
+    }
+
+    static get_object_vars(obj) {
+        let vars = [];
+        for(let prop in obj) {
+            if(typeof obj[prop] !== 'function') {
+                vars[vars.length] = prop;
+            }
+        }
+        return vars;
+    }
 };

@@ -3,7 +3,6 @@ let constants = require('../../core/constantes');
 let ctrl = require(constants.CorePath + '/controller');
 let Error = require(constants.ViewsFormatPath + '/Error');
 let utils = require(constants.CorePath + '/utils');
-let fs = require('fs');
 
 module.exports = class controller1 extends ctrl {
     view(format) {
@@ -20,6 +19,14 @@ module.exports = class controller1 extends ctrl {
         let obj_for_vars = {
             mon_message: 'voila le text du template'
         };
+
+        this.get_results_size();
+
+        if(this.get_results_size() > 0) {
+            Object.keys(this.model_result).forEach((key) => {
+                obj_for_vars[key] = this.model_result[key];
+            });
+        }
 
         if(format !== 'json') {
             view_obj.Template(
