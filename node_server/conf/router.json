@@ -1,0 +1,11 @@
+{
+  "/": {
+    "controller": "controller1",
+    "method": "method2",
+    "format": "html",
+    "args": {
+      "key": "value",
+      "key2": "value"
+    }
+  }
+}

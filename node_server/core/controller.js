@@ -3,6 +3,7 @@ let constants = require('./constantes');
 let utils = require(constants.CorePath + '/utils');
 let object_base = require(constants.CorePath + '/Object');
 let fs = require('fs');
+let args_class = require(constants.CorePath + '/args');
 
 module.exports = class controller {
     constructor(request, response) {
@@ -16,27 +17,29 @@ module.exports = class controller {
 
     after_construct() {}
 
+    static method_is_in(method_name, methods, ext) {
+        for(let i=0, max=methods.length; i<max; i++) {
+            if(methods[i] === method_name + '_' + ext) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     model(methode, args, ext) {
         this.args = args;
         this.format_args();
         if(fs.existsSync(constants.MvcModelsPath + '/' + this.object.getClass() + '.js')) {
             let model = require(constants.MvcModelsPath + '/' + this.object.getClass());
-            let model_obj = new model(methode, this.args);
 
-            let method_is_in_array = false;
+            let args_obj = new args_class(this.args);
+            let model_obj = new model(methode, args_obj);
             let methodes = utils.get_object_methods(constants.MvcModelsPath + '/' + this.object.getClass());
 
-            for(let i=0, max=methodes.length; i<max; i++) {
-                if(methodes[i] === methode) {
-                    method_is_in_array = true;
-                    break;
-                }
-            }
-
-            if(method_is_in_array) {
+            if(controller.method_is_in(methode, methodes, ext)) {
                 model_obj.object.setClass(this.object.getClass());
                 if (model_obj.object.getClass() === this.object.getClass()) {
-                    this.model_result = model_obj.execute();
+                    this.model_result = model_obj.execute(ext);
                 }
             }
             else {
@@ -44,7 +47,7 @@ module.exports = class controller {
                 let Error_obj = new Error(this.response, 404);
                 Error_obj.request(this.request);
                 Error_obj.type(ext);
-                Error_obj.message('method ' + this.object.getClass() + '::' + methode + '() not found !');
+                Error_obj.message('method ' + this.object.getClass() + '::' + methode + '() for `' + ext + '` format not found !');
                 return Error_obj;
             }
         }
@@ -53,12 +56,7 @@ module.exports = class controller {
     view(format) {}
 
     format_args() {
-        let args = [];
-        this.args.forEach((obj, key) => {
-            let expression = obj;
-            args[expression.split('=')[0]] = expression.split('=')[1];
-        });
-        this.args = args;
+        this.args = utils.format_args(this.args);
     }
 
     count_args() {

@@ -13,8 +13,8 @@ module.exports = class model {
 
     after_construct() {}
 
-    execute() {
-        this.results = eval('this.' + this.methode + '();');
+    execute(format) {
+        this.results = eval('this.' + this.methode + '_' + format + '();');
         return this.results;
     }
 

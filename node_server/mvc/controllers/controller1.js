@@ -27,6 +27,7 @@ module.exports = class controller1 extends ctrl {
                 obj_for_vars[key] = this.model_result[key];
             });
         }
+        obj_for_vars['host'] = constants.Host + ':' + constants.ServerPort;
 
         if(format !== 'json') {
             view_obj.Template(

@@ -114,4 +114,21 @@ module.exports = class utils {
         }
         return vars;
     }
+
+    static in(key_word, array) {
+        for(let i=0, max=array.length; i<max; i++ ) {
+            if(array[i] === key_word) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static format_args(args) {
+        let new_args = [];
+        args.forEach(obj => {
+            new_args[obj.split('=')[0]] = obj.split('=')[1];
+        });
+        return new_args;
+    }
 };
