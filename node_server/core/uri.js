@@ -1,6 +1,5 @@
 "use strict";
 let constants = require('./constantes');
-let utils = require(constants.CorePath + '/utils');
 
 module.exports = class uri {
     constructor(url) {
@@ -17,7 +16,7 @@ module.exports = class uri {
         let url_parsed = this.url.split('/');
         let args = [];
 
-        url_parsed.forEach((obj, key) => {
+        url_parsed.forEach(obj => {
             if(obj.indexOf('=') !== -1) {
                 let arg = obj.split('=');
                 args[args.length] = arg.join('=');

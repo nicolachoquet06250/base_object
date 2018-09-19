@@ -26,16 +26,16 @@ module.exports = class controller {
         return false;
     }
 
-    model(methode, args, ext) {
+    model(method, args, ext) {
         if(this.args[0] !== undefined) this.args = utils.format_args(args);
         if(fs.existsSync(constants.MvcModelsPath + '/' + this.object.getClass() + '.js')) {
             let model = require(constants.MvcModelsPath + '/' + this.object.getClass());
 
             let args_obj = new args_class(args);
-            let model_obj = new model(methode, args_obj);
-            let methodes = utils.get_object_methods(constants.MvcModelsPath + '/' + this.object.getClass());
+            let model_obj = new model(method, args_obj);
+            let methods = utils.get_object_methods(constants.MvcModelsPath + '/' + this.object.getClass());
 
-            if(controller.method_is_in(methode, methodes, ext)) {
+            if(controller.method_is_in(method, methods, ext)) {
                 model_obj.object.setClass(this.object.getClass());
                 if (model_obj.object.getClass() === this.object.getClass()) {
                     this.model_result = model_obj.execute(ext);
@@ -46,17 +46,13 @@ module.exports = class controller {
                 let Error_obj = new Error(this.response, 404);
                 Error_obj.request(this.request);
                 Error_obj.type(ext);
-                Error_obj.message('method ' + this.object.getClass() + '::' + methode + '() for `' + ext + '` format not found !');
+                Error_obj.message(constants.MethodNotFoundMessage(this.object.getClass(), method, ext));
                 return Error_obj;
             }
         }
     }
 
     view(format) {}
-
-    count_args() {
-        return Object.keys(this.args).length;
-    }
 
     get_results_size() {
         let nb = 0;

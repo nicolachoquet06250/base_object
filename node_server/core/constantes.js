@@ -51,6 +51,18 @@ module.exports = new class constants {
     }
 
     ControllerNotFoundMessage(controller) {
-        return 'controller ' + controller + ' not found !';
+        return `controller ${controller} not found !`;
+    }
+
+    MethodNotFoundMessage(model, method, ext) {
+        return `method ${model}::${method}() for \`${ext}\` format not found !`;
+    }
+
+    FileNotFoundMessage(file) {
+        return `\`${file}\` file not found !`;
+    }
+
+    SassCompilationCommand(file, get = false) {
+        return get ? `cat ${this.ScssDestination}/compile_${file}.css` : `node-sass --output-style uncompressed ${this.ScssSources}/uncompile_${file}.scss > ${this.ScssDestination}/compile_${file}.css`;
     }
 };

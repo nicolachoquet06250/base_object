@@ -37,8 +37,8 @@ http.createServer((request, response, log) => {
                     });
                     fs.writeFile(`${constants.ScssSources}/uncompile_${args.get('a')}.scss`, concat);
                     let cmd = 'node-sass --output-style uncompressed ' + constants.ScssSources + '/uncompile_' + args.get('a') + '.scss > ' + constants.ScssDestination + '/compile_' + args.get('a') + '.css';
-                    exec(cmd, () => {
-                        exec('cat ./statics/css/compile_toto.css', (err, out) => {
+                    exec(constants.SassCompilationCommand(args.get('a')), () => {
+                        exec(constants.SassCompilationCommand(args.get('a'), true), (err, out) => {
                             if (out !== '') {
                                 response.write(out);
                                 response.end();
@@ -120,7 +120,7 @@ http.createServer((request, response, log) => {
                     let Error_obj = new Error(response, 404);
                     Error_obj.request(request);
                     Error_obj.type('html');
-                    Error_obj.message('`' + url + '` file not found !');
+                    Error_obj.message(constants.FileNotFoundMessage(file));
                     Error_obj.display(request);
                 }
             }

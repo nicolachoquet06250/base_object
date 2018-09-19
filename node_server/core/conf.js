@@ -1,6 +1,5 @@
 "use strict";
 let constants = require('./constantes');
-let utils = require(constants.CorePath + '/utils');
 let fs = require('fs');
 
 class conf {
