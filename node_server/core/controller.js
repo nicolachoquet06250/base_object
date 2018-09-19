@@ -31,7 +31,7 @@ module.exports = class controller {
         if(fs.existsSync(constants.MvcModelsPath + '/' + this.object.getClass() + '.js')) {
             let model = require(constants.MvcModelsPath + '/' + this.object.getClass());
 
-            let args_obj = new args_class(this.args);
+            let args_obj = new args_class(args);
             let model_obj = new model(methode, args_obj);
             let methodes = utils.get_object_methods(constants.MvcModelsPath + '/' + this.object.getClass());
 
