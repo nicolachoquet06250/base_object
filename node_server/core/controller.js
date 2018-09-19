@@ -27,8 +27,7 @@ module.exports = class controller {
     }
 
     model(methode, args, ext) {
-        this.args = args;
-        this.format_args();
+        if(this.args[0] !== undefined) this.args = utils.format_args(args);
         if(fs.existsSync(constants.MvcModelsPath + '/' + this.object.getClass() + '.js')) {
             let model = require(constants.MvcModelsPath + '/' + this.object.getClass());
 
@@ -54,10 +53,6 @@ module.exports = class controller {
     }
 
     view(format) {}
-
-    format_args() {
-        this.args = utils.format_args(this.args);
-    }
 
     count_args() {
         return Object.keys(this.args).length;

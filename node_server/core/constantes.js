@@ -46,5 +46,11 @@ module.exports = new class constants {
         // Formats supported Constants
         this.formats= JSON.parse(fs.readFileSync(`${this.ConfsPath}/formats.json`));
         this.DefaultFormat= this.formats[1];
+
+        this.console = console;
+    }
+
+    ControllerNotFoundMessage(controller) {
+        return 'controller ' + controller + ' not found !';
     }
 };
