@@ -10,6 +10,7 @@ class conf {
         this.router = JSON.parse(fs.readFileSync(constants.ConfsPath + '/router.json').toString());
         this.sql = JSON.parse(fs.readFileSync(constants.ConfsPath + '/sql_conf.json').toString());
         this.static_dirs = JSON.parse(fs.readFileSync(constants.ConfsPath + '/static_dirs.json').toString());
+        this.access_rights = JSON.parse(fs.readFileSync(constants.ConfsPath + '/access_rights.json').toString());
     }
 
     get_formats() {
@@ -30,6 +31,14 @@ class conf {
 
     get_statics_dirs() {
         return this.static_dirs;
+    }
+
+    get_access_rights() {
+        return this.access_rights;
+    }
+
+    get_access_right(right_name) {
+        return this.access_rights[right_name] !== undefined ? this.access_rights[right_name] : null;
     }
 }
 
