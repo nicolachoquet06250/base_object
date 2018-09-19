@@ -32,7 +32,7 @@ module.exports = class controller {
             let model = require(constants.MvcModelsPath + '/' + this.object.getClass());
 
             let args_obj = new args_class(args);
-            let model_obj = new model(method, args_obj);
+            let model_obj = new model(this.response, this.request, method, args_obj);
             let methods = utils.get_object_methods(constants.MvcModelsPath + '/' + this.object.getClass());
 
             if(controller.method_is_in(method, methods, ext)) {

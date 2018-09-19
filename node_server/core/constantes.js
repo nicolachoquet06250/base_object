@@ -1,4 +1,5 @@
 "use strict";
+let confs = require('./conf');
 let fs = require("fs");
 
 module.exports = new class constants {
@@ -10,17 +11,17 @@ module.exports = new class constants {
         this.ServerPort= 1337;
 
         // Path Constants
-        this.RootPath= fs.realpathSync(__dirname + '/..');
+        this.RootPath= fs.realpathSync(`${__dirname}/..`);
         this.CorePath = `${this.RootPath}/core`;
-        this.ViewsPath = this.RootPath + '/views';
-        this.ViewsFormatPath = this.ViewsPath + '/formats';
-        this.ViewsLayoutsPath = this.ViewsPath + '/layouts';
-        this.MvcPath = this.RootPath + '/mvc';
-        this.MvcControllersPath = this.MvcPath + '/controllers';
-        this.MvcModelsPath = this.MvcPath + '/models';
+        this.ViewsPath = `${this.RootPath}/views`;
+        this.ViewsFormatPath = `${this.ViewsPath}/formats`;
+        this.ViewsLayoutsPath = `${this.ViewsPath}/layouts`;
+        this.MvcPath = `${this.RootPath}/mvc`;
+        this.MvcControllersPath = `${this.MvcPath}/controllers`;
+        this.MvcModelsPath = `${this.MvcPath}/models`;
 
         // Logs Constants
-        this.LogsPath = this.RootPath + '/logs';
+        this.LogsPath = `${this.RootPath}/logs`;
         this.LogFileName = this.TodayDate.replace(/\ /g, '');
         this.LogSyntax = '[{date}] {host} [{statusCode}]: {url} {message}';
         this.LogExtension = '.log';
@@ -34,18 +35,27 @@ module.exports = new class constants {
         // Statics Files Constants
         this.StaticsPath = `${this.RootPath}/statics`;
         this.StaticsControllers = ['css', 'img', 'js'];
-        this.StaticsMimeTypes = JSON.parse(fs.readFileSync(`${this.ConfsPath}/static_dirs.json`));
+        this.StaticsMimeTypes = confs.get_statics_dirs();
 
         // Scss Constants
         this.ScssSources = `${this.StaticsPath}/scss`;
         this.ScssDestination = `${this.StaticsPath}/css`;
+        this.ScssCompileSuffix = 'compile_';
+        this.ScssUncompileSuffix = 'uncompile_';
+
+        // Js Constants
+        this.JsSources = `${this.StaticsPath}/js`;
+
+        this.filesExtensions = confs.get_files_extensions();
 
         // Messages Constants
         this.ServerHomeMessage = `Server running on url ${this.Host}:${this.ServerPort}`;
 
         // Formats supported Constants
-        this.formats= JSON.parse(fs.readFileSync(`${this.ConfsPath}/formats.json`));
+        this.formats= confs.get_formats();
         this.DefaultFormat= this.formats[1];
+
+        this.HttpMethods = confs.get_http_methods();
 
         this.console = console;
     }
@@ -63,6 +73,6 @@ module.exports = new class constants {
     }
 
     SassCompilationCommand(file, get = false) {
-        return get ? `cat ${this.ScssDestination}/compile_${file}.css` : `node-sass --output-style uncompressed ${this.ScssSources}/uncompile_${file}.scss > ${this.ScssDestination}/compile_${file}.css`;
+        return get ? `cat ${this.ScssDestination}/compile_${file}.css` : `node-sass --output-style uncompressed ${this.ScssSources}/uncompile_${file}.scss > ${this.ScssDestination}/compile_${file}.css;rm ${this.ScssSources}/uncompile_${file}.scss`;
     }
 };

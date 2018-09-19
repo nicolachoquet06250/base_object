@@ -3,8 +3,10 @@ let constants = require('./constantes');
 let object_base = require(constants.CorePath + '/Object');
 
 module.exports = class model {
-    constructor(methode, args) {
+    constructor(response, request, methode, args) {
         this.object = new object_base('');
+        this.response = response;
+        this.request = request;
         this.results = [];
         this.methode = methode;
         this.args = args;

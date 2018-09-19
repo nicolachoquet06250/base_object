@@ -7,5 +7,15 @@
       "key": "value",
       "key2": "value"
     }
+  },
+
+  "/toto/nicolas/choquet/test/ma_femme": {
+    "controller": "controller1",
+    "method": "method2",
+    "format": "json",
+    "args": {
+      "key": "value",
+      "key2": "value"
+    }
   }
 }
