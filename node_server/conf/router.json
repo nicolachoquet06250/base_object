@@ -17,5 +17,15 @@
       "key": "value",
       "key2": "value"
     }
+  },
+
+  "/{id}/{name}": {
+    "controller": "controller1",
+    "method": "method2",
+    "format": "html",
+    "args": {
+      "id": "$id",
+      "name": "$name"
+    }
   }
 }

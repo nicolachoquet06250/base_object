@@ -1,5 +1,6 @@
 "use strict";
 let constants = require(require('../../constantsPath'));
+let utils = require(constants.CoreUtilsPath + '/utils');
 
 module.exports = class uri {
     constructor(url, request, METHOD) {
@@ -69,11 +70,73 @@ module.exports = class uri {
             });
         }
         else {
+            let routes = this.router.get_routes();
+            let selected_route = false;
+            let m;
+            let m1;
+            Object.keys(routes).forEach(key => {
+                if(m = key.match(/\{([a-zA-Z0-9\_]+)\}/g)) {
+                    let url_match = key;
+                    m.forEach(obj => {
+                        url_match = url_match.replace(obj, '([a-zA-Z0-9\\_]+)');
+                    });
+                    if(m1 = url_probably_route.match(url_match)) {
+                        let m_tmp = [];
+                        delete m1[0];
+                        delete m1['input'];
+                        delete m1['index'];
+                        m1.forEach(obj => {
+                            if(obj !== '') {
+                                m_tmp[m_tmp.length] = obj;
+                            }
+                        });
+                        m1 = m_tmp;
+                    }
+
+                    let probably_url = url_probably_route;
+                    m1.forEach((obj, key) => {
+                        probably_url = probably_url.replace('/' + obj, '/' + m[key]);
+                    });
+
+                    if(this.router.has_route(probably_url)) {
+                        selected_route = {
+                            match: m,
+                            match1: m1,
+                            url: probably_url
+                        };
+                    }
+                }
+            });
             this.controller = url_probably_route.split('/')[1];
             let method = url_probably_route.split('/')[2];
             let _method = method.split('.');
             this.format = _method.length > 1 ? _method[1] : constants.DefaultFormat;
             this.method = _method.length > 1 ? _method[0] : method;
+
+            let files_extensions = constants.filesExtensions;
+            if(selected_route && this.controller !== 'static' && !utils.in(this.method, Object.keys(files_extensions))) {
+                let _args = {};
+                selected_route.match.forEach((obj, key) => {
+                    _args[obj.replace('{', '').replace('}', '')] = selected_route.match1[key];
+                });
+                let route = this.router.get_route(selected_route.url);
+                this.controller = route['controller'];
+                this.method = route['method'];
+                this.format = route['format'];
+                let args = route['args'];
+                if (route['http_method'] !== undefined) {
+                    this.httpMethod = route['http_method'];
+                }
+                Object.keys(args).forEach(key => {
+                    this.args[key] = args[key];
+                });
+
+                Object.keys(this.args).forEach(key => {
+                    if(_args[key] !== undefined) {
+                        this.args[key] = _args[key];
+                    }
+                });
+            }
         }
     }
 
