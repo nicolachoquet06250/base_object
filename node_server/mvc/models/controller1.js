@@ -11,7 +11,6 @@ module.exports = class controller1 extends model {
 
     /** @method */
     method2_json() {
-        console.log(this.args.get('fields'));
         this.args.set('test', 'Je suis dans la méthode `method2` du model `controller1` !');
         return this.args.get_all();
     }

@@ -80,4 +80,8 @@ module.exports = new class constants {
     SassCompilationCommand(file, get = false) {
         return get ? `cat ${this.ScssDestination}/compile_${file}.css` : `node-sass --output-style uncompressed ${this.ScssSources}/uncompile_${file}.scss > ${this.ScssDestination}/compile_${file}.css;rm ${this.ScssSources}/uncompile_${file}.scss`;
     }
+
+    HttpMethodNotManaged(method) {
+        return `http method \`${method}\` not managed !`;
+    }
 };

@@ -10,10 +10,6 @@ let uri = require(constants.CoreParsersPath + '/uri');
 let confs = require(constants.CoreConfPath + '/conf');
 let qs = require("querystring");
 let formidable = require('formidable');
-
-// let _util = require('util');
-// let path = require("path");
-
 const {exec} = require('child_process');
 
 http.createServer((request, response, log) => {
@@ -177,6 +173,14 @@ http.createServer((request, response, log) => {
                 }
             }
         });
+    }
+    else {
+        let Error_obj = new Error(response, 500);
+        Error_obj.request(request);
+        Error_obj.type('html');
+        Error_obj.message(constants.HttpMethodNotManaged(request.method));
+        Error_obj.display(request);
+        response.end();
     }
 }, constants.ServerPort);
 

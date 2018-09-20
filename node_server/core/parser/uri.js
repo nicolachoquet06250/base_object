@@ -12,6 +12,26 @@ module.exports = class uri {
         this.httpMethod = 'GET';
         this.args = [];
         this.METHOD = METHOD;
+        if(this.request.method === 'GET') {
+            let args_get = this.url.split('?');
+            if(args_get.length > 1) {
+                this.url = args_get[0];
+                args_get = args_get[1];
+                args_get = args_get.split('&');
+            }
+            else {
+                args_get = [];
+            }
+            args_get.forEach((obj, key) => {
+                if(obj !== '') {
+                    let arg = obj.split('=');
+                    if(this.args[this.request.method] === undefined) {
+                        this.args[this.request.method] = {};
+                    }
+                    this.args[this.request.method][arg[0]] = arg[1];
+                }
+            });
+        }
         this.parse();
     }
 

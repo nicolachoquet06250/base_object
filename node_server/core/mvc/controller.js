@@ -10,7 +10,7 @@ module.exports = class controller {
         this.response = response;
         this.request = request;
         this.object = new object_base('');
-        this.args = '';
+        this.args = [];
         this.model_result = [];
         this.after_construct();
     }
@@ -28,12 +28,17 @@ module.exports = class controller {
 
     model(method, args, fields, files, ext) {
         if(this.args[0] !== undefined) this.args = utils.format_args(args);
-        if(fs.existsSync(constants.MvcModelsPath + '/' + this.object.getClass() + '.js')) {
+        if(fs.existsSync(constants.MvcModelsPath + '/' + this.object.getClass() + constants.filesExtensions['js'])) {
             let model = require(constants.MvcModelsPath + '/' + this.object.getClass());
 
             let args_obj = new args_class(args);
-            args_obj.set(this.request.method, fields);
-            args_obj.set('files', files);
+            if(this.request.method !== 'GET') {
+                args_obj.set(this.request.method, fields);
+            }
+            if(files.length > 0) {
+                args_obj.set('files', files);
+            }
+            this.args = args_obj;
             let model_obj = new model(this.response, this.request, method, args_obj);
             let methods = utils.get_object_methods(constants.MvcModelsPath + '/' + this.object.getClass());
 
