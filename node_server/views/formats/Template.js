@@ -1,8 +1,8 @@
 "use strict";
-let constants = require('../../core/constantes');
-let view = require(constants.CorePath + '/view');
+let constants = require(require('../../constantsPath'));
+let view = require(constants.CoreMvcPath + '/view');
 let fs = require('fs');
-let utils = require(constants.CorePath + '/utils');
+let utils = require(constants.CoreUtilsPath + '/utils');
 
 module.exports = class Template extends view {
     after_construct() {

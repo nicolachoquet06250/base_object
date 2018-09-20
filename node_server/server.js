@@ -1,16 +1,16 @@
 "use strict";
-let constants = require('./core/constantes');
-let utils = require(constants.CorePath + '/utils');
-let args_class = require(constants.CorePath + '/args');
+let constants = require(require('./constantsPath'));
+let utils = require(constants.CoreUtilsPath + '/utils');
+let args_class = require(constants.CoreParsersPath + '/args');
 let fs = require('fs');
-let http_server = require(constants.CorePath + '/http_server');
+let http_server = require(constants.CoreHttpPath + '/http_server');
 let http = new http_server();
 let Error = require(constants.ViewsFormatPath + '/Error');
-let uri = require(constants.CorePath + '/uri');
-let confs = require(constants.CorePath + '/conf');
+let uri = require(constants.CoreParsersPath + '/uri');
+let confs = require(constants.CoreConfPath + '/conf');
 let qs = require("querystring");
+let formidable = require('formidable');
 
-// let formidable = require('formidable');
 // let _util = require('util');
 // let path = require("path");
 
@@ -19,16 +19,20 @@ const {exec} = require('child_process');
 http.createServer((request, response, log) => {
     if(utils.in(request.method, constants.HttpMethods)) {
         let body='';
+        let _files = {};
+        let _fields = {};
+
         request.on('data', data => {
             body += data;
         });
 
-        request.on('end',() => {
+        let form = new formidable.IncomingForm();
+        form.parse(request, function (err, fields, files) {
+            _fields = fields;
+            _files = files;
+        });
 
-            // let form = new formidable.IncomingForm();
-            // form.parse(request, (err, fields, files) => {
-            //     console.log(files);
-            // });
+        request.on('end',() => {
 
             let url = request.url;
 
@@ -150,7 +154,7 @@ http.createServer((request, response, log) => {
                     let ctrl = require(`${constants.MvcControllersPath}/${controller}`);
                     let ctrl_obj = new ctrl(request, response);
                     ctrl_obj.object.setClass(controller);
-                    let model = ctrl_obj.model(method, args, format);
+                    let model = ctrl_obj.model(method, args, _fields, _files, format);
                     if (typeof model === 'object' && model instanceof Error) {
                         model.display(request);
                     } else {

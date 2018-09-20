@@ -1,7 +1,7 @@
 "use strict";
-let constants = require('../../core/constantes');
-let utils = require(constants.CorePath + '/utils');
-let view = require(constants.CorePath + '/view');
+let constants = require(require('../../constantsPath'));
+let utils = require(constants.CoreUtilsPath + '/utils');
+let view = require(constants.CoreMvcPath + '/view');
 
 module.exports = class Error extends view {
     after_construct() {

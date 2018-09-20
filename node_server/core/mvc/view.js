@@ -1,6 +1,6 @@
 "use strict";
-let constants = require('./constantes');
-let object_base = require(constants.CorePath + '/Object');
+let constants = require(require('../../constantsPath'));
+let object_base = require(constants.CoreUtilsPath + '/Object');
 
 module.exports = class view {
     constructor(response, http_code) {

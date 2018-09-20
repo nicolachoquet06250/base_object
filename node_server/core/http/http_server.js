@@ -1,7 +1,7 @@
 "use strict";
-let constants = require('./constantes');
+let constants = require(require('../../constantsPath'));
 let http = require('http');
-let utils = require(constants.CorePath + '/utils');
+let utils = require(constants.CoreUtilsPath + '/utils');
 
 class http_server {
     createServer(callback, port) {

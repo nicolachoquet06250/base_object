@@ -1,5 +1,5 @@
 "use strict";
-let confs = require('./conf');
+let confs = require('../conf/conf');
 let fs = require("fs");
 
 module.exports = new class constants {
@@ -11,8 +11,13 @@ module.exports = new class constants {
         this.ServerPort= 1337;
 
         // Path Constants
-        this.RootPath= fs.realpathSync(`${__dirname}/..`);
+        this.RootPath = fs.realpathSync(`${__dirname}/../..`);
         this.CorePath = `${this.RootPath}/core`;
+        this.CoreConfPath = `${this.CorePath}/conf`;
+        this.CoreHttpPath = `${this.CorePath}/http`;
+        this.CoreMvcPath = `${this.CorePath}/mvc`;
+        this.CoreParsersPath = `${this.CorePath}/parser`;
+        this.CoreUtilsPath = `${this.CorePath}/utils`;
         this.ViewsPath = `${this.RootPath}/views`;
         this.ViewsFormatPath = `${this.ViewsPath}/formats`;
         this.ViewsLayoutsPath = `${this.ViewsPath}/layouts`;

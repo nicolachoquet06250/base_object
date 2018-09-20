@@ -1,9 +1,9 @@
 "use strict";
-let constants = require('./constantes');
-let utils = require(constants.CorePath + '/utils');
-let object_base = require(constants.CorePath + '/Object');
+let constants = require(require('../../constantsPath'));
+let utils = require(constants.CoreUtilsPath + '/utils');
+let object_base = require(constants.CoreUtilsPath + '/Object');
 let fs = require('fs');
-let args_class = require(constants.CorePath + '/args');
+let args_class = require(constants.CoreParsersPath + '/args');
 
 module.exports = class controller {
     constructor(request, response) {
@@ -26,12 +26,14 @@ module.exports = class controller {
         return false;
     }
 
-    model(method, args, ext) {
+    model(method, args, fields, files, ext) {
         if(this.args[0] !== undefined) this.args = utils.format_args(args);
         if(fs.existsSync(constants.MvcModelsPath + '/' + this.object.getClass() + '.js')) {
             let model = require(constants.MvcModelsPath + '/' + this.object.getClass());
 
             let args_obj = new args_class(args);
+            args_obj.set(this.request.method, fields);
+            args_obj.set('files', files);
             let model_obj = new model(this.response, this.request, method, args_obj);
             let methods = utils.get_object_methods(constants.MvcModelsPath + '/' + this.object.getClass());
 

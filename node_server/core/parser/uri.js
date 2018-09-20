@@ -1,11 +1,11 @@
 "use strict";
-let constants = require('./constantes');
+let constants = require(require('../../constantsPath'));
 
 module.exports = class uri {
     constructor(url, request, METHOD) {
         this.url = url;
         this.request = request;
-        this.router = require(constants.CorePath + '/router');
+        this.router = require(constants.CoreParsersPath + '/router');
         this.controller = '';
         this.method = '';
         this.format = '';
@@ -71,5 +71,9 @@ module.exports = class uri {
 
     get_format() {
         return this.format;
+    }
+
+    get_http_method() {
+        return this.httpMethod;
     }
 };

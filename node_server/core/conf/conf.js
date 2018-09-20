@@ -1,5 +1,5 @@
 "use strict";
-let constants = require('./constantes');
+let constants = require(require('../../constantsPath'));
 let fs = require('fs');
 
 class conf {

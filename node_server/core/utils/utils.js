@@ -1,5 +1,5 @@
 "use strict";
-let constants = require('../core/constantes');
+let constants = require(require('../../constantsPath'));
 let fs = require('fs');
 let cli_color = require("cli-color");
 

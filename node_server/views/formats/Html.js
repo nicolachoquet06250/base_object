@@ -1,6 +1,6 @@
 "use strict";
-let constants = require('../../core/constantes');
-let view = require(constants.CorePath + '/view');
+let constants = require(require('../../constantsPath'));
+let view = require(constants.CoreMvcPath + '/view');
 let Template = require(constants.ViewsFormatPath + '/Template');
 
 module.exports = class Html extends view {

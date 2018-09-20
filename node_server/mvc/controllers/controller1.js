@@ -1,8 +1,8 @@
 "use strict";
-let constants = require('../../core/constantes');
-let ctrl = require(constants.CorePath + '/controller');
+let constants = require(require('../../constantsPath'));
+let ctrl = require(constants.CoreMvcPath + '/controller');
 let Error = require(constants.ViewsFormatPath + '/Error');
-let utils = require(constants.CorePath + '/utils');
+let utils = require(constants.CoreUtilsPath + '/utils');
 
 module.exports = class controller1 extends ctrl {
     view(format) {
