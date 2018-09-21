@@ -29,15 +29,21 @@ http.createServer((request, response, log) => {
         });
 
         request.on('end',() => {
-
             let url = request.url;
 
             let uri_obj = new uri(url, request, qs.parse(body));
             let controller = uri_obj.get_controller();
             let method = uri_obj.get_method();
             let format = uri_obj.get_format();
+            let redirect = uri_obj.get_redirect();
             let args = uri_obj.get_args();
 
+            if(redirect !== null && redirect !== undefined) {
+                utils.http_log(request, response, `Redirection ${redirect.code} vers ${constants.Host}:${constants.ServerPort}${redirect.url}`);
+                response.writeHead(redirect.code, {Location: `${constants.Host}:${constants.ServerPort+redirect.url}`});
+                response.end();
+                return;
+            }
             if(controller === 'static') {
                 args = new args_class(args);
                 let file = args.get('f');

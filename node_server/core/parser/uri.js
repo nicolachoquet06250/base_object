@@ -23,15 +23,25 @@ module.exports = class uri {
             else {
                 args_get = [];
             }
-            args_get.forEach((obj, key) => {
+            args_get.forEach(obj => {
                 if(obj !== '') {
                     let arg = obj.split('=');
                     if(this.args[this.request.method] === undefined) {
                         this.args[this.request.method] = {};
                     }
-                    this.args[this.request.method][arg[0]] = arg[1];
+                    this.args[this.request.method][arg[0]] = decodeURI(arg[1]);
                 }
             });
+
+            let _url = this.url.split('/');
+            _url.forEach((obj, key) => {
+                if(obj !== '' && obj.indexOf('=') !== -1) {
+                    let arg = obj.split('=');
+                    this.args[arg[0]] = decodeURI(arg[1]);
+                    delete _url[key];
+                }
+            });
+            this.url = _url.join('/').substr(0, _url.join('/').length-1);
         }
         this.parse();
     }
@@ -43,12 +53,12 @@ module.exports = class uri {
         url_parsed.forEach(obj => {
             if(obj.indexOf('=') !== -1) {
                 let arg = obj.split('=');
-                args[args.length] = arg.join('=');
-                this.args[arg[0]] = arg[1];
+                args[args.length] = decodeURI(arg.join('='));
+                this.args[arg[0]] = decodeURI(arg[1]);
             }
         });
         Object.keys(this.METHOD).forEach(key => {
-            args[key] = this.METHOD[key];
+            args[key] = decodeURI(this.METHOD[key]);
         });
 
         let url_probably_route = url_parsed.join('/').replace('/' + args.join('/'), '');
@@ -58,16 +68,27 @@ module.exports = class uri {
 
         if(this.router.has_route(url_probably_route)) {
             let route = this.router.get_route(url_probably_route);
-            this.controller = route['controller'];
-            this.method = route['method'];
-            this.format = route['format'];
-            let args = route['args'];
-            if(route['http_method'] !== undefined) {
-                this.httpMethod = route['http_method'];
+            if(route['redirect'] !== undefined) {
+                this.redirect = route['redirect'];
+                this.controller = null;
+                this.method = null;
+                this.format = null;
+                this.args = null;
+                this.httpMethod = null;
             }
-            Object.keys(args).forEach((key) => {
-                this.args[key] = args[key];
-            });
+            else {
+                this.redirect = null;
+                this.controller = route['controller'];
+                this.method = route['method'];
+                this.format = route['format'];
+                let args = route['args'];
+                if (route['http_method'] !== undefined) {
+                    this.httpMethod = route['http_method'];
+                }
+                Object.keys(args).forEach((key) => {
+                    this.args[key] = decodeURI(args[key]);
+                });
+            }
         }
         else {
             let routes = this.router.get_routes();
@@ -107,6 +128,7 @@ module.exports = class uri {
                     }
                 }
             });
+
             this.controller = url_probably_route.split('/')[1];
             let method = url_probably_route.split('/')[2];
             let _method = method.split('.');
@@ -128,17 +150,18 @@ module.exports = class uri {
                 this.controller = route['controller'];
                 this.method = route['method'];
                 this.format = route['format'];
+                this.redirect = route['redirect'] !== undefined ? route['redirect'] : null;
                 let args = route['args'];
                 if (route['http_method'] !== undefined) {
                     this.httpMethod = route['http_method'];
                 }
                 Object.keys(args).forEach(key => {
-                    this.args[key] = args[key];
+                    this.args[key] = decodeURI(args[key]);
                 });
 
                 Object.keys(this.args).forEach(key => {
                     if(_args[key] !== undefined) {
-                        this.args[key] = _args[key];
+                        this.args[key] = typeof _args[key] === 'string' ? decodeURI(_args[key]) : _args[key];
                     }
                 });
             }
@@ -159,6 +182,10 @@ module.exports = class uri {
 
     get_format() {
         return this.format;
+    }
+
+    get_redirect() {
+        return this.redirect;
     }
 
     get_http_method() {
