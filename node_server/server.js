@@ -35,6 +35,7 @@ http.createServer((request, response, log) => {
             let controller = uri_obj.get_controller();
             let method = uri_obj.get_method();
             let format = uri_obj.get_format();
+            let http_method_used = uri_obj.get_http_method();
             let redirect = uri_obj.get_redirect();
             let args = uri_obj.get_args();
 
@@ -152,30 +153,40 @@ http.createServer((request, response, log) => {
                 }
             }
             else {
-                if (fs.existsSync(`${constants.MvcControllersPath}/${controller}${constants.filesExtensions['js']}`)) {
-                    let ctrl = require(`${constants.MvcControllersPath}/${controller}`);
-                    let ctrl_obj = new ctrl(request, response);
-                    ctrl_obj.object.setClass(controller);
-                    let model = ctrl_obj.model(method, args, _fields, _files, format);
-                    if (typeof model === 'object' && model instanceof Error) {
-                        model.display(request);
-                    } else {
-                        let view = ctrl_obj.view(format);
-                        if (typeof view === "object" && view instanceof Error) {
-                            view.type(format);
-                        } else {
-                            log(request, response, null);
-                        }
-                        view.display(request);
-                        response.end();
-                    }
-                } else {
-                    let Error_obj = new Error(response, 404);
+                if(http_method_used !== null && http_method_used !== undefined && http_method_used !== request.method) {
+                    let Error_obj = new Error(response, 500);
                     Error_obj.request(request);
                     Error_obj.type(format);
-                    Error_obj.message(constants.ControllerNotFoundMessage(controller));
+                    Error_obj.message(constants.HttpMethodUsedError(request.method));
                     Error_obj.display(request);
                     response.end();
+                }
+                else {
+                    if (fs.existsSync(`${constants.MvcControllersPath}/${controller}${constants.filesExtensions['js']}`)) {
+                        let ctrl = require(`${constants.MvcControllersPath}/${controller}`);
+                        let ctrl_obj = new ctrl(request, response);
+                        ctrl_obj.object.setClass(controller);
+                        let model = ctrl_obj.model(method, args, _fields, _files, format);
+                        if (typeof model === 'object' && model instanceof Error) {
+                            model.display(request);
+                        } else {
+                            let view = ctrl_obj.view(format);
+                            if (typeof view === "object" && view instanceof Error) {
+                                view.type(format);
+                            } else {
+                                log(request, response, null);
+                            }
+                            view.display(request);
+                            response.end();
+                        }
+                    } else {
+                        let Error_obj = new Error(response, 404);
+                        Error_obj.request(request);
+                        Error_obj.type(format);
+                        Error_obj.message(constants.ControllerNotFoundMessage(controller));
+                        Error_obj.display(request);
+                        response.end();
+                    }
                 }
             }
         });

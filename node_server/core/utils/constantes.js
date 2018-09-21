@@ -84,4 +84,8 @@ module.exports = new class constants {
     HttpMethodNotManaged(method) {
         return `http method \`${method}\` not managed !`;
     }
+
+    HttpMethodUsedError(method) {
+        return `not expected \`${method}\` http method`;
+    }
 };

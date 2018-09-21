@@ -29,7 +29,7 @@ module.exports = class uri {
                     if(this.args[this.request.method] === undefined) {
                         this.args[this.request.method] = {};
                     }
-                    this.args[this.request.method][arg[0]] = decodeURI(arg[1]);
+                    this.args[this.request.method][arg[0]] = decodeURI(arg[1]).replace(/\+/g, ' ').replace(/%2B/g, '+');
                 }
             });
 
@@ -41,7 +41,7 @@ module.exports = class uri {
                     delete _url[key];
                 }
             });
-            this.url = _url.join('/').substr(0, _url.join('/').length-1);
+            this.url = _url.join('/').substr(_url.join('/').length-2, 1) === '/' ? _url.join('/').substr(0, _url.join('/').length-1) : _url.join('/');
         }
         this.parse();
     }
