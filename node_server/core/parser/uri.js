@@ -72,14 +72,14 @@ module.exports = class uri {
         else {
             let routes = this.router.get_routes();
             let selected_route = false;
-            let m;
-            let m1;
+            let m, m1;
             Object.keys(routes).forEach(key => {
                 if(m = key.match(/\{([a-zA-Z0-9\_]+)\}/g)) {
                     let url_match = key;
                     m.forEach(obj => {
                         url_match = url_match.replace(obj, '([a-zA-Z0-9\\_]+)');
                     });
+
                     if(m1 = url_probably_route.match(url_match)) {
                         let m_tmp = [];
                         delete m1[0];
@@ -91,19 +91,19 @@ module.exports = class uri {
                             }
                         });
                         m1 = m_tmp;
-                    }
 
-                    let probably_url = url_probably_route;
-                    m1.forEach((obj, key) => {
-                        probably_url = probably_url.replace('/' + obj, '/' + m[key]);
-                    });
+                        let probably_url = url_probably_route;
+                        m1.forEach((obj, key) => {
+                            probably_url = probably_url.replace('/' + obj, '/' + m[key]);
+                        });
 
-                    if(this.router.has_route(probably_url)) {
-                        selected_route = {
-                            match: m,
-                            match1: m1,
-                            url: probably_url
-                        };
+                        if(this.router.has_route(probably_url)) {
+                            selected_route = {
+                                match: m,
+                                match1: m1,
+                                url: probably_url
+                            };
+                        }
                     }
                 }
             });
@@ -117,7 +117,12 @@ module.exports = class uri {
             if(selected_route && this.controller !== 'static' && !utils.in(this.method, Object.keys(files_extensions))) {
                 let _args = {};
                 selected_route.match.forEach((obj, key) => {
-                    _args[obj.replace('{', '').replace('}', '')] = selected_route.match1[key];
+                    let value = selected_route.match1[key];
+                    let parsed = parseInt(value);
+                    if (!isNaN(parsed)) {
+                        value = parsed;
+                    }
+                    _args[obj.replace('{', '').replace('}', '')] = value;
                 });
                 let route = this.router.get_route(selected_route.url);
                 this.controller = route['controller'];

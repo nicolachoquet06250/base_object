@@ -19,10 +19,20 @@
     }
   },
 
+  "/test/user/{id}/{name}": {
+    "controller": "controller1",
+    "method": "method2",
+    "format": "json",
+    "args": {
+      "id": "$id",
+      "name": "$name"
+    }
+  },
+
   "/{id}/{name}": {
     "controller": "controller1",
     "method": "method2",
-    "format": "html",
+    "format": "json",
     "args": {
       "id": "$id",
       "name": "$name"
